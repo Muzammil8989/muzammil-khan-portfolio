@@ -1,43 +1,32 @@
 import { NextResponse } from "next/server";
-import { handleUpload } from "@/lib/cloudinary";
+import cloudinary from "@/lib/cloudinary";
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    const folder = formData.get("folder") as string;
 
     if (!file) {
       return NextResponse.json({ error: "File is required" }, { status: 400 });
     }
 
-    // Read file as ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-
-    // Convert to base64 (Edge compatible)
-    const base64String = arrayBufferToBase64(arrayBuffer);
+    const buffer = Buffer.from(arrayBuffer);
+    const base64String = buffer.toString("base64");
     const dataUri = `data:${file.type};base64,${base64String}`;
 
-    // Upload to Cloudinary
-    const result = await handleUpload(dataUri, {
-      folder: "portfolio",
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: folder || "uploads",
+      resource_type: "auto",
     });
 
-    return NextResponse.json({ result });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Upload error:", error);
-    return NextResponse.json(
-      { error: "Failed to upload file" },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : "Upload failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
-// Helper function for Edge runtime
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
+export const runtime = "nodejs"; // or omit this if default

@@ -1,79 +1,97 @@
-import React, { useState, useCallback } from "react";
-import useCloudinaryUpload from "@/app/hooks/useCloudinaryUpload";
-import { CldImage } from "next-cloudinary";
+"use client";
 
-interface CloudinaryUploaderProps {
-  onSuccess?: (result: any) => void;
-  folder?: string;
+import React, { useCallback } from "react";
+import { useCloudinaryUpload } from "@/app/hooks/useCloudinaryUpload";
+
+interface UploadResult {
+  secure_url: string;
+  public_id: string;
+  width?: number;
+  height?: number;
+  [key: string]: any;
 }
 
-const CloudinaryUploader: React.FC<CloudinaryUploaderProps> = ({
+interface CloudinaryUploaderProps {
+  onSuccess?: (result: UploadResult) => void;
+  onError?: (error: string) => void;
+  folder?: string;
+  className?: string;
+  accept?: string;
+  disabled?: boolean;
+  label?: string;
+  buttonText?: string;
+  loadingText?: string;
+}
+
+export const CloudinaryUploader: React.FC<CloudinaryUploaderProps> = ({
   onSuccess,
-  folder = "portfolio",
+  onError,
+  folder = "uploads",
+  className = "",
+  accept = "image/*",
+  disabled = false,
+  label = "Choose file",
+  buttonText = "Upload",
+  loadingText = "Uploading...",
 }) => {
-  const [preview, setPreview] = useState<string | null>(null);
-  const { upload, loading, error, result } = useCloudinaryUpload();
+  const { upload, loading, error } = useCloudinaryUpload();
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      // Upload to Cloudinary
-      await upload(file);
-      if (result && onSuccess) {
-        onSuccess(result);
+      try {
+        const response = await upload(file, folder);
+        if (response && onSuccess) {
+          onSuccess(response);
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Upload failed";
+        console.error("Upload error:", errorMessage);
+        if (onError) {
+          onError(errorMessage);
+        }
       }
     },
-    [upload, onSuccess, result]
+    [upload, folder, onSuccess, onError]
   );
 
   return (
-    <div className="space-y-4">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        disabled={loading}
-        className="block w-full text-sm text-gray-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-md file:border-0
-          file:text-sm file:font-semibold
-          file:bg-blue-50 file:text-blue-700
-          hover:file:bg-blue-100"
-      />
-
-      {loading && <p>Uploading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      {preview && !result && (
-        <div className="mt-4">
-          <p className="mb-2">Preview:</p>
-          <img src={preview} alt="Preview" className="max-w-xs rounded-md" />
-        </div>
-      )}
-
-      {result && (
-        <div className="mt-4">
-          <p className="mb-2">Uploaded Image:</p>
-          <CldImage
-            width="400"
-            height="300"
-            src={result.public_id}
-            alt="Uploaded content"
-            className="rounded-md"
+    <div className={`space-y-2 ${className}`}>
+      <label className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept={accept}
+            onChange={handleFileChange}
+            disabled={disabled || loading}
+            className="hidden"
+            id="cloudinary-upload"
           />
+          <label
+            htmlFor="cloudinary-upload"
+            className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer ${
+              disabled || loading
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+            }`}
+          >
+            {buttonText}
+          </label>
+          {loading && (
+            <span className="text-sm text-gray-500">{loadingText}</span>
+          )}
         </div>
+      </label>
+
+      {error && (
+        <p className="text-sm text-red-500">
+          {typeof error === "string" ? error : "Upload failed"}
+        </p>
       )}
     </div>
   );
 };
-
-export default CloudinaryUploader;
