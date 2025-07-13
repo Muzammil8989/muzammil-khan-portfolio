@@ -79,39 +79,49 @@
 }
 
 .dark {
-  --background: oklch(0.1765 0.1223 264.05);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.12 0.03 270);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.12 0.03 270);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.795 0.184 86.047);
-  --primary-foreground: oklch(0.421 0.095 57.708);
-  --secondary: oklch(0.15 0.03 270);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.15 0.03 270);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.15 0.03 270);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.554 0.135 66.442);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.12 0.03 270);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.795 0.184 86.047);
-  --sidebar-primary-foreground: oklch(0.421 0.095 57.708);
-  --sidebar-accent: oklch(0.15 0.03 270);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.554 0.135 66.442);
-}
+  /* Base Colors */
+  --background: oklch(0.1765 0.1223 264.05); /* Dark blue-purple */
+  --foreground: oklch(0.985 0 0); /* Pure white */
 
+  /* Card Colors */
+  --card: oklch(0.12 0.03 270); /* Very dark blue */
+  --card-foreground: oklch(0.985 0 0); /* White text */
+
+  /* UI Colors */
+  --primary: oklch(0.795 0.184 86.047); /* Vibrant yellow */
+  --primary-foreground: oklch(0.421 0.095 57.708); /* Dark yellow/brown */
+
+  --secondary: oklch(0.15 0.03 270); /* Dark blue */
+  --secondary-foreground: oklch(0.985 0 0); /* White */
+
+  --accent: oklch(0.15 0.03 270); /* Dark blue */
+  --accent-foreground: oklch(0.985 0 0); /* White */
+
+  --destructive: oklch(0.704 0.191 22.216); /* Red-orange */
+
+  /* Borders and Inputs */
+  --border: oklch(1 0 0 / 10%); /* White with 10% opacity */
+  --input: oklch(1 0 0 / 15%); /* White with 15% opacity */
+
+  /* Chart Colors */
+  --chart-1: oklch(0.488 0.243 264.376); /* Purple-blue */
+  --chart-2: oklch(0.696 0.17 162.48); /* Teal */
+  --chart-3: oklch(0.769 0.188 70.08); /* Yellow */
+  --chart-4: oklch(0.627 0.265 303.9); /* Pink */
+  --chart-5: oklch(0.645 0.246 16.439); /* Orange */
+
+  /* Sidebar Specific */
+  --sidebar: oklch(0.12 0.03 270); /* Very dark blue */
+  --sidebar-foreground: oklch(0.985 0 0); /* White */
+  --sidebar-primary: oklch(0.795 0.184 86.047); /* Vibrant yellow */
+  --sidebar-primary-foreground: oklch(
+    0.421 0.095 57.708
+  ); /* Dark yellow/brown */
+  --sidebar-accent: oklch(0.15 0.03 270); /* Dark blue */
+  --sidebar-accent-foreground: oklch(0.985 0 0); /* White */
+  --sidebar-border: oklch(1 0 0 / 10%); /* White 10% opacity */
+  --sidebar-ring: oklch(0.554 0.135 66.442); /* Gold/yellow */
+}
 @layer base {
   * {
     @apply border-border;
@@ -119,76 +129,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-h3 code {
-  @apply !text-lg md:!text-xl;
-}
-
-pre {
-  @apply !px-0 rounded-lg overflow-x-auto py-4;
-}
-
-pre [data-line] {
-  @apply px-4;
-}
-
-code {
-  @apply text-sm md:text-base !leading-loose;
-}
-
-pre > code {
-  counter-reset: line;
-}
-
-code[data-theme*=" "],
-code[data-theme*=" "] span {
-  color: var(--shiki-light);
-  background-color: var(--shiki-light-bg);
-}
-
-@media (prefers-color-scheme: dark) {
-  code[data-theme*=" "],
-  code[data-theme*=" "] span {
-    color: var(--shiki-dark);
-    background-color: var(--shiki-dark-bg);
-  }
-}
-
-code[data-line-numbers] {
-  counter-reset: line;
-}
-
-code[data-line-numbers] > [data-line]::before {
-  counter-increment: line;
-  content: counter(line);
-  @apply inline-block w-4 mr-4 text-right text-gray-500;
-}
-
-code {
-  counter-reset: line;
-}
-
-code > [data-line]::before {
-  counter-increment: line;
-  content: counter(line);
-  display: inline-block;
-  width: 1rem;
-  margin-right: 2rem;
-  text-align: right;
-  color: gray;
-}
-
-code[data-line-numbers-max-digits="2"] > [data-line]::before {
-  width: 2rem;
-}
-
-code[data-line-numbers-max-digits="3"] > [data-line]::before {
-  width: 3rem;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
 }

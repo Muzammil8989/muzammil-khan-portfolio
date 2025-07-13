@@ -127,14 +127,14 @@ export default function DashboardManager() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen ">
       <div className="container mx-auto ">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
           <SignOutButton />
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className=" rounded-lg shadow-md p-6">
           <Tabs defaultValue="profiles">
             <div className="flex justify-between items-center mb-6">
               <TabsList className="grid w-full max-w-xs grid-cols-2">
@@ -156,7 +156,7 @@ export default function DashboardManager() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-gray-800">
+                    <DialogTitle className="text-xl font-semibold ">
                       Create New Profile
                     </DialogTitle>
                   </DialogHeader>
@@ -189,7 +189,7 @@ export default function DashboardManager() {
               >
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-gray-800">
+                    <DialogTitle className="text-xl font-semibold ">
                       Edit Profile
                     </DialogTitle>
                   </DialogHeader>
@@ -212,10 +212,10 @@ export default function DashboardManager() {
               >
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold text-gray-800">
+                    <AlertDialogTitle className="text-lg font-semibold">
                       Confirm Deletion
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-gray-600">
+                    <AlertDialogDescription className="">
                       This will permanently delete the profile "
                       {selectedProfile?.name}". This action cannot be undone.
                     </AlertDialogDescription>
@@ -227,7 +227,7 @@ export default function DashboardManager() {
                     <AlertDialogAction
                       onClick={handleDelete}
                       disabled={deleteProfile.isPending}
-                      className="bg-red-600 hover:bg-red-700"
+                      className="bg-red-600 hover:bg-red-700 dark:text-white"
                     >
                       {deleteProfile.isPending ? (
                         <>
