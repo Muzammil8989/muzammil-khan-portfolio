@@ -20,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ProfileTable } from "@/components/profile-table";
 import { ProfileForm } from "@/components/profile-form";
 import {
   useProfiles,
@@ -30,8 +29,10 @@ import {
 } from "@/app/hooks/useProfiles";
 import { Profile } from "@/services/profile";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, User, Plus } from "lucide-react";
 import SignOutButton from "@/components/signout-button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ProfileCard } from "@/components/profile-card";
 
 export default function DashboardManager() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -127,21 +128,15 @@ export default function DashboardManager() {
   }
 
   return (
-    <div className="min-h-screen ">
-      <div className="container mx-auto ">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <SignOutButton />
-        </div>
-
-        <div className=" rounded-lg shadow-md p-6">
-          <Tabs defaultValue="profiles">
-            <div className="flex justify-between items-center mb-6">
-              <TabsList className="grid w-full max-w-xs grid-cols-2">
-                <TabsTrigger value="profiles">Profiles</TabsTrigger>
-                <TabsTrigger value="my-profile">My Profile</TabsTrigger>
-              </TabsList>
-
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Profile Dashboard
+          </h1>
+          <div className="grid gap-2  grid-cols-2  md:w-auto">
+            {/* Moved Create Profile button here to avoid collision with tabs on mobile */}
+            {profiles.length === 0 && (
               <Dialog
                 open={isCreateDialogOpen}
                 onOpenChange={(open) => {
@@ -150,13 +145,18 @@ export default function DashboardManager() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button variant="default" size="sm">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="w-full md:w-auto"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
                     Create Profile
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold ">
+                    <DialogTitle className="text-xl font-semibold">
                       Create New Profile
                     </DialogTitle>
                   </DialogHeader>
@@ -168,17 +168,55 @@ export default function DashboardManager() {
                   />
                 </DialogContent>
               </Dialog>
+            )}
+            <SignOutButton />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+          <Tabs defaultValue="profiles">
+            <div className="mb-6">
+              <TabsList className="grid w-full grid-cols-2 max-w-xs">
+                <TabsTrigger value="profiles">Profiles</TabsTrigger>
+                <TabsTrigger value="my-profile">My Profile</TabsTrigger>
+              </TabsList>
             </div>
 
             <TabsContent value="profiles">
-              <div className="overflow-x-auto">
-                <ProfileTable
-                  profiles={profiles}
-                  isLoading={isLoading}
-                  onEdit={handleEditClick}
-                  onDelete={handleDeleteClick}
-                />
-              </div>
+              {isLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-64 rounded-lg" />
+                  ))}
+                </div>
+              ) : profiles.length > 0 ? (
+                <div
+                  className={`grid gap-4 md:gap-6 ${
+                    profiles.length === 1
+                      ? "grid-cols-1 max-w-md mx-auto"
+                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                  }`}
+                >
+                  {profiles.map((profile) => (
+                    <ProfileCard
+                      key={profile._id}
+                      profile={profile}
+                      onEdit={handleEditClick}
+                      onDelete={handleDeleteClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <User className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-lg font-medium text-gray-900">
+                    No profiles
+                  </h3>
+                  <p className="mt-1 text-gray-500">
+                    Get started by creating a new profile.
+                  </p>
+                </div>
+              )}
 
               <Dialog
                 open={isEditDialogOpen}
@@ -189,7 +227,7 @@ export default function DashboardManager() {
               >
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold ">
+                    <DialogTitle className="text-xl font-semibold">
                       Edit Profile
                     </DialogTitle>
                   </DialogHeader>
@@ -215,7 +253,7 @@ export default function DashboardManager() {
                     <AlertDialogTitle className="text-lg font-semibold">
                       Confirm Deletion
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="">
+                    <AlertDialogDescription>
                       This will permanently delete the profile "
                       {selectedProfile?.name}". This action cannot be undone.
                     </AlertDialogDescription>
@@ -244,8 +282,8 @@ export default function DashboardManager() {
             </TabsContent>
 
             <TabsContent value="my-profile">
-              <div className="p-6 border border-gray-200 rounded-lg bg-gray-50">
-                <h2 className="text-xl font-bold mb-4 text-gray-800">
+              <div className="p-4 md:p-6 border border-gray-200 rounded-lg bg-gray-50">
+                <h2 className="text-lg md:text-xl font-bold mb-4 text-gray-800">
                   My Profile
                 </h2>
                 <p className="text-gray-600">
