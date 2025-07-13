@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +46,25 @@ export default function DashboardManager() {
   const createProfile = useCreateProfile();
   const updateProfile = useUpdateProfile();
   const deleteProfile = useDeleteProfile();
+
+  // 🛠️ Scrollbar layout shift fix
+  useEffect(() => {
+    const anyDialogOpen =
+      isCreateDialogOpen || isEditDialogOpen || isDeleteDialogOpen;
+    if (anyDialogOpen) {
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.paddingRight = "";
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.paddingRight = "";
+      document.body.style.overflow = "";
+    };
+  }, [isCreateDialogOpen, isEditDialogOpen, isDeleteDialogOpen]);
 
   const resetFormStates = () => {
     setAvatarUrl("");
@@ -128,14 +147,13 @@ export default function DashboardManager() {
   }
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen px-6 py-12 sm:py-20">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Profile Dashboard
           </h1>
-          <div className="grid gap-2  grid-cols-2  md:w-auto">
-            {/* Moved Create Profile button here to avoid collision with tabs on mobile */}
+          <div className="grid gap-2 grid-cols-2 md:w-auto">
             {profiles.length === 0 && (
               <Dialog
                 open={isCreateDialogOpen}
@@ -218,6 +236,7 @@ export default function DashboardManager() {
                 </div>
               )}
 
+              {/* Edit Dialog */}
               <Dialog
                 open={isEditDialogOpen}
                 onOpenChange={(open) => {
@@ -241,6 +260,7 @@ export default function DashboardManager() {
                 </DialogContent>
               </Dialog>
 
+              {/* Delete Alert Dialog */}
               <AlertDialog
                 open={isDeleteDialogOpen}
                 onOpenChange={(open) => {

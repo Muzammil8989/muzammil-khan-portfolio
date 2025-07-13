@@ -29,7 +29,7 @@ export default function Page() {
   }, [isLoading, profiles]);
 
   return (
-    <main className="flex flex-col min-h-[100dvh] space-y-10 overflow-x-hidden sm:px-6">
+    <main className="flex flex-col min-h-[100dvh] space-y-10 overflow-x-hidden  px-6 py-12 sm:py-20">
       <section id="hero">
         <div className="mx-auto w-full max-w-2xl space-y-8">
           <div className="flex flex-col gap-6">
