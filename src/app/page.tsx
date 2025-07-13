@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { BlurFade } from "@/components/magicui/blur-fade";
-import BlurFadeText from "@/components/magicui/blur-fade-text";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfiles } from "@/app/hooks/useProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 const BLUR_FADE_DELAY = 0.04;
+
+// Animation variants for text
+const textVariants = {
+  hidden: { opacity: 0, filter: "blur(4px)" },
+  visible: { opacity: 1, filter: "blur(0px)" },
+};
 
 export default function Page() {
   const { data: profiles = [], isLoading, isError } = useProfiles();
@@ -23,17 +29,30 @@ export default function Page() {
   }, [isLoading, profiles]);
 
   return (
-    <main className="flex flex-col min-h-[100dvh] space-y-10 overflow-x-hidden  sm:px-6">
+    <main className="flex flex-col min-h-[100dvh] space-y-10 overflow-x-hidden sm:px-6">
       <section id="hero">
         <div className="mx-auto w-full max-w-2xl space-y-8">
           <div className="flex flex-col gap-6">
             {isLoading ? (
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 space-y-3">
-                  <Skeleton className="h-8 w-3/4 rounded-md" />
-                  <Skeleton className="h-5 w-full rounded-md" />
+              <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                {/* Avatar skeleton */}
+                <div className="order-1 sm:order-2">
+                  <Skeleton className="h-28 w-28 rounded-full" />
                 </div>
-                <Skeleton className="h-28 w-28 rounded-full self-center sm:self-start" />
+
+                {/* Text content skeleton */}
+                <div className="order-2 sm:order-1 flex-1 space-y-4 w-full">
+                  <div className="space-y-2">
+                    <Skeleton className="h-8 w-3/4 sm:hidden mx-auto sm:mx-0" />
+                    <Skeleton className="hidden sm:block h-10 w-1/2" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </div>
               </div>
             ) : (
               profiles.map((profile) => {
@@ -47,7 +66,7 @@ export default function Page() {
                     key={profile._id.toString()}
                     className="flex flex-col sm:flex-row sm:justify-between gap-4 items-center sm:items-start"
                   >
-                    {/* Avatar First on Mobile */}
+                    {/* Avatar */}
                     <div className="order-1 sm:order-2 px-1 sm:px-0">
                       {showAnimated ? (
                         <BlurFade delay={BLUR_FADE_DELAY}>
@@ -70,36 +89,61 @@ export default function Page() {
                       )}
                     </div>
 
-                    {/* Text Second on Mobile */}
-                    <div className="flex flex-col flex-1 space-y-2 text-center sm:text-left order-2 sm:order-1">
+                    {/* Text Content */}
+                    <div className="flex flex-col flex-1 space-y-2 order-2 sm:order-1">
                       {showAnimated ? (
                         <>
-                          {/* First two words in mobile */}
-                          <BlurFadeText
-                            delay={BLUR_FADE_DELAY}
-                            className="font-bold tracking-tight text-[22px] sm:hidden break-words"
-                            yOffset={8}
-                            text={`Hi, I'm ${mobileName} 👋`}
-                          />
-                          {/* First word in desktop/tablet */}
-                          <BlurFadeText
-                            delay={BLUR_FADE_DELAY}
-                            className="hidden sm:block font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl break-words"
-                            yOffset={8}
-                            text={`Hi, I'm ${firstWord} 👋`}
-                          />
-                          <BlurFadeText
-                            delay={BLUR_FADE_DELAY}
+                          {/* Mobile Name */}
+                          <motion.p
+                            initial="hidden"
+                            animate="visible"
+                            variants={textVariants}
+                            transition={{
+                              duration: 0.6,
+                              delay: BLUR_FADE_DELAY,
+                              ease: "easeOut",
+                            }}
+                            className="font-bold tracking-tight text-[22px] sm:hidden break-words text-center sm:text-left"
+                          >
+                            Hi, I'm {mobileName} 👋
+                          </motion.p>
+
+                          {/* Desktop Name */}
+                          <motion.p
+                            initial="hidden"
+                            animate="visible"
+                            variants={textVariants}
+                            transition={{
+                              duration: 0.6,
+                              delay: BLUR_FADE_DELAY,
+                              ease: "easeOut",
+                            }}
+                            className="hidden sm:block font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl break-words text-center sm:text-left"
+                          >
+                            Hi, I'm {firstWord} 👋
+                          </motion.p>
+
+                          {/* Description */}
+                          <motion.p
+                            initial="hidden"
+                            animate="visible"
+                            variants={textVariants}
+                            transition={{
+                              duration: 0.6,
+                              delay: BLUR_FADE_DELAY + 0.1,
+                              ease: "easeOut",
+                            }}
                             className="max-w-[600px] text-[16px] sm:text-base md:text-lg text-justify"
-                            text={profile.description}
-                          />
+                          >
+                            {profile.description}
+                          </motion.p>
                         </>
                       ) : (
                         <>
-                          <p className="font-bold tracking-tight text-[22px] sm:hidden break-words">
+                          <p className="font-bold tracking-tight text-[22px] sm:hidden break-words text-center sm:text-left">
                             Hi, I'm {mobileName} 👋
                           </p>
-                          <p className="hidden sm:block font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl break-words">
+                          <p className="hidden sm:block font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl break-words text-center sm:text-left">
                             Hi, I'm {firstWord} 👋
                           </p>
                           <p className="max-w-[600px] text-[16px] sm:text-base md:text-lg text-justify">

@@ -1,19 +1,38 @@
 "use client";
 
-import { usePathname } from "next/navigation"; // ✅
+import { usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SmoothCursor } from "@/components/ui/smooth-cursor";
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: ReactNode }) {
-  const pathname = usePathname(); // ✅ Get current route
+  const pathname = usePathname();
+  const isRoot = pathname === "/";
+  const [isMobile, setIsMobile] = useState(false);
 
-  const isRoot = pathname === "/"; // ✅ Check if we are on root route
+  useEffect(() => {
+    // Check if window is defined (client-side)
+    if (typeof window !== "undefined") {
+      const checkIfMobile = () => {
+        setIsMobile(window.innerWidth < 768); // 768px is typically the breakpoint for 'md' in Tailwind
+      };
+
+      // Initial check
+      checkIfMobile();
+
+      // Add event listener for window resize
+      window.addEventListener("resize", checkIfMobile);
+
+      // Cleanup
+      return () => window.removeEventListener("resize", checkIfMobile);
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -26,7 +45,8 @@ export function Providers({ children }: { children: ReactNode }) {
         <TooltipProvider delayDuration={0}>
           {children}
           <Toaster />
-          {isRoot && <Navbar />} {/* ✅ Show Navbar only on "/" */}
+          {!isMobile && <SmoothCursor />} {/* Only show on non-mobile */}
+          {isRoot && <Navbar />}
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
