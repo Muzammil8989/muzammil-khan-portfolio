@@ -16,7 +16,7 @@ export default function Page() {
       {/* ✅ Animated Background Layer */}
       <div className="fixed inset-0 -z-10">
         <Particles
-          particleColors={['#ffffff', '#0b0a0aff']}
+          particleColors={['#ffffff', '#3624d6', '#FED000', '#c300ffff']}
           particleCount={200}
           particleSpread={10}
           speed={0.1}
