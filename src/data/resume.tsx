@@ -47,17 +47,11 @@ export const DATA = {
 
         navbar: true,
       },
-      X: {
-        name: "X",
+      "Download Resume": {
+        name: "Download Resume",
         url: "https://dub.sh/dillion-twitter",
-        icon: Icons.x,
+        icon: Icons.download,
 
-        navbar: true,
-      },
-      Youtube: {
-        name: "Youtube",
-        url: "https://dub.sh/dillion-youtube",
-        icon: Icons.youtube,
         navbar: true,
       },
       email: {
@@ -529,11 +523,7 @@ export const DATA = {
           icon: <Icons.globe className="h-4 w-4" />,
           href: "https://devpost.com/software/pocketdoc-react-native",
         },
-        {
-          title: "YouTube",
-          icon: <Icons.youtube className="h-4 w-4" />,
-          href: "https://www.youtube.com/watch?v=XwFdn5Rmx68",
-        },
+
         {
           title: "Source",
           icon: <Icons.github className="h-4 w-4" />,
@@ -564,11 +554,7 @@ export const DATA = {
           icon: <Icons.globe className="h-4 w-4" />,
           href: "https://devpost.com/software/pocketdoc-react-native",
         },
-        {
-          title: "YouTube",
-          icon: <Icons.youtube className="h-4 w-4" />,
-          href: "https://www.youtube.com/watch?v=XwFdn5Rmx68",
-        },
+
         {
           title: "Source",
           icon: <Icons.github className="h-4 w-4" />,
