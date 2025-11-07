@@ -28,44 +28,86 @@ import {
   useUpdateProfile,
   useDeleteProfile,
 } from "@/app/hooks/useProfiles";
-import { 
-  useAbout, 
-  useCreateAbout, 
-  useUpdateAbout, 
-  useDeleteAbout 
+import {
+  useAbout,
+  useCreateAbout,
+  useUpdateAbout,
+  useDeleteAbout,
 } from "@/app/hooks/useAbout";
 import { Profile } from "@/services/profile";
 import { About } from "@/services/about";
 import { toast } from "sonner";
-import { Loader2, User, Plus, FileText } from "lucide-react";
+import { Loader2, User, Plus, FileText, Briefcase } from "lucide-react";
 import SignOutButton from "@/components/signout-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProfileCard } from "@/components/profile-card";
 import { AboutCard } from "@/components/about-card";
 
+// ★ NEW: work imports
+import {
+  useWorkExperiences,
+  useCreateWorkExperience,
+  useUpdateWorkExperience,
+  useDeleteWorkExperience,
+} from "@/app/hooks/useWorkExperiences";
+import { WorkExperience } from "@/services/work";
+import { WorkExperienceCard } from "@/components/work-experience-card";
+import { WorkExperienceForm } from "@/components/work-experience-form";
+
 export default function DashboardManager() {
+  // dialogs (profiles)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // dialogs (about)
   const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false);
   const [isAboutDeleteDialogOpen, setIsAboutDeleteDialogOpen] = useState(false);
+
+  // ★ NEW: dialogs (work)
+  const [isWorkCreateDialogOpen, setIsWorkCreateDialogOpen] = useState(false);
+  const [isWorkEditDialogOpen, setIsWorkEditDialogOpen] = useState(false);
+  const [isWorkDeleteDialogOpen, setIsWorkDeleteDialogOpen] = useState(false);
+
+  // selections
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [selectedAbout, setSelectedAbout] = useState<About | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [selectedWork, setSelectedWork] = useState<WorkExperience | null>(null);
 
+  // uploads
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+
+  // data hooks
   const { data: profiles = [], isLoading, isError, refetch } = useProfiles();
+
   const {
     data: about,
     isLoading: isLoadingAbout,
     refetch: refetchAbout,
   } = useAbout();
 
+  // ★ NEW: work hooks
+  const {
+    data: workExperiences = [],
+    isLoading: isLoadingWork,
+    isError: isErrorWork,
+    refetch: refetchWork,
+  } = useWorkExperiences();
+
+  // mutations
   const createProfile = useCreateProfile();
   const updateProfile = useUpdateProfile();
   const deleteProfile = useDeleteProfile();
+
   const createAbout = useCreateAbout();
   const updateAbout = useUpdateAbout();
   const deleteAboutMutation = useDeleteAbout();
+
+  // ★ NEW: work mutations
+  const createWork = useCreateWorkExperience();
+  const updateWork = useUpdateWorkExperience();
+  const deleteWork = useDeleteWorkExperience();
 
   // 🛠️ Scrollbar layout shift fix
   useEffect(() => {
@@ -74,10 +116,14 @@ export default function DashboardManager() {
       isEditDialogOpen ||
       isDeleteDialogOpen ||
       isAboutDialogOpen ||
-      isAboutDeleteDialogOpen;
-    
+      isAboutDeleteDialogOpen ||
+      isWorkCreateDialogOpen ||
+      isWorkEditDialogOpen ||
+      isWorkDeleteDialogOpen;
+
     if (anyDialogOpen) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
       document.body.style.paddingRight = `${scrollbarWidth}px`;
       document.body.style.overflow = "hidden";
     } else {
@@ -95,14 +141,20 @@ export default function DashboardManager() {
     isDeleteDialogOpen,
     isAboutDialogOpen,
     isAboutDeleteDialogOpen,
+    isWorkCreateDialogOpen,
+    isWorkEditDialogOpen,
+    isWorkDeleteDialogOpen,
   ]);
 
   const resetFormStates = () => {
     setAvatarUrl("");
+    setLogoUrl("");
     setSelectedProfile(null);
     setSelectedAbout(null);
+    setSelectedWork(null);
   };
 
+  // PROFILE handlers
   const handleCreateSubmit = (data: Omit<Profile, "_id">) => {
     createProfile.mutate(
       { ...data, avatarUrl },
@@ -113,7 +165,7 @@ export default function DashboardManager() {
           resetFormStates();
           refetch();
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast.error(error.message || "Failed to create profile");
         },
       }
@@ -136,7 +188,7 @@ export default function DashboardManager() {
           resetFormStates();
           refetch();
         },
-        onError: (error) => {
+        onError: (error: any) => {
           toast.error(error.message || "Failed to update profile");
         },
       }
@@ -153,16 +205,15 @@ export default function DashboardManager() {
         resetFormStates();
         refetch();
       },
-      onError: (error) => {
+      onError: (error: any) => {
         toast.error(error.message || "Failed to delete profile");
       },
     });
   };
 
-  // About Section Handlers
+  // ABOUT handlers
   const handleAboutSubmit = (data: Omit<About, "_id">) => {
     if (about) {
-      // Update existing about
       updateAbout.mutate(data, {
         onSuccess: () => {
           toast.success("About section updated successfully");
@@ -175,7 +226,6 @@ export default function DashboardManager() {
         },
       });
     } else {
-      // Create new about
       createAbout.mutate(data, {
         onSuccess: () => {
           toast.success("About section created successfully");
@@ -198,37 +248,86 @@ export default function DashboardManager() {
         resetFormStates();
         refetchAbout();
       },
-      onError: (error) => {
+      onError: (error: any) => {
         toast.error(error.message || "Failed to delete About section");
       },
     });
   };
 
-  const handleEditClick = (profile: Profile) => {
-    setSelectedProfile(profile);
-    setAvatarUrl(profile.avatarUrl || "");
-    setIsEditDialogOpen(true);
+  // WORK handlers
+  const handleWorkCreateSubmit = (data: Omit<WorkExperience, "_id">) => {
+    createWork.mutate(
+      { ...data, logoUrl },
+      {
+        onSuccess: () => {
+          toast.success("Experience created successfully");
+          setIsWorkCreateDialogOpen(false);
+          resetFormStates();
+          refetchWork();
+        },
+        onError: (error: any) => {
+          toast.error(error.message || "Failed to create experience");
+        },
+      }
+    );
   };
 
-  const handleDeleteClick = (profile: Profile) => {
-    setSelectedProfile(profile);
-    setIsDeleteDialogOpen(true);
+  const handleWorkEditSubmit = (data: Omit<WorkExperience, "_id">) => {
+    if (!selectedWork) return;
+
+    updateWork.mutate(
+      { ...selectedWork, ...data, logoUrl: logoUrl || data.logoUrl },
+      {
+        onSuccess: () => {
+          toast.success("Experience updated successfully");
+          setIsWorkEditDialogOpen(false);
+          resetFormStates();
+          refetchWork();
+        },
+        onError: (error: any) => {
+          toast.error(error.message || "Failed to update experience");
+        },
+      }
+    );
   };
 
-  const handleAboutEditClick = () => {
-    setSelectedAbout(about || null);
-    setIsAboutDialogOpen(true);
+  const handleWorkDelete = () => {
+    if (!selectedWork) return;
+    deleteWork.mutate(selectedWork._id, {
+      onSuccess: () => {
+        toast.success("Experience deleted successfully");
+        setIsWorkDeleteDialogOpen(false);
+        resetFormStates();
+        refetchWork();
+      },
+      onError: (error: any) => {
+        toast.error(error.message || "Failed to delete experience");
+      },
+    });
   };
 
-  const handleAboutDeleteClick = () => {
-    setSelectedAbout(about || null);
-    setIsAboutDeleteDialogOpen(true);
+  const handleWorkEditClick = (work: WorkExperience) => {
+    setSelectedWork(work);
+    setLogoUrl(work.logoUrl || "");
+    setIsWorkEditDialogOpen(true);
+  };
+
+  const handleWorkDeleteClick = (work: WorkExperience) => {
+    setSelectedWork(work);
+    setIsWorkDeleteDialogOpen(true);
   };
 
   if (isError) {
     return (
       <div className="p-4 text-red-500">
         Error loading profiles. Please try again.
+      </div>
+    );
+  }
+  if (isErrorWork) {
+    return (
+      <div className="p-4 text-red-500">
+        Error loading work experiences. Please try again.
       </div>
     );
   }
@@ -250,11 +349,7 @@ export default function DashboardManager() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="w-full sm:w-auto"
-                  >
+                  <Button variant="default" size="sm" className="w-full sm:w-auto">
                     <Plus className="mr-2 h-4 w-4" />
                     Create Profile
                   </Button>
@@ -274,6 +369,33 @@ export default function DashboardManager() {
                 </DialogContent>
               </Dialog>
             )}
+            <Dialog
+              open={isWorkCreateDialogOpen}
+              onOpenChange={(open) => {
+                setIsWorkCreateDialogOpen(open);
+                if (!open) resetFormStates();
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Experience
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold">
+                    Create Work Experience
+                  </DialogTitle>
+                </DialogHeader>
+                <WorkExperienceForm
+                  onSubmit={handleWorkCreateSubmit}
+                  isSubmitting={createWork.isPending}
+                  onLogoUpload={setLogoUrl}
+                  logoUrl={logoUrl}
+                />
+              </DialogContent>
+            </Dialog>
             <SignOutButton />
           </div>
         </div>
@@ -281,10 +403,10 @@ export default function DashboardManager() {
         <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
           <Tabs defaultValue="profiles">
             <div className="mb-6">
-              <TabsList className="grid w-full grid-cols-3 max-w-md">
+              <TabsList className="grid w-full grid-cols-3 max-w-xl">
                 <TabsTrigger value="profiles">Profiles</TabsTrigger>
+                <TabsTrigger value="work">Work</TabsTrigger>
                 <TabsTrigger value="about">About</TabsTrigger>
-               
               </TabsList>
             </div>
 
@@ -308,8 +430,15 @@ export default function DashboardManager() {
                     <ProfileCard
                       key={profile._id}
                       profile={profile}
-                      onEdit={handleEditClick}
-                      onDelete={handleDeleteClick}
+                      onEdit={(p) => {
+                        setSelectedProfile(p);
+                        setAvatarUrl(p.avatarUrl || "");
+                        setIsEditDialogOpen(true);
+                      }}
+                      onDelete={(p) => {
+                        setSelectedProfile(p);
+                        setIsDeleteDialogOpen(true);
+                      }}
                     />
                   ))}
                 </div>
@@ -322,10 +451,7 @@ export default function DashboardManager() {
                   <p className="mt-1 text-gray-500">
                     Get started by creating a new profile.
                   </p>
-                  <Button
-                    onClick={() => setIsCreateDialogOpen(true)}
-                    className="mt-4"
-                  >
+                  <Button onClick={() => setIsCreateDialogOpen(true)} className="mt-4">
                     <Plus className="mr-2 h-4 w-4" />
                     Create Profile
                   </Button>
@@ -356,7 +482,7 @@ export default function DashboardManager() {
                 </DialogContent>
               </Dialog>
 
-              {/* Delete Profile Alert Dialog */}
+              {/* Delete Profile Alert */}
               <AlertDialog
                 open={isDeleteDialogOpen}
                 onOpenChange={(open) => {
@@ -370,8 +496,7 @@ export default function DashboardManager() {
                       Confirm Deletion
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete the profile "
-                      {selectedProfile?.name}". This action cannot be undone.
+                      This will permanently delete the profile "{selectedProfile?.name}". This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -397,26 +522,126 @@ export default function DashboardManager() {
               </AlertDialog>
             </TabsContent>
 
+            {/* ★ NEW: Work Tab */}
+            <TabsContent value="work">
+              {isLoadingWork ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-64 rounded-lg" />
+                  ))}
+                </div>
+              ) : workExperiences.length > 0 ? (
+                <div
+                  className={`grid gap-4 md:gap-6 ${
+                    workExperiences.length === 1
+                      ? "grid-cols-1 max-w-md mx-auto"
+                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                  }`}
+                >
+                  {workExperiences.map((work) => (
+                    <WorkExperienceCard
+                      key={work._id}
+                      work={work}
+                      onEdit={handleWorkEditClick}
+                      onDelete={handleWorkDeleteClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-lg font-medium text-gray-900">
+                    No work experiences
+                  </h3>
+                  <p className="mt-1 text-gray-500">
+                    Add your first work experience.
+                  </p>
+                  <Button onClick={() => setIsWorkCreateDialogOpen(true)} className="mt-4">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Experience
+                  </Button>
+                </div>
+              )}
+
+              {/* Edit Work Dialog */}
+              <Dialog
+                open={isWorkEditDialogOpen}
+                onOpenChange={(open) => {
+                  setIsWorkEditDialogOpen(open);
+                  if (!open) resetFormStates();
+                }}
+              >
+                <DialogContent className="sm:max-w-[700px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold">
+                      Edit Experience
+                    </DialogTitle>
+                  </DialogHeader>
+                  <WorkExperienceForm
+                    work={selectedWork || undefined}
+                    onSubmit={handleWorkEditSubmit}
+                    isSubmitting={updateWork.isPending}
+                    onLogoUpload={setLogoUrl}
+                    logoUrl={logoUrl}
+                  />
+                </DialogContent>
+              </Dialog>
+
+              {/* Delete Work Alert */}
+              <AlertDialog
+                open={isWorkDeleteDialogOpen}
+                onOpenChange={(open) => {
+                  setIsWorkDeleteDialogOpen(open);
+                  if (!open) resetFormStates();
+                }}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-lg font-semibold">
+                      Confirm Deletion
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete the selected work experience. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleWorkDelete}
+                      disabled={deleteWork.isPending}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {deleteWork.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </TabsContent>
+
             {/* About Tab */}
             <TabsContent value="about">
               <div className="space-y-6">
-                {/* About Management Section */}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold text-gray-800">
                     About Section
                   </h2>
                   <div className="flex gap-2">
-                    <Button
-                      onClick={handleAboutEditClick}
-                      variant="default"
-                      size="sm"
-                    >
+                    <Button onClick={() => setIsAboutDialogOpen(true)} variant="default" size="sm">
                       <FileText className="mr-2 h-4 w-4" />
                       {about ? "Edit About" : "Create About"}
                     </Button>
                     {about && (
                       <Button
-                        onClick={handleAboutDeleteClick}
+                        onClick={() => setIsAboutDeleteDialogOpen(true)}
                         variant="outline"
                         size="sm"
                         className="text-red-600 border-red-600 hover:bg-red-50"
@@ -448,7 +673,7 @@ export default function DashboardManager() {
                   </div>
                 )}
 
-                {/* About Edit/Create Dialog */}
+                {/* About Dialog */}
                 <Dialog
                   open={isAboutDialogOpen}
                   onOpenChange={(open) => {
@@ -465,12 +690,14 @@ export default function DashboardManager() {
                     <AboutForm
                       about={about || undefined}
                       onSubmit={handleAboutSubmit}
-                      isSubmitting={about ? updateAbout.isPending : createAbout.isPending}
+                      isSubmitting={
+                        about ? updateAbout.isPending : createAbout.isPending
+                      }
                     />
                   </DialogContent>
                 </Dialog>
 
-                {/* Delete About Alert Dialog */}
+                {/* About Delete Alert */}
                 <AlertDialog
                   open={isAboutDeleteDialogOpen}
                   onOpenChange={(open) => {
@@ -484,8 +711,7 @@ export default function DashboardManager() {
                         Confirm Deletion
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will permanently delete the About section. This
-                        action cannot be undone.
+                        This will permanently delete the About section. This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
