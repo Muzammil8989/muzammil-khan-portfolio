@@ -3,15 +3,10 @@ import { HomeIcon, NotebookIcon } from "lucide-react";
 
 export const DATA = {
   name: "Muhammad Muzammil Khan",
-  initials: "DV",
-  url: "https://dillion.io",
-  location: "San Francisco, CA",
-  locationLink: "https://www.google.com/maps/place/sanfrancisco",
-  description:
-    "Full Stack Web Developer with a focus on innovative answers to challenging problems. Committed to developing web apps that are scalable and to enhancing both the user experience and backend performance.",
-  summary:
-    "At the end of 2022, I quit my job as a software engineer to go fulltime into building and scaling my own SaaS businesses. In the past, [I pursued a double degree in computer science and business](/#education), [interned at big tech companies in Silicon Valley](https://www.youtube.com/watch?v=d-LJ2e5qKdE), and [competed in over 21 hackathons for fun](/#hackathons). I also had the pleasure of being a part of the first ever in-person cohort of buildspace called [buildspace sf1](https://buildspace.so/sf1).",
-  avatarUrl: "/me.png",
+  initials: "MMK",
+  url: "https://muzammil-khan-portfolio.vercel.app/",
+  location: "Karachi, Pakistan",
+  locationLink: "https://www.google.com/maps/place/Karachi",
   skills: [
     "React",
     "Next.js",
@@ -30,36 +25,31 @@ export const DATA = {
     { href: "/blog", icon: NotebookIcon, label: "Blog" },
   ],
   contact: {
-    email: "hello@example.com",
-    tel: "+123456789",
+    email: "muzammilkhan89223@gmail.com",
+    tel: "+92 341 7221921",
     social: {
       GitHub: {
         name: "GitHub",
-        url: "https://dub.sh/dillion-github",
+        url: "https://github.com/Muzammil8989",
         icon: Icons.github,
 
         navbar: true,
       },
       LinkedIn: {
         name: "LinkedIn",
-        url: "https://dub.sh/dillion-linkedin",
+        url: "https://www.linkedin.com/in/muhammad-muzammil-khan-?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
         icon: Icons.linkedin,
 
         navbar: true,
       },
-      X: {
-        name: "X",
-        url: "https://dub.sh/dillion-twitter",
-        icon: Icons.x,
+      "Download Resume": {
+        name: "Download Resume",
+        url: "/resume.pdf", // points to the public folder file
+        icon: Icons.download,
+        download: true, // optional custom flag if you handle download via <a> tag
+        navbar: true,
+      },
 
-        navbar: true,
-      },
-      Youtube: {
-        name: "Youtube",
-        url: "https://dub.sh/dillion-youtube",
-        icon: Icons.youtube,
-        navbar: true,
-      },
       email: {
         name: "Send Email",
         url: "#",
@@ -529,11 +519,7 @@ export const DATA = {
           icon: <Icons.globe className="h-4 w-4" />,
           href: "https://devpost.com/software/pocketdoc-react-native",
         },
-        {
-          title: "YouTube",
-          icon: <Icons.youtube className="h-4 w-4" />,
-          href: "https://www.youtube.com/watch?v=XwFdn5Rmx68",
-        },
+
         {
           title: "Source",
           icon: <Icons.github className="h-4 w-4" />,
@@ -564,11 +550,7 @@ export const DATA = {
           icon: <Icons.globe className="h-4 w-4" />,
           href: "https://devpost.com/software/pocketdoc-react-native",
         },
-        {
-          title: "YouTube",
-          icon: <Icons.youtube className="h-4 w-4" />,
-          href: "https://www.youtube.com/watch?v=XwFdn5Rmx68",
-        },
+
         {
           title: "Source",
           icon: <Icons.github className="h-4 w-4" />,

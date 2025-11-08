@@ -84,7 +84,7 @@
   --foreground: oklch(0.985 0 0); /* Pure white */
 
   /* Card Colors */
-  --card: oklch(0.12 0.03 270); /* Very dark blue */
+  --card: oklch(0.1765 0.1223 264.05); /* Very dark blue */
   --card-foreground: oklch(0.985 0 0); /* White text */
 
   /* UI Colors */

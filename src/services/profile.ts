@@ -12,9 +12,18 @@ export interface Profile {
 export const fetchProfiles = async (): Promise<Profile[]> => {
   try {
     const response = await axios.get(API_URL);
-    return response.data;
+    
+    // If no profiles are found, return an empty array
+    if (!response.data || response.data.length === 0) {
+      console.warn("No profiles found.");
+      return []; // Return an empty array instead of throwing an error
+    }
+    
+    return response.data; // Return the fetched profiles if they exist
   } catch (error) {
-    throw error;
+    console.error("Error fetching profiles:", error);
+    // Optionally, you can return an empty array if the error is non-critical or log it
+    return [];
   }
 };
 
