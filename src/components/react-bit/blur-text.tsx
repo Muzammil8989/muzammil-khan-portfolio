@@ -16,6 +16,47 @@ type BlurTextProps = {
   easing?: Easing | Easing[];
   onAnimationComplete?: () => void;
   stepDuration?: number;
+
+  // NEW: emphasize keywords (supports multi-word phrases)
+  emphasizeKeywords?: string[];
+  emphasizeClassName?: string;
+};
+
+// Escape user phrases safely for regex
+const escapeRegExp = (s: string) =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Split text into segments: matched phrases vs normal text
+const splitByKeywords = (
+  text: string,
+  keywords: string[]
+): Array<{ text: string; emphasize: boolean }> => {
+  if (!text || !keywords?.length) return [{ text, emphasize: false }];
+
+  // Sort by length desc so longer phrases match before subparts
+  const sorted = [...keywords].sort((a, b) => b.length - a.length);
+  const pattern = new RegExp(`(${sorted.map(escapeRegExp).join("|")})`, "gi");
+
+  const segments: Array<{ text: string; emphasize: boolean }> = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    const start = match.index;
+    const end = pattern.lastIndex;
+
+    if (start > lastIndex) {
+      segments.push({ text: text.slice(lastIndex, start), emphasize: false });
+    }
+    segments.push({ text: text.slice(start, end), emphasize: true });
+    lastIndex = end;
+  }
+
+  if (lastIndex < text.length) {
+    segments.push({ text: text.slice(lastIndex), emphasize: false });
+  }
+
+  return segments;
 };
 
 const buildKeyframes = (
@@ -24,7 +65,7 @@ const buildKeyframes = (
 ): Record<string, Array<string | number>> => {
   const keys = new Set<string>([
     ...Object.keys(from),
-    ...steps.flatMap((s) => Object.keys(s))
+    ...steps.flatMap((s) => Object.keys(s)),
   ]);
 
   const keyframes: Record<string, Array<string | number>> = {};
@@ -46,9 +87,23 @@ const BlurText: React.FC<BlurTextProps> = ({
   animationTo,
   easing = (t: number) => t,
   onAnimationComplete,
-  stepDuration = 0.4 // slightly slower for small text
+  stepDuration = 0.4,
+  emphasizeKeywords = [],
+  emphasizeClassName = "font-bold underline underline-offset-2 decoration-gray-700",
 }) => {
-  const elements = animateBy === "words" ? text.split(" ") : text.split("");
+  const useEmphasis = Array.isArray(emphasizeKeywords) && emphasizeKeywords.length > 0;
+
+  // Build elements: if emphasis is requested, split by phrases; else by words/letters
+  const elements = useMemo(() => {
+    if (!useEmphasis) {
+      return (animateBy === "words" ? text.split(" ") : text.split("")).map(
+        (t) => ({ text: t, emphasize: false })
+      );
+    }
+    // Keep original spacing/punctuation by segmenting on phrases
+    return splitByKeywords(text, emphasizeKeywords);
+  }, [text, animateBy, useEmphasis, emphasizeKeywords]);
+
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLParagraphElement>(null);
 
@@ -67,7 +122,7 @@ const BlurText: React.FC<BlurTextProps> = ({
     return () => observer.disconnect();
   }, [threshold, rootMargin]);
 
-  // Use marginTop instead of translateY so spans can remain inline and justify works
+  // Use marginTop instead of translateY for inline justification stability
   const defaultFrom = useMemo(
     () =>
       direction === "top"
@@ -81,9 +136,9 @@ const BlurText: React.FC<BlurTextProps> = ({
       {
         filter: "blur(3px)",
         opacity: 0.5,
-        marginTop: direction === "top" ? 4 : -4
+        marginTop: direction === "top" ? 4 : -4,
       },
-      { filter: "blur(0px)", opacity: 1, marginTop: 0 }
+      { filter: "blur(0px)", opacity: 1, marginTop: 0 },
     ],
     [direction]
   );
@@ -105,7 +160,7 @@ const BlurText: React.FC<BlurTextProps> = ({
       style={{
         textAlign: "justify",
         textJustify: "inter-word",
-        hyphens: "auto"
+        hyphens: "auto",
       }}
     >
       {elements.map((segment, index) => {
@@ -115,7 +170,7 @@ const BlurText: React.FC<BlurTextProps> = ({
           duration: totalDuration,
           times,
           delay: (index * delay) / 1000,
-          ease: easing
+          ease: easing,
         };
 
         return (
@@ -127,15 +182,19 @@ const BlurText: React.FC<BlurTextProps> = ({
             onAnimationComplete={
               index === elements.length - 1 ? onAnimationComplete : undefined
             }
-            // Keep inline so justification can stretch spaces naturally
             style={{
               display: "inline",
-              willChange: "filter, opacity, margin-top"
+              willChange: "filter, opacity, margin-top",
             }}
+            className={segment.emphasize ? emphasizeClassName : undefined}
           >
-            {segment}
-            {/* Add a normal space between words when animating by words */}
-            {animateBy === "words" && index < elements.length - 1 && " "}
+            {segment.text}
+            {/* If you're animating by words and NOT using phrase splitting,
+                manually insert spaces between words */}
+            {!useEmphasis &&
+              animateBy === "words" &&
+              index < elements.length - 1 &&
+              " "}
           </motion.span>
         );
       })}

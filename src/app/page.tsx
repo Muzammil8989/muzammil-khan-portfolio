@@ -3,59 +3,43 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfiles } from "@/app/hooks/useProfiles";
 import { useAbout } from "./hooks/useAbout";
+import { useWorkExperiences } from "./hooks/useWorkExperiences";
 import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
 import BlurText from "@/components/react-bit/blur-text";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { ResumeCard } from "@/components/resume-card";
 import React from "react";
 
-// ✅ Safe Highlight function
-const highlightKeywords = (text: string, keywords: string[]) => {
-  if (!text || !Array.isArray(keywords) || keywords.length === 0) return text;
-
-  const pattern = new RegExp(`(${keywords.join("|")})`, "gi");
-
-  return text.split(pattern).map((part, index) => {
-    const match =
-      typeof part === "string" &&
-      keywords.some(
-        (k) => typeof k === "string" && k.toLowerCase() === part.toLowerCase()
-      );
-
-    if (match) {
-      return (
-        <span
-          key={index}
-          className="bg-yellow-100 text-yellow-800 px-1 rounded font-medium"
-        >
-          {part}
-        </span>
-      );
-    }
-
-    return <React.Fragment key={index}>{part}</React.Fragment>;
-  });
-};
-
-// ✅ AboutData type
 interface AboutData {
   message: string;
 }
 
+const BLUR_FADE_DELAY = 0.08;
+
 export default function Page() {
+  // Profiles (Hero)
   const { data: profiles = [], isLoading, isError } = useProfiles();
+
+  // About
   const {
     data: aboutData = { message: "" },
     isLoading: isAboutLoading,
     isError: isAboutError,
   } = useAbout();
 
-  // ✅ Default About text (based on your latest version)
+  // Work Experiences
+  const {
+    data: workData = [],
+    isLoading: isWorkLoading,
+    isError: isWorkError,
+  } = useWorkExperiences();
+
   const aboutMessage =
     (aboutData as AboutData)?.message ||
     "I hold a degree in Computer Science from Bahria University, which gave me a solid foundation for my career as a full-stack engineer. I’m currently applying my skills at Pakistan Agriculture Research (PAR) through a collaboration with the US-based company DPSolutions. I’m passionate about solving real-world problems and focused on building high-quality, reliable software. My work is supported by strong skills in Data Structures and Algorithms, Database Management Systems (DBMS), and Agile development practices.";
 
-  // ✅ Keywords to highlight (matching your text)
   const highlightList = [
     "Computer Science",
     "Bahria University",
@@ -69,16 +53,9 @@ export default function Page() {
     "Agile development practices",
   ];
 
-  // ✅ Render highlighted about text safely
-  const renderHighlightedText = (text: string) => (
-    <p className="max-w-[600px] text-[14px] sm:text-[15px] md:text-[15.5px] leading-relaxed text-justify">
-      {highlightKeywords(text, highlightList)}
-    </p>
-  );
-
   return (
-    <main className="relative flex flex-col min-h-[100dvh] space-y-4 overflow-x-hidden px-6 py-6 sm:py-10">
-      {/* ✅ Background Animation */}
+    <main className="relative flex flex-col min-h-[500dvh] space-y-4 overflow-x-hidden px-6 py-6 sm:py-10">
+      {/* Background Animation */}
       <div className="fixed inset-0 -z-10">
         <Particles
           particleColors={["#ffffff", "#3624d6", "#FED000", "#c300ffff"]}
@@ -92,7 +69,7 @@ export default function Page() {
         />
       </div>
 
-      {/* ✅ Hero Section */}
+      {/* Hero */}
       <section id="hero" className="pb-4">
         <div className="mx-auto w-full max-w-2xl space-y-6">
           <div className="flex flex-col gap-6">
@@ -184,7 +161,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ✅ About Section */}
+      {/* About */}
       <section id="about">
         <div className="mx-auto w-full max-w-2xl space-y-6">
           <div className="flex flex-col gap-6">
@@ -202,7 +179,7 @@ export default function Page() {
               </p>
             ) : (
               <div className="space-y-3">
-                <div className="font-bold tracking-tight text-2xl md:text-3xl text-left">
+                <div className="font-bold tracking-tight text-xl text-left">
                   <SplitText
                     text="About Me"
                     delay={100}
@@ -214,18 +191,83 @@ export default function Page() {
                   />
                 </div>
 
-                {/* Highlighted About Message with BlurText */}
+                {/* Animated + emphasized keywords (bold+underline, no bg) */}
                 <BlurText
-                  text={aboutMessage} // Pass plain text to BlurText
+                  text={aboutMessage}
                   delay={100}
                   animateBy="words"
                   direction="top"
                   className="max-w-[600px] text-[14px] sm:text-[15px] md:text-[15.5px] leading-relaxed text-justify"
                   stepDuration={0.45}
+                  emphasizeKeywords={highlightList}
+                  emphasizeClassName="font-bold underline underline-offset-2 decoration-gray-700"
                 />
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* Work Experience */}
+      <section id="work">
+        <div className="mx-auto w-full max-w-2xl flex min-h-0 flex-col pt-4">
+          <BlurFade delay={BLUR_FADE_DELAY * 5}>
+            <h2 className="text-xl font-bold">
+              <SplitText
+                text="Work Experience"
+                delay={60}
+                duration={0.55}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 24 }}
+                to={{ opacity: 1, y: 0 }}
+              />
+            </h2>
+          </BlurFade>
+
+          {isWorkLoading ? (
+            // Work skeletons
+            <>
+              <div className="flex gap-4 items-start">
+                <Skeleton className="h-12 w-12 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <Skeleton className="h-12 w-12 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            </>
+          ) : isWorkError ? (
+            <p className="text-red-500 text-sm">Failed to load work data.</p>
+          ) : workData.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No work entries yet.</p>
+          ) : (
+            workData.map((work: any, id: number) => (
+              <BlurFade key={work.company} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
+                <ResumeCard
+                  logoUrl={work.logoUrl}
+                  altText={work.company}
+                  title={work.company}
+                  subtitle={work.title}
+                  href={work.href}
+                  badges={work.badges}
+                  period={`${work.start} - ${work.end ?? "Present"}`}
+                  description={work.description}
+                
+                />
+              </BlurFade>
+            ))
+          )}
         </div>
       </section>
     </main>

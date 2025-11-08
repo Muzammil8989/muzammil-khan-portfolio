@@ -4,49 +4,72 @@ import "./globals.css";
 import { Providers } from "./providers/providers";
 import { DATA } from "@/data/resume";
 import { Inter as FontSans } from "next/font/google";
-import "./globals.css";
 
+// ✅ Font setup
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(DATA.url),
-  title: {
-    default: DATA.name,
-    template: `%s | ${DATA.name}`,
-  },
-  description: DATA.description,
-  openGraph: {
-    title: `${DATA.name}`,
-    description: DATA.description,
-    url: DATA.url,
-    siteName: `${DATA.name}`,
-    locale: "en_US",
-    type: "website",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+// ✅ Fetch profile data (single object)
+async function getProfileData() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch profile data");
+
+    const data = await res.json();
+
+    return {
+      name: data?.name || DATA.name,
+      description: data?.description ,
+    };
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return { name: DATA.name };
+  }
+}
+
+// ✅ Dynamic Metadata (title + description)
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getProfileData();
+
+  return {
+    metadataBase: new URL(DATA.url),
+    title: {
+      default: profile.name,
+      template: `%s | ${profile.name}`,
+    },
+    description: profile.description,
+    openGraph: {
+      title: profile.name,
+      description: profile.description,
+      url: DATA.url,
+      siteName: profile.name,
+      locale: "en_US",
+      type: "website",
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-  twitter: {
-    title: `${DATA.name}`,
-    card: "summary_large_image",
-  },
-  verification: {
-    google: "",
-    yandex: "",
-  },
-};
+    verification: {
+      google: "",
+      yandex: "",
+    },
+  };
+}
 
+// ✅ Root Layout
 export default function RootLayout({
   children,
 }: Readonly<{
