@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SmoothCursor } from "@/components/ui/smooth-cursor";
 
 const queryClient = new QueryClient();
 
@@ -17,19 +16,14 @@ export function Providers({ children }: { children: ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Check if window is defined (client-side)
     if (typeof window !== "undefined") {
       const checkIfMobile = () => {
-        setIsMobile(window.innerWidth < 768); // 768px is typically the breakpoint for 'md' in Tailwind
+        setIsMobile(window.innerWidth < 768);
       };
 
-      // Initial check
       checkIfMobile();
-
-      // Add event listener for window resize
       window.addEventListener("resize", checkIfMobile);
 
-      // Cleanup
       return () => window.removeEventListener("resize", checkIfMobile);
     }
   }, []);
@@ -45,7 +39,6 @@ export function Providers({ children }: { children: ReactNode }) {
         <TooltipProvider delayDuration={0}>
           {children}
           <Toaster />
-          {!isMobile && <SmoothCursor />} {/* Only show on non-mobile */}
           {isRoot && <Navbar />}
         </TooltipProvider>
       </ThemeProvider>

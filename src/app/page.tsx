@@ -7,6 +7,7 @@ import { useWorkExperiences } from "./hooks/useWorkExperiences";
 import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
+import { DynamicBackground } from "@/components/three/corner-scene";
 import BlurText from "@/components/react-bit/blur-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/resume-card";
@@ -67,9 +68,10 @@ export default function Page() {
           alphaParticles={false}
           disableRotation={false}
         />
+          <DynamicBackground />
       </div>
 
-      {/* Hero */}
+      {/* Hero Section */}
       <section id="hero" className="pb-4">
         <div className="mx-auto w-full max-w-2xl space-y-6">
           <div className="flex flex-col gap-6">
@@ -101,10 +103,7 @@ export default function Page() {
                     {/* Avatar */}
                     <div className="order-1 sm:order-2 px-1 sm:px-0">
                       <Avatar className="size-28 sm:size-28 border">
-                        <AvatarImage
-                          alt={profile.name}
-                          src={profile.avatarUrl}
-                        />
+                        <AvatarImage alt={profile.name} src={profile.avatarUrl} />
                         <AvatarFallback>{profile.initials}</AvatarFallback>
                       </Avatar>
                     </div>
@@ -161,7 +160,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* About */}
+      {/* About Section */}
       <section id="about">
         <div className="mx-auto w-full max-w-2xl space-y-6">
           <div className="flex flex-col gap-6">
@@ -191,10 +190,10 @@ export default function Page() {
                   />
                 </div>
 
-                {/* Animated + emphasized keywords (bold+underline, no bg) */}
+                {/* Animated + emphasized keywords */}
                 <BlurText
                   text={aboutMessage}
-                  delay={100}
+                  delay={200}
                   animateBy="words"
                   direction="top"
                   className="max-w-[600px] text-[14px] sm:text-[15px] md:text-[15.5px] leading-relaxed text-justify"
@@ -208,25 +207,10 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Work Experience */}
+      {/* Work Experience Section */}
       <section id="work">
         <div className="mx-auto w-full max-w-2xl flex min-h-0 flex-col pt-4">
-          <BlurFade delay={BLUR_FADE_DELAY * 5}>
-            <h2 className="text-xl font-bold">
-              <SplitText
-                text="Work Experience"
-                delay={60}
-                duration={0.55}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0, y: 24 }}
-                to={{ opacity: 1, y: 0 }}
-              />
-            </h2>
-          </BlurFade>
-
           {isWorkLoading ? (
-            // Work skeletons
             <>
               <div className="flex gap-4 items-start">
                 <Skeleton className="h-12 w-12 rounded" />
@@ -252,21 +236,36 @@ export default function Page() {
           ) : workData.length === 0 ? (
             <p className="text-sm text-muted-foreground">No work entries yet.</p>
           ) : (
-            workData.map((work: any, id: number) => (
-              <BlurFade key={work.company} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
-                <ResumeCard
-                  logoUrl={work.logoUrl}
-                  altText={work.company}
-                  title={work.company}
-                  subtitle={work.title}
-                  href={work.href}
-                  badges={work.badges}
-                  period={`${work.start} - ${work.end ?? "Present"}`}
-                  description={work.description}
-                
-                />
+            <>
+              <BlurFade delay={BLUR_FADE_DELAY * 5}>
+                <h2 className="text-xl font-bold">
+                  <SplitText
+                    text="Work Experience"
+                    delay={60}
+                    duration={0.55}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 24 }}
+                    to={{ opacity: 1, y: 0 }}
+                  />
+                </h2>
               </BlurFade>
-            ))
+
+              {workData.map((work: any, id: number) => (
+                <BlurFade key={work.company} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
+                  <ResumeCard
+                    logoUrl={work.logoUrl}
+                    altText={work.company}
+                    title={work.company}
+                    subtitle={work.title}
+                    href={work.href}
+                    badges={work.badges}
+                    period={`${work.start} - ${work.end ?? "Present"}`}
+                    description={work.description}
+                  />
+                </BlurFade>
+              ))}
+            </>
           )}
         </div>
       </section>
