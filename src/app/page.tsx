@@ -54,7 +54,7 @@ export default function Page() {
   ];
 
   return (
-    <main className="relative flex flex-col min-h-[500dvh] space-y-4 overflow-x-hidden px-6 py-6 sm:py-10">
+    <main className="relative flex flex-col min-h-[500dvh] space-y-2 overflow-x-hidden px-6 py-6 sm:py-10">
       {/* Background Animation */}
       <div className="fixed inset-0 -z-10">
         <Particles
