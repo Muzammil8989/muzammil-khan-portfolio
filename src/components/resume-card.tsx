@@ -107,21 +107,22 @@ export const ResumeCard = ({
 
             {/* Description expand animation */}
             <AnimatePresence initial={false}>
-              {isExpanded && description && (
-                <motion.div
-                  key="description"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden text-[13px] sm:text-[15px] text-muted-foreground leading-relaxed mt-2"
-                >
-                  <div className="border-l-2 border-emerald-400/50 pl-3">
-                    {description}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+  {isExpanded && description && (
+    <motion.div
+      key="description"
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className="overflow-hidden text-[13px] sm:text-[15px] text-muted-foreground leading-relaxed mt-2 text-justify"
+    >
+      <div className="border-l-2 border-emerald-400/50 pl-3">
+        {description}
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
           </div>
         </div>
       </motion.div>
