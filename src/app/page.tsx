@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfiles } from "@/app/hooks/useProfiles";
 import { useAbout } from "./hooks/useAbout";
@@ -12,7 +11,7 @@ import { DynamicBackground } from "@/components/three/dynamic-background";
 import BlurText from "@/components/react-bit/blur-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/resume-card";
-
+import React from "react";
 
 interface AboutData {
   message: string;
