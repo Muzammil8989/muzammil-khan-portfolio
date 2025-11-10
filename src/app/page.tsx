@@ -7,7 +7,7 @@ import { useWorkExperiences } from "./hooks/useWorkExperiences";
 import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
-import { DynamicBackground } from "@/components/three/dynamic-background";
+import DynamicBackground from "@/components/three/dynamic-background";
 import BlurText from "@/components/react-bit/blur-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/resume-card";
@@ -77,7 +77,7 @@ export default function Page() {
 
       {/* Hero Section */}
       <section id="hero" className="pb-4">
-        <div className="mx-auto w-full max-w-2xl space-y-6">
+        <div className="mx-auto w-full max-w-4xl space-y-6">
           <div className="flex flex-col gap-6">
             {isLoading ? (
               <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
@@ -118,7 +118,7 @@ export default function Page() {
                     {/* Text */}
                     <div className="flex flex-col flex-1 space-y-2 order-2 sm:order-1">
                       {/* Mobile Heading */}
-                      <div className="block sm:hidden font-bold tracking-tight text-[22px] text-center">
+                      <div className="block sm:hidden font-extrabold tracking-tight text-[24px] leading-tight text-center">
                         <SplitText
                           text={`Hi, I'm ${mobileName} 👋`}
                           delay={80}
@@ -131,7 +131,7 @@ export default function Page() {
                       </div>
 
                       {/* Desktop Heading */}
-                      <div className="hidden sm:block font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl text-left">
+                      <div className="hidden sm:block font-extrabold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-left">
                         <SplitText
                           text={`Hi, I'm ${firstWord} 👋`}
                           delay={100}
@@ -149,7 +149,7 @@ export default function Page() {
                         delay={100}
                         animateBy="words"
                         direction="top"
-                        className="max-w-[600px] text-[14px] sm:text-[15px] md:text-[15.5px] leading-relaxed text-justify"
+                        className="max-w-[680px] text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed text-foreground/90 text-justify"
                         stepDuration={0.45}
                       />
                     </div>
@@ -169,7 +169,7 @@ export default function Page() {
 
       {/* About Section */}
       <section id="about">
-        <div className="mx-auto w-full max-w-2xl space-y-6">
+        <div className="mx-auto w-full max-w-4xl space-y-6">
           <div className="flex flex-col gap-6">
             {isAboutLoading ? (
               <div className="space-y-4">
@@ -185,7 +185,7 @@ export default function Page() {
               </p>
             ) : (
               <div className="space-y-3">
-                <div className="font-bold tracking-tight text-xl text-left">
+                <div className="font-bold tracking-tight text-2xl md:text-3xl text-left">
                   <SplitText
                     text="About Me"
                     delay={100}
@@ -203,10 +203,10 @@ export default function Page() {
                   delay={200}
                   animateBy="words"
                   direction="top"
-                  className="max-w-[600px] text-[14px] sm:text-[15px] md:text-[15.5px] leading-relaxed text-justify"
+                  className="max-w-[680px] text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed text-foreground/90 text-justify"
                   stepDuration={0.45}
                   emphasizeKeywords={highlightList}
-                  emphasizeClassName="font-bold underline underline-offset-2 decoration-gray-700"
+                  emphasizeClassName="font-semibold underline underline-offset-4 decoration-2 decoration-foreground/60"
                 />
               </div>
             )}
@@ -216,7 +216,7 @@ export default function Page() {
 
       {/* Work Experience Section */}
       <section id="work">
-        <div className="mx-auto w-full max-w-2xl flex min-h-0 flex-col pt-4">
+        <div className="mx-auto w-full max-w-4xl flex min-h-0 flex-col pt-4">
           {isWorkLoading ? (
             <>
               <div className="flex gap-4 items-start">
@@ -241,13 +241,11 @@ export default function Page() {
           ) : isWorkError ? (
             <p className="text-red-500 text-sm">Failed to load work data.</p>
           ) : workData.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No work entries yet.
-            </p>
+            <p className="text-sm text-muted-foreground">No work entries yet.</p>
           ) : (
             <>
               <BlurFade delay={BLUR_FADE_DELAY * 5}>
-                <h2 className="text-xl font-bold">
+                <h2 className="text-2xl md:text-3xl font-bold">
                   <SplitText
                     text="Work Experience"
                     delay={60}
