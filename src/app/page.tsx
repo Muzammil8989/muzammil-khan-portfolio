@@ -7,7 +7,7 @@ import { useWorkExperiences } from "./hooks/useWorkExperiences";
 import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
-import { DynamicBackground } from "@/components/three/corner-scene";
+import { DynamicBackground } from "@/components/three/dynamic-background";
 import BlurText from "@/components/react-bit/blur-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/resume-card";
