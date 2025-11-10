@@ -37,13 +37,17 @@ export const ResumeCard = ({
   description,
 }: ResumeCardProps) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
+  // increments only when expanding (opening), used to re-trigger animation on reopen
+  const [openCount, setOpenCount] = React.useState(0);
 
-  const handleClick = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     if (description) {
       e.preventDefault();
-      setIsExpanded((prev) => !prev);
+      setIsExpanded((prev) => {
+        const next = !prev;
+        if (next) setOpenCount((c) => c + 1); // bump when opening
+        return next;
+      });
     }
   };
 
@@ -136,7 +140,11 @@ export const ResumeCard = ({
                   {badges && badges.length > 0 && (
                     <div className="flex sm:hidden flex-wrap gap-1 mt-1">
                       {badges.map((badge, i) => (
-                        <Badge key={i} variant="secondary" className="text-[11px]">
+                        <Badge
+                          key={i}
+                          variant="secondary"
+                          className="text-[11px]"
+                        >
                           {badge}
                         </Badge>
                       ))}
@@ -149,7 +157,11 @@ export const ResumeCard = ({
                   <div className="flex-none self-center ml-2">
                     <motion.span
                       animate={{ rotate: isExpanded ? 90 : 0 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 22,
+                      }}
                       className="block"
                     >
                       <ChevronRightIcon className="size-4 text-emerald-400" />
@@ -178,26 +190,26 @@ export const ResumeCard = ({
             </CardHeader>
 
             {/* Expandable description */}
+            {/* Expandable description */}
             <AnimatePresence initial={false}>
               {isExpanded && description && (
                 <motion.div
-                  key="description"
+                  key={`desc-wrap-${isExpanded}`} // triggers animation only on expand
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden text-[14.5px] sm:text-[16px] md:text-[16.5px] text-foreground/85 leading-[1.75] mt-2 sm:mt-2.5 text-justify"
                 >
-                  <div className="border-l-2 border-emerald-400/60 pl-2 sm:pl-3">
-                    <BlurText
-                      text={description}
-                      delay={200}
-                      animateBy="words"
-                      direction="top"
-                      stepDuration={0.32}
-                      className="block"
-                    />
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="border-l-2 border-emerald-400/60 pl-2 sm:pl-3"
+                  >
+                    {description}
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

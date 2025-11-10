@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
 import DynamicBackground from "@/components/three/dynamic-background";
+import BlobCursor from "@/components/react-bit/blob-cursor";
 import BlurText from "@/components/react-bit/blur-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/resume-card";
@@ -81,7 +82,26 @@ export default function Page() {
           disableRotation={false}
         />
         <DynamicBackground />
+       
       </div>
+       <BlobCursor
+          blobType="circle"
+          fillColor="#5227FF"
+          trailCount={3}
+          sizes={[60, 125, 75]}
+          innerSizes={[20, 35, 25]}
+          innerColor="rgba(255,255,255,0.8)"
+          opacities={[0.6, 0.6, 0.6]}
+          shadowColor="rgba(0,0,0,0.75)"
+          shadowBlur={5}
+          shadowOffsetX={10}
+          shadowOffsetY={10}
+          filterStdDeviation={30}
+          useFilter={true}
+          fastDuration={0.1}
+          slowDuration={0.5}
+          zIndex={-100}
+        />
 
       {/* Hero Section */}
       <section id="hero" className="pb-4">
@@ -115,7 +135,10 @@ export default function Page() {
                     {/* Avatar */}
                     <div className="order-1 sm:order-2 px-1 sm:px-0">
                       <Avatar className="size-28 sm:size-28 border">
-                        <AvatarImage alt={profile.name} src={profile.avatarUrl} />
+                        <AvatarImage
+                          alt={profile.name}
+                          src={profile.avatarUrl}
+                        />
                         <AvatarFallback>{profile.initials}</AvatarFallback>
                       </Avatar>
                     </div>
@@ -246,7 +269,9 @@ export default function Page() {
           ) : isWorkError ? (
             <p className="text-red-500 text-sm">Failed to load work data.</p>
           ) : workData.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No work entries yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No work entries yet.
+            </p>
           ) : (
             <>
               <BlurFade delay={BLUR_FADE_DELAY * 5}>
@@ -264,7 +289,10 @@ export default function Page() {
               </BlurFade>
 
               {workData.map((work: any, id: number) => (
-                <BlurFade key={work._id ?? `${work.company}-${id}`} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
+                <BlurFade
+                  key={work._id ?? `${work.company}-${id}`}
+                  delay={BLUR_FADE_DELAY * 6 + id * 0.05}
+                >
                   <ResumeCard
                     logoUrl={work.logoUrl}
                     altText={work.company}
@@ -307,9 +335,13 @@ export default function Page() {
               </div>
             </>
           ) : isEducationError ? (
-            <p className="text-red-500 text-sm">Failed to load education data.</p>
+            <p className="text-red-500 text-sm">
+              Failed to load education data.
+            </p>
           ) : educationData.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No education entries yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No education entries yet.
+            </p>
           ) : (
             <>
               <BlurFade delay={BLUR_FADE_DELAY * 5}>
@@ -327,7 +359,10 @@ export default function Page() {
               </BlurFade>
 
               {educationData.map((education: any, id: number) => (
-                <BlurFade key={education._id ?? `${education.school}-${id}`} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
+                <BlurFade
+                  key={education._id ?? `${education.school}-${id}`}
+                  delay={BLUR_FADE_DELAY * 6 + id * 0.05}
+                >
                   <ResumeCard
                     href={education.href}
                     logoUrl={education.logoUrl}
