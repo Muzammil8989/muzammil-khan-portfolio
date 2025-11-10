@@ -2,8 +2,9 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfiles } from "@/app/hooks/useProfiles";
-import { useAbout } from "./hooks/useAbout";
-import { useWorkExperiences } from "./hooks/useWorkExperiences";
+import { useAbout } from "@/app/hooks/useAbout";
+import { useWorkExperiences } from "@/app/hooks/useWorkExperiences";
+import { useEducations } from "@/app/hooks/useEducation";
 import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
@@ -36,6 +37,13 @@ export default function Page() {
     isLoading: isWorkLoading,
     isError: isWorkError,
   } = useWorkExperiences();
+
+  // Educations
+  const {
+    data: educationData = [],
+    isLoading: isEducationLoading,
+    isError: isEducationError,
+  } = useEducations();
 
   const aboutMessage =
     (aboutData as AboutData)?.message ||
@@ -107,10 +115,7 @@ export default function Page() {
                     {/* Avatar */}
                     <div className="order-1 sm:order-2 px-1 sm:px-0">
                       <Avatar className="size-28 sm:size-28 border">
-                        <AvatarImage
-                          alt={profile.name}
-                          src={profile.avatarUrl}
-                        />
+                        <AvatarImage alt={profile.name} src={profile.avatarUrl} />
                         <AvatarFallback>{profile.initials}</AvatarFallback>
                       </Avatar>
                     </div>
@@ -259,10 +264,7 @@ export default function Page() {
               </BlurFade>
 
               {workData.map((work: any, id: number) => (
-                <BlurFade
-                  key={work.company}
-                  delay={BLUR_FADE_DELAY * 6 + id * 0.05}
-                >
+                <BlurFade key={work._id ?? `${work.company}-${id}`} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
                   <ResumeCard
                     logoUrl={work.logoUrl}
                     altText={work.company}
@@ -272,6 +274,67 @@ export default function Page() {
                     badges={work.badges}
                     period={`${work.start} - ${work.end ?? "Present"}`}
                     description={work.description}
+                  />
+                </BlurFade>
+              ))}
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Education Section */}
+      <section id="education">
+        <div className="mx-auto w-full max-w-4xl flex min-h-0 flex-col pt-4">
+          {isEducationLoading ? (
+            <>
+              <div className="flex gap-4 items-start">
+                <Skeleton className="h-12 w-12 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <Skeleton className="h-12 w-12 rounded" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            </>
+          ) : isEducationError ? (
+            <p className="text-red-500 text-sm">Failed to load education data.</p>
+          ) : educationData.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No education entries yet.</p>
+          ) : (
+            <>
+              <BlurFade delay={BLUR_FADE_DELAY * 5}>
+                <h2 className="text-2xl md:text-3xl font-bold">
+                  <SplitText
+                    text="Education"
+                    delay={60}
+                    duration={0.55}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 24 }}
+                    to={{ opacity: 1, y: 0 }}
+                  />
+                </h2>
+              </BlurFade>
+
+              {educationData.map((education: any, id: number) => (
+                <BlurFade key={education._id ?? `${education.school}-${id}`} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
+                  <ResumeCard
+                    href={education.href}
+                    logoUrl={education.logoUrl}
+                    altText={education.school}
+                    title={education.school}
+                    subtitle={education.degree}
+                    period={`${education.start} - ${education.end || "Present"}`}
                   />
                 </BlurFade>
               ))}

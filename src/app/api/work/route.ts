@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
+import { getToken } from "next-auth/jwt";
 import { ObjectId } from "mongodb";
 
 interface WorkExperience {
@@ -41,6 +42,11 @@ export async function GET() {
  * 🟢 POST - Create a new work experience
  */
 export async function POST(req: NextRequest) {
+  const token = await getToken({ req });
+  if (!token?.sub) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { db } = await connectToDatabase();
     const data = await req.json();
@@ -81,17 +87,27 @@ export async function POST(req: NextRequest) {
  * Example: /api/work?id=WORK_ID
  */
 export async function PUT(req: NextRequest) {
+  const token = await getToken({ req });
+  if (!token?.sub) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { db } = await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json({ message: "Missing 'id' parameter" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Missing 'id' parameter" },
+        { status: 400 }
+      );
     }
 
     if (!ObjectId.isValid(id)) {
-      return NextResponse.json({ message: "Invalid 'id' parameter" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid 'id' parameter" },
+        { status: 400 }
+      );
     }
 
     const raw = await req.json();
@@ -113,19 +129,24 @@ export async function PUT(req: NextRequest) {
     if (Object.keys(unsetPayload).length) update.$unset = unsetPayload;
 
     if (!Object.keys(update).length) {
-      return NextResponse.json({ message: "No valid fields to update." }, { status: 400 });
+      return NextResponse.json(
+        { message: "No valid fields to update." },
+        { status: 400 }
+      );
     }
 
-    const updatedExperience = await db
-      .collection<WorkExperience>("work_experiences")
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        update,
-        { returnDocument: "after" }
-      ) ?? {};
+    const updatedExperience =
+      (await db
+        .collection<WorkExperience>("work_experiences")
+        .findOneAndUpdate({ _id: new ObjectId(id) }, update, {
+          returnDocument: "after",
+        })) ?? {};
 
     if (!updatedExperience) {
-      return NextResponse.json({ message: "Work experience not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Work experience not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(updatedExperience);
@@ -138,14 +159,15 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-
-
-
 /**
  * 🔴 DELETE - Delete a work experience by ID
  * Example: /api/work?id=WORK_ID
  */
 export async function DELETE(req: NextRequest) {
+  const token = await getToken({ req });
+  if (!token?.sub) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { db } = await connectToDatabase();
     const { searchParams } = new URL(req.url);

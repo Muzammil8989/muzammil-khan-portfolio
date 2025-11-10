@@ -37,13 +37,13 @@ import {
 import { Profile } from "@/services/profile";
 import { About } from "@/services/about";
 import { toast } from "sonner";
-import { Loader2, User, Plus, FileText, Briefcase } from "lucide-react";
+import { Loader2, User, Plus, FileText, Briefcase, GraduationCap } from "lucide-react";
 import SignOutButton from "@/components/signout-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProfileCard } from "@/components/profile-card";
 import { AboutCard } from "@/components/about-card";
 
-// ★ NEW: work imports
+// Work
 import {
   useWorkExperiences,
   useCreateWorkExperience,
@@ -53,6 +53,17 @@ import {
 import { WorkExperience } from "@/services/work";
 import { WorkExperienceCard } from "@/components/work-experience-card";
 import { WorkExperienceForm } from "@/components/work-experience-form";
+
+// Education
+import {
+  useEducations,
+  useCreateEducation,
+  useUpdateEducation,
+  useDeleteEducation,
+} from "@/app/hooks/useEducation";
+import type { Education } from "@/services/educations";
+import { EducationCard } from "@/components/educations-card";
+import { EducationForm } from "@/components/educations-form";
 
 export default function DashboardManager() {
   // dialogs (profiles)
@@ -64,36 +75,46 @@ export default function DashboardManager() {
   const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false);
   const [isAboutDeleteDialogOpen, setIsAboutDeleteDialogOpen] = useState(false);
 
-  // ★ NEW: dialogs (work)
+  // dialogs (work)
   const [isWorkCreateDialogOpen, setIsWorkCreateDialogOpen] = useState(false);
   const [isWorkEditDialogOpen, setIsWorkEditDialogOpen] = useState(false);
   const [isWorkDeleteDialogOpen, setIsWorkDeleteDialogOpen] = useState(false);
+
+  // dialogs (education)
+  const [isEduCreateDialogOpen, setIsEduCreateDialogOpen] = useState(false);
+  const [isEduEditDialogOpen, setIsEduEditDialogOpen] = useState(false);
+  const [isEduDeleteDialogOpen, setIsEduDeleteDialogOpen] = useState(false);
 
   // selections
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [selectedAbout, setSelectedAbout] = useState<About | null>(null);
   const [selectedWork, setSelectedWork] = useState<WorkExperience | null>(null);
+  const [selectedEducation, setSelectedEducation] = useState<Education | null>(null);
 
   // uploads
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");      // for Work
+  const [eduLogoUrl, setEduLogoUrl] = useState(""); // for Education
 
   // data hooks
   const { data: profiles = [], isLoading, isError, refetch } = useProfiles();
+  const { data: about, isLoading: isLoadingAbout, refetch: refetchAbout } = useAbout();
 
-  const {
-    data: about,
-    isLoading: isLoadingAbout,
-    refetch: refetchAbout,
-  } = useAbout();
-
-  // ★ NEW: work hooks
+  // work hooks
   const {
     data: workExperiences = [],
     isLoading: isLoadingWork,
     isError: isErrorWork,
     refetch: refetchWork,
   } = useWorkExperiences();
+
+  // education hooks
+  const {
+    data: educations = [],
+    isLoading: isLoadingEdu,
+    isError: isErrorEdu,
+    refetch: refetchEdu,
+  } = useEducations();
 
   // mutations
   const createProfile = useCreateProfile();
@@ -104,10 +125,13 @@ export default function DashboardManager() {
   const updateAbout = useUpdateAbout();
   const deleteAboutMutation = useDeleteAbout();
 
-  // ★ NEW: work mutations
   const createWork = useCreateWorkExperience();
   const updateWork = useUpdateWorkExperience();
   const deleteWork = useDeleteWorkExperience();
+
+  const createEducation = useCreateEducation();
+  const updateEducation = useUpdateEducation();
+  const deleteEducation = useDeleteEducation();
 
   // 🛠️ Scrollbar layout shift fix
   useEffect(() => {
@@ -119,11 +143,13 @@ export default function DashboardManager() {
       isAboutDeleteDialogOpen ||
       isWorkCreateDialogOpen ||
       isWorkEditDialogOpen ||
-      isWorkDeleteDialogOpen;
+      isWorkDeleteDialogOpen ||
+      isEduCreateDialogOpen ||
+      isEduEditDialogOpen ||
+      isEduDeleteDialogOpen;
 
     if (anyDialogOpen) {
-      const scrollbarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.paddingRight = `${scrollbarWidth}px`;
       document.body.style.overflow = "hidden";
     } else {
@@ -144,14 +170,19 @@ export default function DashboardManager() {
     isWorkCreateDialogOpen,
     isWorkEditDialogOpen,
     isWorkDeleteDialogOpen,
+    isEduCreateDialogOpen,
+    isEduEditDialogOpen,
+    isEduDeleteDialogOpen,
   ]);
 
   const resetFormStates = () => {
     setAvatarUrl("");
     setLogoUrl("");
+    setEduLogoUrl("");
     setSelectedProfile(null);
     setSelectedAbout(null);
     setSelectedWork(null);
+    setSelectedEducation(null);
   };
 
   // PROFILE handlers
@@ -317,28 +348,85 @@ export default function DashboardManager() {
     setIsWorkDeleteDialogOpen(true);
   };
 
-  if (isError) {
-    return (
-      <div className="p-4 text-red-500">
-        Error loading profiles. Please try again.
-      </div>
+  // EDUCATION handlers
+  const handleEduCreateSubmit = (data: Omit<Education, "_id">) => {
+    createEducation.mutate(
+      { ...data, logoUrl: eduLogoUrl },
+      {
+        onSuccess: () => {
+          toast.success("Education created successfully");
+          setIsEduCreateDialogOpen(false);
+          resetFormStates();
+          refetchEdu();
+        },
+        onError: (error: any) => {
+          toast.error(error.message || "Failed to create education");
+        },
+      }
     );
+  };
+
+  const handleEduEditSubmit = (data: Omit<Education, "_id">) => {
+    if (!selectedEducation) return;
+
+    updateEducation.mutate(
+      { id: selectedEducation._id, data: { ...data, logoUrl: eduLogoUrl || data.logoUrl } },
+      {
+        onSuccess: () => {
+          toast.success("Education updated successfully");
+          setIsEduEditDialogOpen(false);
+          resetFormStates();
+          refetchEdu();
+        },
+        onError: (error: any) => {
+          toast.error(error.message || "Failed to update education");
+        },
+      }
+    );
+  };
+
+  const handleEduDelete = () => {
+    if (!selectedEducation) return;
+
+    deleteEducation.mutate(selectedEducation._id, {
+      onSuccess: () => {
+        toast.success("Education deleted successfully");
+        setIsEduDeleteDialogOpen(false);
+        resetFormStates();
+        refetchEdu();
+      },
+      onError: (error: any) => {
+        toast.error(error.message || "Failed to delete education");
+      },
+    });
+  };
+
+  const handleEduEditClick = (education: Education) => {
+    setSelectedEducation(education);
+    setEduLogoUrl(education.logoUrl || "");
+    setIsEduEditDialogOpen(true);
+  };
+
+  const handleEduDeleteClick = (education: Education) => {
+    setSelectedEducation(education);
+    setIsEduDeleteDialogOpen(true);
+  };
+
+  if (isError) {
+    return <div className="p-4 text-red-500">Error loading profiles. Please try again.</div>;
   }
   if (isErrorWork) {
-    return (
-      <div className="p-4 text-red-500">
-        Error loading work experiences. Please try again.
-      </div>
-    );
+    return <div className="p-4 text-red-500">Error loading work experiences. Please try again.</div>;
+  }
+  if (isErrorEdu) {
+    return <div className="p-4 text-red-500">Error loading education. Please try again.</div>;
   }
 
   return (
     <div className="min-h-screen px-6 py-12 sm:py-20">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Dashboard Manager
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dashboard Manager</h1>
           <div className="flex flex-col sm:flex-row gap-2 md:w-auto">
             {profiles.length === 0 && (
               <Dialog
@@ -356,9 +444,7 @@ export default function DashboardManager() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">
-                      Create New Profile
-                    </DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">Create New Profile</DialogTitle>
                   </DialogHeader>
                   <ProfileForm
                     onSubmit={handleCreateSubmit}
@@ -369,6 +455,8 @@ export default function DashboardManager() {
                 </DialogContent>
               </Dialog>
             )}
+
+            {/* Add Work */}
             <Dialog
               open={isWorkCreateDialogOpen}
               onOpenChange={(open) => {
@@ -384,9 +472,7 @@ export default function DashboardManager() {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[700px]">
                 <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold">
-                    Create Work Experience
-                  </DialogTitle>
+                  <DialogTitle className="text-xl font-semibold">Create Work Experience</DialogTitle>
                 </DialogHeader>
                 <WorkExperienceForm
                   onSubmit={handleWorkCreateSubmit}
@@ -396,6 +482,34 @@ export default function DashboardManager() {
                 />
               </DialogContent>
             </Dialog>
+
+            {/* Add Education */}
+            <Dialog
+              open={isEduCreateDialogOpen}
+              onOpenChange={(open) => {
+                setIsEduCreateDialogOpen(open);
+                if (!open) resetFormStates();
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Education
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold">Create Education</DialogTitle>
+                </DialogHeader>
+                <EducationForm
+                  onSubmit={handleEduCreateSubmit}
+                  isSubmitting={createEducation.isPending}
+                  onLogoUpload={setEduLogoUrl}
+                  logoUrl={eduLogoUrl}
+                />
+              </DialogContent>
+            </Dialog>
+
             <SignOutButton />
           </div>
         </div>
@@ -403,9 +517,10 @@ export default function DashboardManager() {
         <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
           <Tabs defaultValue="profiles">
             <div className="mb-6">
-              <TabsList className="grid w-full grid-cols-3 max-w-xl">
+              <TabsList className="grid w-full grid-cols-4 max-w-2xl">
                 <TabsTrigger value="profiles">Profiles</TabsTrigger>
                 <TabsTrigger value="work">Work</TabsTrigger>
+                <TabsTrigger value="education">Education</TabsTrigger>
                 <TabsTrigger value="about">About</TabsTrigger>
               </TabsList>
             </div>
@@ -421,9 +536,7 @@ export default function DashboardManager() {
               ) : profiles.length > 0 ? (
                 <div
                   className={`grid gap-4 md:gap-6 ${
-                    profiles.length === 1
-                      ? "grid-cols-1 max-w-md mx-auto"
-                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    profiles.length === 1 ? "grid-cols-1 max-w-md mx-auto" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                   }`}
                 >
                   {profiles.map((profile) => (
@@ -445,12 +558,8 @@ export default function DashboardManager() {
               ) : (
                 <div className="text-center py-12">
                   <User className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">
-                    No profiles
-                  </h3>
-                  <p className="mt-1 text-gray-500">
-                    Get started by creating a new profile.
-                  </p>
+                  <h3 className="mt-2 text-lg font-medium text-gray-900">No profiles</h3>
+                  <p className="mt-1 text-gray-500">Get started by creating a new profile.</p>
                   <Button onClick={() => setIsCreateDialogOpen(true)} className="mt-4">
                     <Plus className="mr-2 h-4 w-4" />
                     Create Profile
@@ -468,9 +577,7 @@ export default function DashboardManager() {
               >
                 <DialogContent className="sm:max-w-[600px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">
-                      Edit Profile
-                    </DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">Edit Profile</DialogTitle>
                   </DialogHeader>
                   <ProfileForm
                     profile={selectedProfile || undefined}
@@ -492,17 +599,13 @@ export default function DashboardManager() {
               >
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold">
-                      Confirm Deletion
-                    </AlertDialogTitle>
+                    <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
                     <AlertDialogDescription>
                       This will permanently delete the profile "{selectedProfile?.name}". This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">
-                      Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
                       disabled={deleteProfile.isPending}
@@ -522,7 +625,7 @@ export default function DashboardManager() {
               </AlertDialog>
             </TabsContent>
 
-            {/* ★ NEW: Work Tab */}
+            {/* Work Tab */}
             <TabsContent value="work">
               {isLoadingWork ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -550,12 +653,8 @@ export default function DashboardManager() {
               ) : (
                 <div className="text-center py-12">
                   <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">
-                    No work experiences
-                  </h3>
-                  <p className="mt-1 text-gray-500">
-                    Add your first work experience.
-                  </p>
+                  <h3 className="mt-2 text-lg font-medium text-gray-900">No work experiences</h3>
+                  <p className="mt-1 text-gray-500">Add your first work experience.</p>
                   <Button onClick={() => setIsWorkCreateDialogOpen(true)} className="mt-4">
                     <Plus className="mr-2 h-4 w-4" />
                     Add Experience
@@ -573,9 +672,7 @@ export default function DashboardManager() {
               >
                 <DialogContent className="sm:max-w-[700px]">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">
-                      Edit Experience
-                    </DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">Edit Experience</DialogTitle>
                   </DialogHeader>
                   <WorkExperienceForm
                     work={selectedWork || undefined}
@@ -597,17 +694,13 @@ export default function DashboardManager() {
               >
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold">
-                      Confirm Deletion
-                    </AlertDialogTitle>
+                    <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
                     <AlertDialogDescription>
                       This will permanently delete the selected work experience. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">
-                      Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleWorkDelete}
                       disabled={deleteWork.isPending}
@@ -627,13 +720,104 @@ export default function DashboardManager() {
               </AlertDialog>
             </TabsContent>
 
+            {/* Education Tab */}
+            <TabsContent value="education">
+              {isLoadingEdu ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-64 rounded-lg" />
+                  ))}
+                </div>
+              ) : educations.length > 0 ? (
+                <div
+                  className={`grid gap-4 md:gap-6 ${
+                    educations.length === 1 ? "grid-cols-1 max-w-md mx-auto" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                  }`}
+                >
+                  {educations.map((education) => (
+                    <EducationCard
+                      key={education._id}
+                      education={education}
+                      onEdit={handleEduEditClick}
+                      onDelete={handleEduDeleteClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <GraduationCap className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-lg font-medium text-gray-900">No education</h3>
+                  <p className="mt-1 text-gray-500">Add your first education entry.</p>
+                  <Button onClick={() => setIsEduCreateDialogOpen(true)} className="mt-4">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Education
+                  </Button>
+                </div>
+              )}
+
+              {/* Edit Education Dialog */}
+              <Dialog
+                open={isEduEditDialogOpen}
+                onOpenChange={(open) => {
+                  setIsEduEditDialogOpen(open);
+                  if (!open) resetFormStates();
+                }}
+              >
+                <DialogContent className="sm:max-w-[700px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold">Edit Education</DialogTitle>
+                  </DialogHeader>
+                  <EducationForm
+                    education={selectedEducation || undefined}
+                    onSubmit={handleEduEditSubmit}
+                    isSubmitting={updateEducation.isPending}
+                    onLogoUpload={setEduLogoUrl}
+                    logoUrl={eduLogoUrl}
+                  />
+                </DialogContent>
+              </Dialog>
+
+              {/* Delete Education Alert */}
+              <AlertDialog
+                open={isEduDeleteDialogOpen}
+                onOpenChange={(open) => {
+                  setIsEduDeleteDialogOpen(open);
+                  if (!open) resetFormStates();
+                }}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete the selected education entry. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleEduDelete}
+                      disabled={deleteEducation.isPending}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {deleteEducation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </TabsContent>
+
             {/* About Tab */}
             <TabsContent value="about">
               <div className="space-y-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    About Section
-                  </h2>
+                  <h2 className="text-xl font-semibold text-gray-800">About Section</h2>
                   <div className="flex gap-2">
                     <Button onClick={() => setIsAboutDialogOpen(true)} variant="default" size="sm">
                       <FileText className="mr-2 h-4 w-4" />
@@ -664,12 +848,8 @@ export default function DashboardManager() {
                 ) : (
                   <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
                     <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-lg font-medium text-gray-900">
-                      No About Section
-                    </h3>
-                    <p className="mt-1 text-gray-500">
-                      Create an about section to tell your story.
-                    </p>
+                    <h3 className="mt-2 text-lg font-medium text-gray-900">No About Section</h3>
+                    <p className="mt-1 text-gray-500">Create an about section to tell your story.</p>
                   </div>
                 )}
 
@@ -690,9 +870,7 @@ export default function DashboardManager() {
                     <AboutForm
                       about={about || undefined}
                       onSubmit={handleAboutSubmit}
-                      isSubmitting={
-                        about ? updateAbout.isPending : createAbout.isPending
-                      }
+                      isSubmitting={about ? updateAbout.isPending : createAbout.isPending}
                     />
                   </DialogContent>
                 </Dialog>
@@ -707,17 +885,13 @@ export default function DashboardManager() {
                 >
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle className="text-lg font-semibold">
-                        Confirm Deletion
-                      </AlertDialogTitle>
+                      <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
                       <AlertDialogDescription>
                         This will permanently delete the About section. This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">
-                        Cancel
-                      </AlertDialogCancel>
+                      <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleAboutDelete}
                         disabled={deleteAboutMutation.isPending}
