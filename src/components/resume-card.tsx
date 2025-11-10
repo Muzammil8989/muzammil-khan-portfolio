@@ -176,9 +176,9 @@ export const ResumeCard = ({
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden text-[14.5px] sm:text-[16px] md:text-[16.5px] text-foreground/85 leading-[1.75] mt-2 sm:mt-2.5"
+                  className="overflow-hidden text-[14.5px] sm:text-[16px] md:text-[16.5px] text-foreground/85 leading-[1.75] mt-2 sm:mt-2.5 text-justify"
                 >
-                  <div className="border-l-2 border-emerald-400/60 pl-3 sm:pl-3.5">
+                  <div className="border-l-2 border-emerald-400/60 pl-2 sm:pl-3">
                     {description}
                   </div>
                 </motion.div>
