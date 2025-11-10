@@ -2,7 +2,12 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRightIcon } from "lucide-react";
@@ -32,27 +37,36 @@ export const ResumeCard = ({
 }: ResumeCardProps) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  const handleClick = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
     if (description) {
       e.preventDefault();
       setIsExpanded((prev) => !prev);
     }
   };
 
-  // ——— Title: first three words + "..." with tooltip for full title ———
+  // Title: first three words + "..."
   const words = title.trim().split(/\s+/);
   const isTruncatedTitle = words.length > 3;
-  const shortTitle = isTruncatedTitle ? `${words.slice(0, 3).join(" ")}...` : title;
+  const shortTitle = isTruncatedTitle
+    ? `${words.slice(0, 3).join(" ")}...`
+    : title;
 
   return (
-    <Link href={href || "#"} onClick={handleClick} className="block cursor-pointer group">
+    <Link
+      href={href || "#"}
+      onClick={handleClick}
+      className="block cursor-pointer group"
+    >
       <motion.div
         layout
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
         className={cn(
           "border border-transparent bg-transparent backdrop-blur-md p-4 sm:p-5 md:p-6",
           "hover:shadow-[0_0_15px_rgba(34,197,94,0.35)] hover:border-emerald-400/40",
-          isExpanded && "shadow-[0_0_25px_rgba(34,197,94,0.5)] border-emerald-400/60"
+          isExpanded &&
+            "shadow-[0_0_25px_rgba(34,197,94,0.5)] border-emerald-400/60"
         )}
       >
         <div className="flex items-start gap-3 sm:gap-4">
@@ -65,76 +79,95 @@ export const ResumeCard = ({
 
           <div className="flex-grow min-w-0">
             <CardHeader className="p-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2">
-                <div className="min-w-0">
-                  {/* Title + badges + chevron */}
+              {/* ===== Top row: Left (title/badges) + Right (chevron) ===== */}
+              <div className="flex items-start min-w-0">
+                {/* LEFT: title + badges (mobile below, desktop inline) */}
+                <div className="flex-1 min-w-0">
+                  {/* Title + inline badges on sm+ */}
                   <h3 className="flex items-center gap-1.5 font-semibold leading-tight text-[15.5px] sm:text-[17px] md:text-[18px] text-foreground min-w-0">
                     <TooltipProvider delayDuration={150}>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span
-                            className="truncate max-w-[60vw] sm:max-w-[46vw] md:max-w-[40vw]"
+                            className="truncate block min-w-0"
                             aria-label={title}
-                            title={isTruncatedTitle ? "" : undefined} // native title only if not using tooltip
+                            title={isTruncatedTitle ? "" : undefined}
                           >
                             {shortTitle}
                           </span>
                         </TooltipTrigger>
                         {isTruncatedTitle && (
-                          <TooltipContent side="top" align="start" className="max-w-[380px] break-words">
+                          <TooltipContent
+                            side="top"
+                            align="start"
+                            className="max-w-[380px] break-words"
+                          >
                             {title}
                           </TooltipContent>
                         )}
                       </Tooltip>
                     </TooltipProvider>
 
+                    {/* Inline badges ONLY on sm+ */}
                     {badges && badges.length > 0 && (
-                      <span className="flex flex-wrap gap-1 ml-1 sm:ml-2">
+                      <span className="hidden sm:flex flex-wrap gap-1 ml-1 sm:ml-2">
                         {badges.map((badge, i) => (
                           <Badge
                             key={i}
                             variant="secondary"
-                            className="text-[11px] sm:text-[12px] md:text-[12.5px] leading-none"
+                            className="text-[11px] sm:text-[12px] md:text-[12.5px]"
                           >
                             {badge}
                           </Badge>
                         ))}
                       </span>
                     )}
-
-                    {/* Chevron */}
-                    {description && (
-                      <span className="ml-1 inline-flex w-4 justify-center">
-                        <motion.span
-                          animate={{ rotate: isExpanded ? 90 : 0 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                          className={cn(
-                            "transition-opacity duration-200",
-                            isExpanded
-                              ? "opacity-100"
-                              : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-focus-visible:opacity-100"
-                          )}
-                        >
-                          <ChevronRightIcon className="size-4 shrink-0 text-emerald-400" />
-                        </motion.span>
-                      </span>
-                    )}
                   </h3>
 
-                  {subtitle && (
-                    <div className="font-sans text-[13.5px] sm:text-[15.5px] md:text-[16px] text-foreground/80 mt-1 line-clamp-1 sm:line-clamp-none">
-                      {subtitle}
+                  {/* Badges BELOW title ONLY on mobile */}
+                  {badges && badges.length > 0 && (
+                    <div className="flex sm:hidden flex-wrap gap-1 mt-1">
+                      {badges.map((badge, i) => (
+                        <Badge
+                          key={i}
+                          variant="secondary"
+                          className="text-[11px]"
+                        >
+                          {badge}
+                        </Badge>
+                      ))}
                     </div>
                   )}
                 </div>
 
-                <div className="text-[13.5px] sm:text-[15.5px] md:text-[16px] tabular-nums text-foreground/75 whitespace-nowrap sm:ml-2 shrink-0">
+                {/* RIGHT: chevron pinned to far right */}
+                {description && (
+                  <div className="flex-none self-center ml-2">
+                    <motion.span
+                      animate={{ rotate: isExpanded ? 90 : 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      className="block"
+                    >
+                      <ChevronRightIcon className="size-4 text-emerald-400" />
+                    </motion.span>
+                  </div>
+                )}
+              </div>
+
+              {/* Subtitle + period row */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-1 sm:mt-2 min-w-0">
+                {subtitle && (
+                  <div className="text-[13.5px] sm:text-[15.5px] md:text-[16px] text-foreground/80 line-clamp-2 min-w-0">
+                    {subtitle}
+                  </div>
+                )}
+                <div className="text-[13.5px] sm:text-[15.5px] md:text-[16px] text-foreground/75 whitespace-nowrap sm:ml-2">
                   {period}
                 </div>
               </div>
             </CardHeader>
 
-            {/* Description expand animation */}
+            {/* Expandable description */}
             <AnimatePresence initial={false}>
               {isExpanded && description && (
                 <motion.div
@@ -145,7 +178,9 @@ export const ResumeCard = ({
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden text-[14.5px] sm:text-[16px] md:text-[16.5px] text-foreground/85 leading-[1.75] mt-2 sm:mt-2.5"
                 >
-                  <div className="border-l-2 border-emerald-400/60 pl-3 sm:pl-3.5">{description}</div>
+                  <div className="border-l-2 border-emerald-400/60 pl-3 sm:pl-3.5">
+                    {description}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
