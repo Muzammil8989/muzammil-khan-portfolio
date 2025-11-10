@@ -42,16 +42,20 @@ export default function Page() {
     "I hold a degree in Computer Science from Bahria University, which gave me a solid foundation for my career as a full-stack engineer. I’m currently applying my skills at Pakistan Agriculture Research (PAR) through a collaboration with the US-based company DPSolutions. I’m passionate about solving real-world problems and focused on building high-quality, reliable software. My work is supported by strong skills in Data Structures and Algorithms, Database Management Systems (DBMS), and Agile development practices.";
 
   const highlightList = [
-    "Computer Science",
+    "BS in Computer Science",
     "Bahria University",
-    "full-stack engineer",
+    "Full-stack engineer",
     "Pakistan Agriculture Research (PAR)",
-    "US-based company DPSolutions",
-    "real-world problems",
-    "high-quality, reliable software",
-    "Data Structures and Algorithms",
-    "Database Management Systems (DBMS)",
-    "Agile development practices",
+    "DPSolutions (USA)",
+    "Turn Figma designs into live apps",
+    "Fast, reliable web apps",
+    "Clean code",
+    "Smooth UX",
+    "Ships useful features",
+    "Solves real-world problems",
+    "End-to-end development",
+    "Performance-focused",
+    "Production-ready",
   ];
 
   return (
@@ -68,7 +72,7 @@ export default function Page() {
           alphaParticles={false}
           disableRotation={false}
         />
-          <DynamicBackground />
+        <DynamicBackground />
       </div>
 
       {/* Hero Section */}
@@ -103,7 +107,10 @@ export default function Page() {
                     {/* Avatar */}
                     <div className="order-1 sm:order-2 px-1 sm:px-0">
                       <Avatar className="size-28 sm:size-28 border">
-                        <AvatarImage alt={profile.name} src={profile.avatarUrl} />
+                        <AvatarImage
+                          alt={profile.name}
+                          src={profile.avatarUrl}
+                        />
                         <AvatarFallback>{profile.initials}</AvatarFallback>
                       </Avatar>
                     </div>
@@ -234,7 +241,9 @@ export default function Page() {
           ) : isWorkError ? (
             <p className="text-red-500 text-sm">Failed to load work data.</p>
           ) : workData.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No work entries yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No work entries yet.
+            </p>
           ) : (
             <>
               <BlurFade delay={BLUR_FADE_DELAY * 5}>
@@ -252,7 +261,10 @@ export default function Page() {
               </BlurFade>
 
               {workData.map((work: any, id: number) => (
-                <BlurFade key={work.company} delay={BLUR_FADE_DELAY * 6 + id * 0.05}>
+                <BlurFade
+                  key={work.company}
+                  delay={BLUR_FADE_DELAY * 6 + id * 0.05}
+                >
                   <ResumeCard
                     logoUrl={work.logoUrl}
                     altText={work.company}

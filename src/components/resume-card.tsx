@@ -50,7 +50,8 @@ export const ResumeCard = ({
         className={cn(
           "border border-transparent bg-transparent backdrop-blur-md p-3 sm:p-4",
           "hover:shadow-[0_0_15px_rgba(34,197,94,0.35)] hover:border-emerald-400/40",
-          isExpanded && "shadow-[0_0_25px_rgba(34,197,94,0.5)] border-emerald-400/60"
+          isExpanded &&
+            "shadow-[0_0_25px_rgba(34,197,94,0.5)] border-emerald-400/60"
         )}
       >
         <div className="flex items-start gap-3 sm:gap-4">
@@ -85,7 +86,11 @@ export const ResumeCard = ({
 
                     <motion.span
                       animate={{ rotate: isExpanded ? 90 : 0 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 22,
+                      }}
                       className="ml-1"
                     >
                       <ChevronRightIcon className="size-4 shrink-0 text-emerald-400" />
@@ -107,22 +112,21 @@ export const ResumeCard = ({
 
             {/* Description expand animation */}
             <AnimatePresence initial={false}>
-  {isExpanded && description && (
-    <motion.div
-      key="description"
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="overflow-hidden text-[13px] sm:text-[15px] text-muted-foreground leading-relaxed mt-2 text-justify"
-    >
-      <div className="border-l-2 border-emerald-400/50 pl-3">
-        {description}
-      </div>
-    </motion.div>
-  )}
-</AnimatePresence>
-
+              {isExpanded && description && (
+                <motion.div
+                  key="description"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden text-[13px] sm:text-[15px] text-muted-foreground leading-relaxed mt-2 text-justify"
+                >
+                  <div className="border-l-2 border-emerald-400/50 pl-3">
+                    {description}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>
