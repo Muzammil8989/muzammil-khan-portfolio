@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRightIcon } from "lucide-react";
@@ -38,20 +39,20 @@ export const ResumeCard = ({
     }
   };
 
+  // ——— Title: first three words + "..." with tooltip for full title ———
+  const words = title.trim().split(/\s+/);
+  const isTruncatedTitle = words.length > 3;
+  const shortTitle = isTruncatedTitle ? `${words.slice(0, 3).join(" ")}...` : title;
+
   return (
-    <Link
-      href={href || "#"}
-      onClick={handleClick}
-      className="block cursor-pointer group"
-    >
+    <Link href={href || "#"} onClick={handleClick} className="block cursor-pointer group">
       <motion.div
         layout
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
         className={cn(
           "border border-transparent bg-transparent backdrop-blur-md p-4 sm:p-5 md:p-6",
           "hover:shadow-[0_0_15px_rgba(34,197,94,0.35)] hover:border-emerald-400/40",
-          isExpanded &&
-            "shadow-[0_0_25px_rgba(34,197,94,0.5)] border-emerald-400/60"
+          isExpanded && "shadow-[0_0_25px_rgba(34,197,94,0.5)] border-emerald-400/60"
         )}
       >
         <div className="flex items-start gap-3 sm:gap-4">
@@ -68,7 +69,24 @@ export const ResumeCard = ({
                 <div className="min-w-0">
                   {/* Title + badges + chevron */}
                   <h3 className="flex items-center gap-1.5 font-semibold leading-tight text-[15.5px] sm:text-[17px] md:text-[18px] text-foreground min-w-0">
-                    <span className="truncate">{title}</span>
+                    <TooltipProvider delayDuration={150}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span
+                            className="truncate max-w-[60vw] sm:max-w-[46vw] md:max-w-[40vw]"
+                            aria-label={title}
+                            title={isTruncatedTitle ? "" : undefined} // native title only if not using tooltip
+                          >
+                            {shortTitle}
+                          </span>
+                        </TooltipTrigger>
+                        {isTruncatedTitle && (
+                          <TooltipContent side="top" align="start" className="max-w-[380px] break-words">
+                            {title}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
 
                     {badges && badges.length > 0 && (
                       <span className="flex flex-wrap gap-1 ml-1 sm:ml-2">
@@ -84,7 +102,7 @@ export const ResumeCard = ({
                       </span>
                     )}
 
-                    {/* Chevron: appears only on hover/focus, stays visible when expanded */}
+                    {/* Chevron */}
                     {description && (
                       <span className="ml-1 inline-flex w-4 justify-center">
                         <motion.span
@@ -127,9 +145,7 @@ export const ResumeCard = ({
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden text-[14.5px] sm:text-[16px] md:text-[16.5px] text-foreground/85 leading-[1.75] mt-2 sm:mt-2.5"
                 >
-                  <div className="border-l-2 border-emerald-400/60 pl-3 sm:pl-3.5">
-                    {description}
-                  </div>
+                  <div className="border-l-2 border-emerald-400/60 pl-3 sm:pl-3.5">{description}</div>
                 </motion.div>
               )}
             </AnimatePresence>
