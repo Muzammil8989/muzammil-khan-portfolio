@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader } from "@/components/ui/card";
+import { CardHeader } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import BlurText from "./react-bit/blur-text";
 
 interface ResumeCardProps {
   logoUrl: string;
@@ -93,7 +94,14 @@ export const ResumeCard = ({
                             aria-label={title}
                             title={isTruncatedTitle ? "" : undefined}
                           >
-                            {shortTitle}
+                            <BlurText
+                              text={shortTitle}
+                              delay={120}
+                              animateBy="words"
+                              direction="top"
+                              stepDuration={0.35}
+                              className="inline"
+                            />
                           </span>
                         </TooltipTrigger>
                         {isTruncatedTitle && (
@@ -128,11 +136,7 @@ export const ResumeCard = ({
                   {badges && badges.length > 0 && (
                     <div className="flex sm:hidden flex-wrap gap-1 mt-1">
                       {badges.map((badge, i) => (
-                        <Badge
-                          key={i}
-                          variant="secondary"
-                          className="text-[11px]"
-                        >
+                        <Badge key={i} variant="secondary" className="text-[11px]">
                           {badge}
                         </Badge>
                       ))}
@@ -158,7 +162,13 @@ export const ResumeCard = ({
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-1 sm:mt-2 min-w-0">
                 {subtitle && (
                   <div className="text-[13.5px] sm:text-[15.5px] md:text-[16px] text-foreground/80 line-clamp-2 min-w-0">
-                    {subtitle}
+                    <BlurText
+                      text={subtitle}
+                      delay={160}
+                      animateBy="words"
+                      direction="top"
+                      stepDuration={0.28}
+                    />
                   </div>
                 )}
                 <div className="text-[13.5px] sm:text-[15.5px] md:text-[16px] text-foreground/75 whitespace-nowrap sm:ml-2">
@@ -179,7 +189,14 @@ export const ResumeCard = ({
                   className="overflow-hidden text-[14.5px] sm:text-[16px] md:text-[16.5px] text-foreground/85 leading-[1.75] mt-2 sm:mt-2.5 text-justify"
                 >
                   <div className="border-l-2 border-emerald-400/60 pl-2 sm:pl-3">
-                    {description}
+                    <BlurText
+                      text={description}
+                      delay={200}
+                      animateBy="words"
+                      direction="top"
+                      stepDuration={0.32}
+                      className="block"
+                    />
                   </div>
                 </motion.div>
               )}
