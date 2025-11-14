@@ -42,6 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: profile.name,
       template: `%s | ${profile.name}`,
     },
+    
     description: profile.description,
     openGraph: {
       title: profile.name,
