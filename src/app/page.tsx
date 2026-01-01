@@ -9,11 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
 import Particles from "@/components/react-bit/particles";
 import DynamicBackground from "@/components/three/dynamic-background";
-import BlobCursor from "@/components/react-bit/blob-cursor";
 import BlurText from "@/components/react-bit/blur-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/resume-card";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface AboutData {
   message: string;
@@ -22,6 +21,26 @@ interface AboutData {
 const BLUR_FADE_DELAY = 0.08;
 
 export default function Page() {
+  // Dark mode detection
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Initial check
+    setIsDarkMode(document.documentElement.classList.contains("dark"));
+
+    // Watch for theme changes
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Profiles (Hero)
   const { data: profiles = [], isLoading, isError } = useProfiles();
 
@@ -68,44 +87,30 @@ export default function Page() {
   ];
 
   return (
-    <main className="relative flex flex-col min-h-[500dvh] space-y-2 overflow-x-hidden px-6 py-6 sm:py-10">
+    <main className="relative flex flex-col min-h-[500dvh] space-y-6 sm:space-y-8 overflow-x-hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
       {/* Background Animation */}
       <div className="fixed inset-0 -z-10">
         <Particles
-          particleColors={["#ffffff", "#3624d6", "#FED000", "#c300ffff"]}
-          particleCount={200}
-          particleSpread={10}
-          speed={0.1}
-          particleBaseSize={100}
+          particleColors={
+            isDarkMode
+              ? ["#1a0f2e", "#0f1a2e", "#2e0f1a", "#0f2e2e"]
+              : ["#c8b6ff", "#b3e5ff", "#ffb3e6", "#b3d9ff"]
+          }
+          particleCount={180}
+          particleSpread={12}
+          speed={0.12}
+          particleBaseSize={110}
           moveParticlesOnHover={true}
           alphaParticles={false}
           disableRotation={false}
         />
         <DynamicBackground />
-       
+
       </div>
-       <BlobCursor
-          blobType="circle"
-          fillColor="#5227FF"
-          trailCount={3}
-          sizes={[60, 125, 75]}
-          innerSizes={[20, 35, 25]}
-          innerColor="rgba(255,255,255,0.8)"
-          opacities={[0.6, 0.6, 0.6]}
-          shadowColor="rgba(0,0,0,0.75)"
-          shadowBlur={5}
-          shadowOffsetX={10}
-          shadowOffsetY={10}
-          filterStdDeviation={30}
-          useFilter={true}
-          fastDuration={0.1}
-          slowDuration={0.5}
-          zIndex={-100}
-        />
 
       {/* Hero Section */}
-      <section id="hero" className="pb-4">
-        <div className="mx-auto w-full max-w-4xl space-y-6">
+      <section id="hero" className="pb-4 sm:pb-6">
+        <div className="mx-auto w-full max-w-5xl space-y-6">
           <div className="flex flex-col gap-6">
             {isLoading ? (
               <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
@@ -144,9 +149,9 @@ export default function Page() {
                     </div>
 
                     {/* Text */}
-                    <div className="flex flex-col flex-1 space-y-2 order-2 sm:order-1">
+                    <div className="flex flex-col flex-1 space-y-3 sm:space-y-4 order-2 sm:order-1">
                       {/* Mobile Heading */}
-                      <div className="block sm:hidden font-extrabold tracking-tight text-[24px] leading-tight text-center">
+                      <div className="block sm:hidden font-bold tracking-tight text-[28px] leading-snug text-center text-foreground antialiased">
                         <SplitText
                           text={`Hi, I'm ${mobileName} 👋`}
                           delay={80}
@@ -159,7 +164,7 @@ export default function Page() {
                       </div>
 
                       {/* Desktop Heading */}
-                      <div className="hidden sm:block font-extrabold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.1] text-left">
+                      <div className="hidden sm:block font-bold tracking-tight text-5xl md:text-6xl lg:text-7xl leading-[1.15] text-left text-foreground antialiased">
                         <SplitText
                           text={`Hi, I'm ${firstWord} 👋`}
                           delay={100}
@@ -177,7 +182,7 @@ export default function Page() {
                         delay={100}
                         animateBy="words"
                         direction="top"
-                        className="max-w-[680px] text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed text-foreground/90 text-justify"
+                        className="max-w-[720px] text-base sm:text-lg md:text-xl leading-[1.7] sm:leading-[1.7] md:leading-[1.7] text-foreground/95 font-normal text-left antialiased"
                         stepDuration={0.45}
                       />
                     </div>
@@ -196,8 +201,8 @@ export default function Page() {
       </section>
 
       {/* About Section */}
-      <section id="about">
-        <div className="mx-auto w-full max-w-4xl space-y-6">
+      <section id="about" className="pt-2 sm:pt-4">
+        <div className="mx-auto w-full max-w-5xl space-y-6">
           <div className="flex flex-col gap-6">
             {isAboutLoading ? (
               <div className="space-y-4">
@@ -212,8 +217,8 @@ export default function Page() {
                 Failed to load about data.
               </p>
             ) : (
-              <div className="space-y-3">
-                <div className="font-bold tracking-tight text-2xl md:text-3xl text-left">
+              <div className="space-y-4 sm:space-y-5">
+                <div className="font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl text-left text-foreground antialiased">
                   <SplitText
                     text="About Me"
                     delay={100}
@@ -231,10 +236,10 @@ export default function Page() {
                   delay={200}
                   animateBy="words"
                   direction="top"
-                  className="max-w-[680px] text-[15.5px] sm:text-[16.5px] md:text-[17px] leading-relaxed text-foreground/90 text-justify"
+                  className="max-w-[720px] text-base sm:text-lg md:text-xl leading-[1.7] sm:leading-[1.7] md:leading-[1.7] text-foreground/95 font-normal text-left antialiased"
                   stepDuration={0.45}
                   emphasizeKeywords={highlightList}
-                  emphasizeClassName="font-semibold underline underline-offset-4 decoration-2 decoration-foreground/60"
+                  emphasizeClassName="font-semibold underline underline-offset-4 decoration-1 decoration-foreground/70"
                 />
               </div>
             )}
@@ -243,8 +248,8 @@ export default function Page() {
       </section>
 
       {/* Work Experience Section */}
-      <section id="work">
-        <div className="mx-auto w-full max-w-4xl flex min-h-0 flex-col pt-4">
+      <section id="work" className="pt-2 sm:pt-4">
+        <div className="mx-auto w-full max-w-5xl flex min-h-0 flex-col gap-3 sm:gap-4">
           {isWorkLoading ? (
             <>
               <div className="flex gap-4 items-start">
@@ -275,7 +280,7 @@ export default function Page() {
           ) : (
             <>
               <BlurFade delay={BLUR_FADE_DELAY * 5}>
-                <h2 className="text-2xl md:text-3xl font-bold">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 text-foreground antialiased">
                   <SplitText
                     text="Work Experience"
                     delay={60}
@@ -311,8 +316,8 @@ export default function Page() {
       </section>
 
       {/* Education Section */}
-      <section id="education">
-        <div className="mx-auto w-full max-w-4xl flex min-h-0 flex-col pt-4">
+      <section id="education" className="pt-2 sm:pt-4 pb-8 sm:pb-12">
+        <div className="mx-auto w-full max-w-5xl flex min-h-0 flex-col gap-3 sm:gap-4">
           {isEducationLoading ? (
             <>
               <div className="flex gap-4 items-start">
@@ -345,7 +350,7 @@ export default function Page() {
           ) : (
             <>
               <BlurFade delay={BLUR_FADE_DELAY * 5}>
-                <h2 className="text-2xl md:text-3xl font-bold">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 text-foreground antialiased">
                   <SplitText
                     text="Education"
                     delay={60}

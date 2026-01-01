@@ -135,19 +135,12 @@ export async function PUT(req: NextRequest) {
     }
 
     // Update the about section
-    const result = await db
+    await db
       .collection<About>("about")
       .updateOne(
         { _id: existingAbout._id },
         { $set: { message: aboutData.message } }
       );
-
-    if (result.modifiedCount === 0) {
-      return NextResponse.json(
-        { message: "About section not found or no changes made." },
-        { status: 404 }
-      );
-    }
 
     return NextResponse.json(
       {

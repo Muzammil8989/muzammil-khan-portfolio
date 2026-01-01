@@ -35,9 +35,9 @@
 /* Light Mode */
 :root {
   --background: oklch(0.95 0.01 250);       /* Soft off-white */
-  --foreground: oklch(0.2 0.01 260);        /* Dark slate */
+  --foreground: oklch(0.15 0.02 260);       /* Darker text for better contrast */
   --card: oklch(0.98 0.01 250);             /* White card */
-  --card-foreground: oklch(0.2 0.01 260);  
+  --card-foreground: oklch(0.15 0.02 260);  
   --border: oklch(0.88 0.01 250);           /* Soft border */
   --input: oklch(0.93 0.01 250);            /* Light input background */
   --ring: oklch(0.55 0.18 280);             /* Indigo ring */
@@ -62,10 +62,10 @@
 
 /* Dark Mode */
 .dark {
-  --background: oklch(0.18 0.12 260);       /* Dark blue */
-  --foreground: oklch(0.95 0.01 250);       /* Light text */
-  --card: oklch(0.18 0.12 260);             /* Dark card */
-  --card-foreground: oklch(0.95 0.01 250);  /* Light card foreground */
+  --background: oklch(0.16 0.06 260);       /* Lighter, smoother blue */
+  --foreground: oklch(0.96 0.01 250);       /* Softer white text */
+  --card: oklch(0.18 0.06 260);             /* Slightly lighter card */
+  --card-foreground: oklch(0.96 0.01 250);  /* Softer card text */
   --border: oklch(0.3 0.02 260);            /* Soft border */
   --input: oklch(0.25 0.02 260);            /* Dark input background */
   --ring: oklch(0.55 0.18 280);             /* Indigo ring */
@@ -89,6 +89,24 @@
 }
 
 @layer base {
-  * { @apply border-border; }
-  body { @apply bg-background text-foreground; }
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply antialiased;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    @apply antialiased;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
 }
