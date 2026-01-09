@@ -2,7 +2,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 export default function SignOutButton() {
@@ -19,7 +19,7 @@ export default function SignOutButton() {
     <Button
       variant="outline"
       onClick={handleSignOut}
-      className="hover:bg-red-50 hover:text-red-600"
+      className="border-slate-300 bg-white text-slate-700 hover:bg-red-50 hover:text-red-600 hover:border-red-300"
     >
       Sign Out
     </Button>

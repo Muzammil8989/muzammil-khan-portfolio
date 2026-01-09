@@ -1,918 +1,105 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { ProfileForm } from "@/components/profile-form";
-import { AboutForm } from "@/components/about-form";
-import {
-  useProfiles,
-  useCreateProfile,
-  useUpdateProfile,
-  useDeleteProfile,
-} from "@/app/hooks/useProfiles";
-import {
-  useAbout,
-  useCreateAbout,
-  useUpdateAbout,
-  useDeleteAbout,
-} from "@/app/hooks/useAbout";
-import { Profile } from "@/services/profile";
-import { About } from "@/services/about";
-import { toast } from "sonner";
-import { Loader2, User, Plus, FileText, Briefcase, GraduationCap } from "lucide-react";
-import SignOutButton from "@/components/signout-button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ProfileCard } from "@/components/profile-card";
-import { AboutCard } from "@/components/about-card";
-
-// Work
-import {
-  useWorkExperiences,
-  useCreateWorkExperience,
-  useUpdateWorkExperience,
-  useDeleteWorkExperience,
-} from "@/app/hooks/useWorkExperiences";
-import { WorkExperience } from "@/services/work";
-import { WorkExperienceCard } from "@/components/work-experience-card";
-import { WorkExperienceForm } from "@/components/work-experience-form";
-
-// Education
-import {
-  useEducations,
-  useCreateEducation,
-  useUpdateEducation,
-  useDeleteEducation,
-} from "@/app/hooks/useEducation";
-import type { Education } from "@/services/educations";
-import { EducationCard } from "@/components/educations-card";
-import { EducationForm } from "@/components/educations-form";
+import { SignOutButton } from "@/components/features/auth";
+import { ProfileManager } from "@/components/features/profile";
+import { WorkManager } from "@/components/features/work";
+import { EducationManager } from "@/components/features/education";
+import { AboutManager } from "@/components/features/about";
+import { ProjectManager } from "@/components/features/projects";
+import { SkillsManager } from "@/components/features/skills";
+import { LayoutDashboard, User, Briefcase, GraduationCap, FileText, Code2, Wrench } from "lucide-react";
 
 export default function DashboardManager() {
-  // dialogs (profiles)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  // dialogs (about)
-  const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false);
-  const [isAboutDeleteDialogOpen, setIsAboutDeleteDialogOpen] = useState(false);
-
-  // dialogs (work)
-  const [isWorkCreateDialogOpen, setIsWorkCreateDialogOpen] = useState(false);
-  const [isWorkEditDialogOpen, setIsWorkEditDialogOpen] = useState(false);
-  const [isWorkDeleteDialogOpen, setIsWorkDeleteDialogOpen] = useState(false);
-
-  // dialogs (education)
-  const [isEduCreateDialogOpen, setIsEduCreateDialogOpen] = useState(false);
-  const [isEduEditDialogOpen, setIsEduEditDialogOpen] = useState(false);
-  const [isEduDeleteDialogOpen, setIsEduDeleteDialogOpen] = useState(false);
-
-  // selections
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [selectedAbout, setSelectedAbout] = useState<About | null>(null);
-  const [selectedWork, setSelectedWork] = useState<WorkExperience | null>(null);
-  const [selectedEducation, setSelectedEducation] = useState<Education | null>(null);
-
-  // uploads
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [logoUrl, setLogoUrl] = useState("");      // for Work
-  const [eduLogoUrl, setEduLogoUrl] = useState(""); // for Education
-
-  // data hooks
-  const { data: profiles = [], isLoading, isError, refetch } = useProfiles();
-  const { data: about, isLoading: isLoadingAbout, refetch: refetchAbout } = useAbout();
-
-  // work hooks
-  const {
-    data: workExperiences = [],
-    isLoading: isLoadingWork,
-    isError: isErrorWork,
-    refetch: refetchWork,
-  } = useWorkExperiences();
-
-  // education hooks
-  const {
-    data: educations = [],
-    isLoading: isLoadingEdu,
-    isError: isErrorEdu,
-    refetch: refetchEdu,
-  } = useEducations();
-
-  // mutations
-  const createProfile = useCreateProfile();
-  const updateProfile = useUpdateProfile();
-  const deleteProfile = useDeleteProfile();
-
-  const createAbout = useCreateAbout();
-  const updateAbout = useUpdateAbout();
-  const deleteAboutMutation = useDeleteAbout();
-
-  const createWork = useCreateWorkExperience();
-  const updateWork = useUpdateWorkExperience();
-  const deleteWork = useDeleteWorkExperience();
-
-  const createEducation = useCreateEducation();
-  const updateEducation = useUpdateEducation();
-  const deleteEducation = useDeleteEducation();
-
-  // 🛠️ Scrollbar layout shift fix
-  useEffect(() => {
-    const anyDialogOpen =
-      isCreateDialogOpen ||
-      isEditDialogOpen ||
-      isDeleteDialogOpen ||
-      isAboutDialogOpen ||
-      isAboutDeleteDialogOpen ||
-      isWorkCreateDialogOpen ||
-      isWorkEditDialogOpen ||
-      isWorkDeleteDialogOpen ||
-      isEduCreateDialogOpen ||
-      isEduEditDialogOpen ||
-      isEduDeleteDialogOpen;
-
-    if (anyDialogOpen) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.paddingRight = "";
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.paddingRight = "";
-      document.body.style.overflow = "";
-    };
-  }, [
-    isCreateDialogOpen,
-    isEditDialogOpen,
-    isDeleteDialogOpen,
-    isAboutDialogOpen,
-    isAboutDeleteDialogOpen,
-    isWorkCreateDialogOpen,
-    isWorkEditDialogOpen,
-    isWorkDeleteDialogOpen,
-    isEduCreateDialogOpen,
-    isEduEditDialogOpen,
-    isEduDeleteDialogOpen,
-  ]);
-
-  const resetFormStates = () => {
-    setAvatarUrl("");
-    setLogoUrl("");
-    setEduLogoUrl("");
-    setSelectedProfile(null);
-    setSelectedAbout(null);
-    setSelectedWork(null);
-    setSelectedEducation(null);
-  };
-
-  // PROFILE handlers
-  const handleCreateSubmit = (data: Omit<Profile, "_id">) => {
-    createProfile.mutate(
-      { ...data, avatarUrl },
-      {
-        onSuccess: () => {
-          toast.success("Profile created successfully");
-          setIsCreateDialogOpen(false);
-          resetFormStates();
-          refetch();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to create profile");
-        },
-      }
-    );
-  };
-
-  const handleEditSubmit = (data: Omit<Profile, "_id">) => {
-    if (!selectedProfile) return;
-
-    updateProfile.mutate(
-      {
-        ...data,
-        _id: selectedProfile._id,
-        avatarUrl: avatarUrl || data.avatarUrl,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Profile updated successfully");
-          setIsEditDialogOpen(false);
-          resetFormStates();
-          refetch();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to update profile");
-        },
-      }
-    );
-  };
-
-  const handleDelete = () => {
-    if (!selectedProfile) return;
-
-    deleteProfile.mutate(selectedProfile._id, {
-      onSuccess: () => {
-        toast.success("Profile deleted successfully");
-        setIsDeleteDialogOpen(false);
-        resetFormStates();
-        refetch();
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Failed to delete profile");
-      },
-    });
-  };
-
-  // ABOUT handlers
-  const handleAboutSubmit = (data: Omit<About, "_id">) => {
-    if (about) {
-      updateAbout.mutate(data, {
-        onSuccess: () => {
-          toast.success("About section updated successfully");
-          setIsAboutDialogOpen(false);
-          resetFormStates();
-          refetchAbout();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to update About section");
-        },
-      });
-    } else {
-      createAbout.mutate(data, {
-        onSuccess: () => {
-          toast.success("About section created successfully");
-          setIsAboutDialogOpen(false);
-          resetFormStates();
-          refetchAbout();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to create About section");
-        },
-      });
-    }
-  };
-
-  const handleAboutDelete = () => {
-    deleteAboutMutation.mutate(undefined, {
-      onSuccess: () => {
-        toast.success("About section deleted successfully");
-        setIsAboutDeleteDialogOpen(false);
-        resetFormStates();
-        refetchAbout();
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Failed to delete About section");
-      },
-    });
-  };
-
-  // WORK handlers
-  const handleWorkCreateSubmit = (data: Omit<WorkExperience, "_id">) => {
-    createWork.mutate(
-      { ...data, logoUrl },
-      {
-        onSuccess: () => {
-          toast.success("Experience created successfully");
-          setIsWorkCreateDialogOpen(false);
-          resetFormStates();
-          refetchWork();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to create experience");
-        },
-      }
-    );
-  };
-
-  const handleWorkEditSubmit = (data: Omit<WorkExperience, "_id">) => {
-    if (!selectedWork) return;
-
-    updateWork.mutate(
-      { ...selectedWork, ...data, logoUrl: logoUrl || data.logoUrl },
-      {
-        onSuccess: () => {
-          toast.success("Experience updated successfully");
-          setIsWorkEditDialogOpen(false);
-          resetFormStates();
-          refetchWork();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to update experience");
-        },
-      }
-    );
-  };
-
-  const handleWorkDelete = () => {
-    if (!selectedWork) return;
-    deleteWork.mutate(selectedWork._id, {
-      onSuccess: () => {
-        toast.success("Experience deleted successfully");
-        setIsWorkDeleteDialogOpen(false);
-        resetFormStates();
-        refetchWork();
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Failed to delete experience");
-      },
-    });
-  };
-
-  const handleWorkEditClick = (work: WorkExperience) => {
-    setSelectedWork(work);
-    setLogoUrl(work.logoUrl || "");
-    setIsWorkEditDialogOpen(true);
-  };
-
-  const handleWorkDeleteClick = (work: WorkExperience) => {
-    setSelectedWork(work);
-    setIsWorkDeleteDialogOpen(true);
-  };
-
-  // EDUCATION handlers
-  const handleEduCreateSubmit = (data: Omit<Education, "_id">) => {
-    createEducation.mutate(
-      { ...data, logoUrl: eduLogoUrl },
-      {
-        onSuccess: () => {
-          toast.success("Education created successfully");
-          setIsEduCreateDialogOpen(false);
-          resetFormStates();
-          refetchEdu();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to create education");
-        },
-      }
-    );
-  };
-
-  const handleEduEditSubmit = (data: Omit<Education, "_id">) => {
-    if (!selectedEducation) return;
-
-    updateEducation.mutate(
-      { id: selectedEducation._id, data: { ...data, logoUrl: eduLogoUrl || data.logoUrl } },
-      {
-        onSuccess: () => {
-          toast.success("Education updated successfully");
-          setIsEduEditDialogOpen(false);
-          resetFormStates();
-          refetchEdu();
-        },
-        onError: (error: any) => {
-          toast.error(error.message || "Failed to update education");
-        },
-      }
-    );
-  };
-
-  const handleEduDelete = () => {
-    if (!selectedEducation) return;
-
-    deleteEducation.mutate(selectedEducation._id, {
-      onSuccess: () => {
-        toast.success("Education deleted successfully");
-        setIsEduDeleteDialogOpen(false);
-        resetFormStates();
-        refetchEdu();
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Failed to delete education");
-      },
-    });
-  };
-
-  const handleEduEditClick = (education: Education) => {
-    setSelectedEducation(education);
-    setEduLogoUrl(education.logoUrl || "");
-    setIsEduEditDialogOpen(true);
-  };
-
-  const handleEduDeleteClick = (education: Education) => {
-    setSelectedEducation(education);
-    setIsEduDeleteDialogOpen(true);
-  };
-
-  if (isError) {
-    return <div className="p-4 text-red-500">Error loading profiles. Please try again.</div>;
-  }
-  if (isErrorWork) {
-    return <div className="p-4 text-red-500">Error loading work experiences. Please try again.</div>;
-  }
-  if (isErrorEdu) {
-    return <div className="p-4 text-red-500">Error loading education. Please try again.</div>;
-  }
-
   return (
-    <div className="min-h-screen px-6 py-12 sm:py-20">
-      <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dashboard Manager</h1>
-          <div className="flex flex-col sm:flex-row gap-2 md:w-auto">
-            {profiles.length === 0 && (
-              <Dialog
-                open={isCreateDialogOpen}
-                onOpenChange={(open) => {
-                  setIsCreateDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="default" size="sm" className="w-full sm:w-auto">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Profile
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">Create New Profile</DialogTitle>
-                  </DialogHeader>
-                  <ProfileForm
-                    onSubmit={handleCreateSubmit}
-                    isSubmitting={createProfile.isPending}
-                    onAvatarUpload={setAvatarUrl}
-                    avatarUrl={avatarUrl}
-                  />
-                </DialogContent>
-              </Dialog>
-            )}
-
-            {/* Add Work */}
-            <Dialog
-              open={isWorkCreateDialogOpen}
-              onOpenChange={(open) => {
-                setIsWorkCreateDialogOpen(open);
-                if (!open) resetFormStates();
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Experience
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[700px]">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold">Create Work Experience</DialogTitle>
-                </DialogHeader>
-                <WorkExperienceForm
-                  onSubmit={handleWorkCreateSubmit}
-                  isSubmitting={createWork.isPending}
-                  onLogoUpload={setLogoUrl}
-                  logoUrl={logoUrl}
-                />
-              </DialogContent>
-            </Dialog>
-
-            {/* Add Education */}
-            <Dialog
-              open={isEduCreateDialogOpen}
-              onOpenChange={(open) => {
-                setIsEduCreateDialogOpen(open);
-                if (!open) resetFormStates();
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Education
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[700px]">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold">Create Education</DialogTitle>
-                </DialogHeader>
-                <EducationForm
-                  onSubmit={handleEduCreateSubmit}
-                  isSubmitting={createEducation.isPending}
-                  onLogoUpload={setEduLogoUrl}
-                  logoUrl={eduLogoUrl}
-                />
-              </DialogContent>
-            </Dialog>
-
-            <SignOutButton />
+    <div className="min-h-screen bg-[#F8FAFC] px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header section */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-blue-600 rounded-xl text-white shadow-lg">
+              <LayoutDashboard size={22} />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Admin Dashboard</h1>
+              <p className="text-sm text-slate-600 font-medium">Manage your portfolio content</p>
+            </div>
           </div>
-        </div>
+          <SignOutButton />
+        </header>
 
-        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-          <Tabs defaultValue="profiles">
-            <div className="mb-6">
-              <TabsList className="grid w-full grid-cols-4 max-w-2xl">
-                <TabsTrigger value="profiles">Profiles</TabsTrigger>
-                <TabsTrigger value="work">Work</TabsTrigger>
-                <TabsTrigger value="education">Education</TabsTrigger>
-                <TabsTrigger value="about">About</TabsTrigger>
+        {/* Main Content Area */}
+        <main className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <Tabs defaultValue="profiles" className="w-full">
+            <div className="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-2">
+              <TabsList className="bg-transparent h-auto p-0 gap-4 sm:gap-6 flex overflow-x-auto no-scrollbar">
+                <TabsTrigger
+                  value="profiles"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-0 py-2.5 text-slate-600 font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                  Profiles
+                </TabsTrigger>
+                <TabsTrigger
+                  value="work"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-0 py-2.5 text-slate-600 font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                  Work
+                </TabsTrigger>
+                <TabsTrigger
+                  value="education"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-0 py-2.5 text-slate-600 font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                  Education
+                </TabsTrigger>
+                <TabsTrigger
+                  value="about"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-0 py-2.5 text-slate-600 font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                  About
+                </TabsTrigger>
+                <TabsTrigger
+                  value="projects"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-0 py-2.5 text-slate-600 font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                  Projects
+                </TabsTrigger>
+                <TabsTrigger
+                  value="skills"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-0 py-2.5 text-slate-600 font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  <Wrench className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                  Skills
+                </TabsTrigger>
               </TabsList>
             </div>
 
-            {/* Profiles Tab */}
-            <TabsContent value="profiles">
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-64 rounded-lg" />
-                  ))}
-                </div>
-              ) : profiles.length > 0 ? (
-                <div
-                  className={`grid gap-4 md:gap-6 ${
-                    profiles.length === 1 ? "grid-cols-1 max-w-md mx-auto" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                  }`}
-                >
-                  {profiles.map((profile) => (
-                    <ProfileCard
-                      key={profile._id}
-                      profile={profile}
-                      onEdit={(p) => {
-                        setSelectedProfile(p);
-                        setAvatarUrl(p.avatarUrl || "");
-                        setIsEditDialogOpen(true);
-                      }}
-                      onDelete={(p) => {
-                        setSelectedProfile(p);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <User className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">No profiles</h3>
-                  <p className="mt-1 text-gray-500">Get started by creating a new profile.</p>
-                  <Button onClick={() => setIsCreateDialogOpen(true)} className="mt-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Profile
-                  </Button>
-                </div>
-              )}
-
-              {/* Edit Profile Dialog */}
-              <Dialog
-                open={isEditDialogOpen}
-                onOpenChange={(open) => {
-                  setIsEditDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <DialogContent className="sm:max-w-[600px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">Edit Profile</DialogTitle>
-                  </DialogHeader>
-                  <ProfileForm
-                    profile={selectedProfile || undefined}
-                    onSubmit={handleEditSubmit}
-                    isSubmitting={updateProfile.isPending}
-                    onAvatarUpload={setAvatarUrl}
-                    avatarUrl={avatarUrl}
-                  />
-                </DialogContent>
-              </Dialog>
-
-              {/* Delete Profile Alert */}
-              <AlertDialog
-                open={isDeleteDialogOpen}
-                onOpenChange={(open) => {
-                  setIsDeleteDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete the profile "{selectedProfile?.name}". This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      disabled={deleteProfile.isPending}
-                      className="bg-red-600 hover:bg-red-700 text-white"
-                    >
-                      {deleteProfile.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Deleting...
-                        </>
-                      ) : (
-                        "Delete"
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </TabsContent>
-
-            {/* Work Tab */}
-            <TabsContent value="work">
-              {isLoadingWork ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-64 rounded-lg" />
-                  ))}
-                </div>
-              ) : workExperiences.length > 0 ? (
-                <div
-                  className={`grid gap-4 md:gap-6 ${
-                    workExperiences.length === 1
-                      ? "grid-cols-1 max-w-md mx-auto"
-                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                  }`}
-                >
-                  {workExperiences.map((work) => (
-                    <WorkExperienceCard
-                      key={work._id}
-                      work={work}
-                      onEdit={handleWorkEditClick}
-                      onDelete={handleWorkDeleteClick}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">No work experiences</h3>
-                  <p className="mt-1 text-gray-500">Add your first work experience.</p>
-                  <Button onClick={() => setIsWorkCreateDialogOpen(true)} className="mt-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Experience
-                  </Button>
-                </div>
-              )}
-
-              {/* Edit Work Dialog */}
-              <Dialog
-                open={isWorkEditDialogOpen}
-                onOpenChange={(open) => {
-                  setIsWorkEditDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <DialogContent className="sm:max-w-[700px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">Edit Experience</DialogTitle>
-                  </DialogHeader>
-                  <WorkExperienceForm
-                    work={selectedWork || undefined}
-                    onSubmit={handleWorkEditSubmit}
-                    isSubmitting={updateWork.isPending}
-                    onLogoUpload={setLogoUrl}
-                    logoUrl={logoUrl}
-                  />
-                </DialogContent>
-              </Dialog>
-
-              {/* Delete Work Alert */}
-              <AlertDialog
-                open={isWorkDeleteDialogOpen}
-                onOpenChange={(open) => {
-                  setIsWorkDeleteDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete the selected work experience. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleWorkDelete}
-                      disabled={deleteWork.isPending}
-                      className="bg-red-600 hover:bg-red-700 text-white"
-                    >
-                      {deleteWork.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Deleting...
-                        </>
-                      ) : (
-                        "Delete"
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </TabsContent>
-
-            {/* Education Tab */}
-            <TabsContent value="education">
-              {isLoadingEdu ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-64 rounded-lg" />
-                  ))}
-                </div>
-              ) : educations.length > 0 ? (
-                <div
-                  className={`grid gap-4 md:gap-6 ${
-                    educations.length === 1 ? "grid-cols-1 max-w-md mx-auto" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                  }`}
-                >
-                  {educations.map((education) => (
-                    <EducationCard
-                      key={education._id}
-                      education={education}
-                      onEdit={handleEduEditClick}
-                      onDelete={handleEduDeleteClick}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <GraduationCap className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-lg font-medium text-gray-900">No education</h3>
-                  <p className="mt-1 text-gray-500">Add your first education entry.</p>
-                  <Button onClick={() => setIsEduCreateDialogOpen(true)} className="mt-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Education
-                  </Button>
-                </div>
-              )}
-
-              {/* Edit Education Dialog */}
-              <Dialog
-                open={isEduEditDialogOpen}
-                onOpenChange={(open) => {
-                  setIsEduEditDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <DialogContent className="sm:max-w-[700px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">Edit Education</DialogTitle>
-                  </DialogHeader>
-                  <EducationForm
-                    education={selectedEducation || undefined}
-                    onSubmit={handleEduEditSubmit}
-                    isSubmitting={updateEducation.isPending}
-                    onLogoUpload={setEduLogoUrl}
-                    logoUrl={eduLogoUrl}
-                  />
-                </DialogContent>
-              </Dialog>
-
-              {/* Delete Education Alert */}
-              <AlertDialog
-                open={isEduDeleteDialogOpen}
-                onOpenChange={(open) => {
-                  setIsEduDeleteDialogOpen(open);
-                  if (!open) resetFormStates();
-                }}
-              >
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete the selected education entry. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleEduDelete}
-                      disabled={deleteEducation.isPending}
-                      className="bg-red-600 hover:bg-red-700 text-white"
-                    >
-                      {deleteEducation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Deleting...
-                        </>
-                      ) : (
-                        "Delete"
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </TabsContent>
-
-            {/* About Tab */}
-            <TabsContent value="about">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">About Section</h2>
-                  <div className="flex gap-2">
-                    <Button onClick={() => setIsAboutDialogOpen(true)} variant="default" size="sm">
-                      <FileText className="mr-2 h-4 w-4" />
-                      {about ? "Edit About" : "Create About"}
-                    </Button>
-                    {about && (
-                      <Button
-                        onClick={() => setIsAboutDeleteDialogOpen(true)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 border-red-600 hover:bg-red-50"
-                      >
-                        Delete About
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {isLoadingAbout ? (
-                  <div className="space-y-4">
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                  </div>
-                ) : about ? (
-                  <AboutCard about={about} />
-                ) : (
-                  <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-                    <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-lg font-medium text-gray-900">No About Section</h3>
-                    <p className="mt-1 text-gray-500">Create an about section to tell your story.</p>
-                  </div>
-                )}
-
-                {/* About Dialog */}
-                <Dialog
-                  open={isAboutDialogOpen}
-                  onOpenChange={(open) => {
-                    setIsAboutDialogOpen(open);
-                    if (!open) resetFormStates();
-                  }}
-                >
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-semibold">
-                        {about ? "Edit About Section" : "Create About Section"}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <AboutForm
-                      about={about || undefined}
-                      onSubmit={handleAboutSubmit}
-                      isSubmitting={about ? updateAbout.isPending : createAbout.isPending}
-                    />
-                  </DialogContent>
-                </Dialog>
-
-                {/* About Delete Alert */}
-                <AlertDialog
-                  open={isAboutDeleteDialogOpen}
-                  onOpenChange={(open) => {
-                    setIsAboutDeleteDialogOpen(open);
-                    if (!open) resetFormStates();
-                  }}
-                >
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-lg font-semibold">Confirm Deletion</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete the About section. This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="border-gray-300 hover:bg-gray-50">Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleAboutDelete}
-                        disabled={deleteAboutMutation.isPending}
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                      >
-                        {deleteAboutMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Deleting...
-                          </>
-                        ) : (
-                          "Delete About"
-                        )}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </TabsContent>
+            <div className="p-4 sm:p-6 md:p-8">
+              <TabsContent value="profiles" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <ProfileManager />
+              </TabsContent>
+              <TabsContent value="work" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <WorkManager />
+              </TabsContent>
+              <TabsContent value="education" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <EducationManager />
+              </TabsContent>
+              <TabsContent value="about" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <AboutManager />
+              </TabsContent>
+              <TabsContent value="projects" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <ProjectManager />
+              </TabsContent>
+              <TabsContent value="skills" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+                <SkillsManager />
+              </TabsContent>
+            </div>
           </Tabs>
-        </div>
+        </main>
       </div>
     </div>
   );

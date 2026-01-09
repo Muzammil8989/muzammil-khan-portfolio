@@ -1,77 +1,53 @@
-import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  fetchAbout,
-  createAbout,
-  updateAbout,
-  deleteAbout,
-} from "@/services/about";
+import { fetchAbout } from "@/services/about";
+import { upsertAboutAction, deleteAboutAction } from "@/actions/about-actions";
 import { toast } from "sonner";
 
 export const useAbout = () => {
-  const query = useQuery({
+  return useQuery({
     queryKey: ["about"],
     queryFn: fetchAbout,
   });
-
-  useEffect(() => {
-    if (query.isError) {
-      toast.error("Failed to fetch about section", {
-        description: query.error.message,
-      });
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 export const useCreateAbout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createAbout,
+    mutationFn: async (data: any) => {
+      const result = await upsertAboutAction(data);
+      if (!result.success) throw new Error(result.error?.message || "Failed to save about section");
+      return result.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["about"] });
-      toast.success("About section created successfully");
+      toast.success("About section saved successfully");
     },
-    onError: (error) => {
-      toast.error("Failed to create about section", {
-        description: error.message,
-      });
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to save about section");
     },
   });
 };
 
 export const useUpdateAbout = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: updateAbout,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["about"] });
-      toast.success("About section updated successfully");
-    },
-    onError: (error) => {
-      toast.error("Failed to update about section", {
-        description: error.message,
-      });
-    },
-  });
+  return useCreateAbout(); // Logic is identical for upsert
 };
 
 export const useDeleteAbout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteAbout,
+    mutationFn: async () => {
+      const result = await deleteAboutAction();
+      if (!result.success) throw new Error(result.error?.message || "Failed to delete about section");
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["about"] });
       toast.success("About section deleted successfully");
     },
-    onError: (error) => {
-      toast.error("Failed to delete about section", {
-        description: error.message,
-      });
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to delete about section");
     },
   });
 };

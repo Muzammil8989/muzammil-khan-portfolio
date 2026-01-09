@@ -1,29 +1,18 @@
-import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchWorkExperiences, WorkExperience } from "@/services/work";
 import {
-  fetchWorkExperiences,
-  createWorkExperience,
-  updateWorkExperience,
-  deleteWorkExperience,
-} from "@/services/work";
+  createWorkAction,
+  updateWorkAction,
+  deleteWorkAction
+} from "@/actions/work-actions";
 import { toast } from "sonner";
 
 /** Fetch all work experiences */
 export const useWorkExperiences = () => {
-  const query = useQuery({
+  return useQuery<WorkExperience[]>({
     queryKey: ["workExperiences"],
     queryFn: fetchWorkExperiences,
   });
-
-  useEffect(() => {
-    if (query.isError) {
-      toast.error("Failed to fetch work experiences", {
-        description: (query.error as Error)?.message,
-      });
-    }
-  }, [query.isError, query.error]);
-
-  return query;
 };
 
 /** Create new work experience */
@@ -31,15 +20,17 @@ export const useCreateWorkExperience = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createWorkExperience,
+    mutationFn: async (data: any) => {
+      const result = await createWorkAction(data);
+      if (!result.success) throw new Error(result.error?.message || "Failed to create work experience");
+      return result.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workExperiences"] });
       toast.success("Work experience created successfully");
     },
     onError: (error: Error) => {
-      toast.error("Failed to create work experience", {
-        description: error.message,
-      });
+      toast.error(error.message || "Failed to create work experience");
     },
   });
 };
@@ -49,15 +40,18 @@ export const useUpdateWorkExperience = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updateWorkExperience,
+    mutationFn: async (data: any) => {
+      const { _id, ...rest } = data;
+      const result = await updateWorkAction(_id, rest);
+      if (!result.success) throw new Error(result.error?.message || "Failed to update work experience");
+      return result.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workExperiences"] });
       toast.success("Work experience updated successfully");
     },
     onError: (error: Error) => {
-      toast.error("Failed to update work experience", {
-        description: error.message,
-      });
+      toast.error(error.message || "Failed to update work experience");
     },
   });
 };
@@ -67,15 +61,17 @@ export const useDeleteWorkExperience = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteWorkExperience,
+    mutationFn: async (id: string) => {
+      const result = await deleteWorkAction(id);
+      if (!result.success) throw new Error(result.error?.message || "Failed to delete work experience");
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workExperiences"] });
       toast.success("Work experience deleted successfully");
     },
     onError: (error: Error) => {
-      toast.error("Failed to delete work experience", {
-        description: error.message,
-      });
+      toast.error(error.message || "Failed to delete work experience");
     },
   });
 };

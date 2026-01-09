@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CloudinaryUploader } from "@/components/ui/cloudinary-uploader";
-import type { Education } from "@/services/educations";
+import type { Education } from "@/services/education";
 
 interface EducationFormProps {
   education?: Education;

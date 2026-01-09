@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
-import type { Education } from "@/services/educations";
+import type { Education } from "@/services/education";
 
 export const EducationCard = ({
   education,

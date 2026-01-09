@@ -12,22 +12,30 @@ if (!process.env.MONGODB_DB) {
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DB;
 
-let cachedClient: MongoClient;
-let cachedDb: Db;
+declare global {
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
 
-export async function connectToDatabase() {
-  if (cachedClient && cachedDb) {
-    return { client: cachedClient, db: cachedDb };
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
+
+if (process.env.NODE_ENV === "development") {
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(uri);
+    global._mongoClientPromise = client.connect();
   }
+  clientPromise = global._mongoClientPromise!;
+} else {
+  client = new MongoClient(uri);
+  clientPromise = client.connect();
+}
 
-  const client = await MongoClient.connect(uri);
-  const db = client.db(dbName);
+export { clientPromise };
 
-  // Verify connection
-  await db.command({ ping: 1 });
+export default clientPromise;
 
-  cachedClient = client;
-  cachedDb = db;
-
-  return { client, db };
+export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
+  const connectedClient = await clientPromise;
+  const db = connectedClient.db(dbName);
+  return { client: connectedClient, db };
 }

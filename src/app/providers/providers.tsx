@@ -4,8 +4,8 @@ import { usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import Navbar from "@/components/navbar";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Navbar } from "@/components/layout";
+import { ThemeProvider } from "@/components/shared";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();

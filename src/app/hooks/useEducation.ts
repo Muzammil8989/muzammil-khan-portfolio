@@ -1,31 +1,18 @@
-// hooks/useEducation.ts
-import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchEducations, Education } from "@/services/education";
 import {
-  fetchEducations,
-  createEducation,
-  updateEducation,
-  deleteEducation,
-  Education,
-} from "@/services/educations";
+  createEducationAction,
+  updateEducationAction,
+  deleteEducationAction
+} from "@/actions/education-actions";
 import { toast } from "sonner";
 
 /** Fetch all education items */
 export const useEducations = () => {
-  const query = useQuery({
+  return useQuery<Education[]>({
     queryKey: ["educations"],
     queryFn: fetchEducations,
   });
-
-  useEffect(() => {
-    if (query.isError) {
-      toast.error("Failed to fetch education items", {
-        description: (query.error as Error)?.message,
-      });
-    }
-  }, [query.isError, query.error]);
-
-  return query; // { data, isLoading, isError, ... }
 };
 
 /** Create */
@@ -33,56 +20,57 @@ export const useCreateEducation = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: createEducation, // (data: Omit<Education, "_id">)
+    mutationFn: async (data: any) => {
+      const result = await createEducationAction(data);
+      if (!result.success) throw new Error(result.error?.message || "Failed to create education item");
+      return result.data;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["educations"] });
       toast.success("Education item created successfully");
     },
-    onError: (error: any) => {
-      toast.error("Failed to create education item", {
-        description: error?.message ?? "Unknown error",
-      });
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create education item");
     },
   });
 };
 
-/** Update by id
- *  Usage: mutate({ id, data })
- */
+/** Update */
 export const useUpdateEducation = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Education, "_id">> }) =>
-      updateEducation(id, data),
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const result = await updateEducationAction(id, data);
+      if (!result.success) throw new Error(result.error?.message || "Failed to update education item");
+      return result.data;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["educations"] });
       toast.success("Education item updated successfully");
     },
-    onError: (error: any) => {
-      toast.error("Failed to update education item", {
-        description: error?.message ?? "Unknown error",
-      });
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update education item");
     },
   });
 };
 
-/** Delete by id
- *  Usage: mutate(id)
- */
+/** Delete */
 export const useDeleteEducation = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteEducation(id),
+    mutationFn: async (id: string) => {
+      const result = await deleteEducationAction(id);
+      if (!result.success) throw new Error(result.error?.message || "Failed to delete education item");
+      return result;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["educations"] });
       toast.success("Education item deleted successfully");
     },
-    onError: (error: any) => {
-      toast.error("Failed to delete education item", {
-        description: error?.message ?? "Unknown error",
-      });
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to delete education item");
     },
   });
 };

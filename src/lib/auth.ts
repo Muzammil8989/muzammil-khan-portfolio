@@ -1,14 +1,27 @@
-// src/lib/auth.ts
-import { AuthOptions, User } from "next-auth";
+import { AuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "@/lib/mongodb";
 import { compare } from "bcryptjs";
+import { z } from "zod";
 
-interface AppUser extends User {
-  id: string;
-  username: string;
-  name: string;
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      username: string;
+    } & DefaultSession["user"];
+  }
+
+  interface User {
+    id: string;
+    username: string;
+  }
 }
+
+const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -18,28 +31,18 @@ export const authOptions: AuthOptions = {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials): Promise<AppUser | null> {
-        if (!credentials?.username || !credentials?.password) {
-          throw new Error("Username and password are required");
+      async authorize(credentials) {
+        const validated = loginSchema.safeParse(credentials);
+        if (!validated.success) {
+          throw new Error("Invalid input");
         }
 
         const { db } = await connectToDatabase();
-        const usersCollection = db.collection("cl_users");
-
-        const user = await usersCollection.findOne({
-          username: credentials.username.trim(),
+        const user = await db.collection("cl_users").findOne({
+          username: validated.data.username.trim(),
         });
 
-        if (!user) {
-          throw new Error("Invalid credentials");
-        }
-
-        const passwordMatch = await compare(
-          credentials.password.trim(),
-          user.password
-        );
-
-        if (!passwordMatch) {
+        if (!user || !(await compare(validated.data.password.trim(), user.password))) {
           throw new Error("Invalid credentials");
         }
 
@@ -47,6 +50,7 @@ export const authOptions: AuthOptions = {
           id: user._id.toString(),
           name: user.name || user.username,
           username: user.username,
+          email: user.email,
         };
       },
     }),
@@ -59,15 +63,13 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.id = user.id;
         token.username = user.username;
-        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id as string;
         session.user.username = token.username as string;
-        session.user.name = token.name as string;
       }
       return session;
     },
@@ -78,3 +80,4 @@ export const authOptions: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
+
