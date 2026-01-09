@@ -8,46 +8,19 @@ import { useEducations } from "@/app/hooks/useEducation";
 import { useProjects } from "@/app/hooks/useProjects";
 import { useSkills } from "@/app/hooks/useSkills";
 import { Skeleton } from "@/components/ui/skeleton";
-import SplitText from "@/components/react-bit/split-text";
-import BlurText from "@/components/react-bit/blur-text";
-import { Badge } from "@/components/ui/badge";
-import { BlurFade } from "@/components/magicui/blur-fade";
 import { ResumeCard } from "@/components/shared";
-import { ProjectCardPublic } from "@/components/features/projects";
-import { Icons } from "@/components/shared";
-import React, { useEffect, useState } from "react";
+import BlurText from "@/components/react-bit/blur-text";
+import React from "react";
 import { PersonStructuredData } from "@/components/seo/structured-data";
 import { DATA } from "@/data/resume";
-import dynamic from "next/dynamic";
-
-// Lazy load Particles for better initial page load performance
-const Particles = dynamic(() => import("@/components/react-bit/particles"), {
-  ssr: false,
-  loading: () => <div className="fixed inset-0 -z-10 bg-background" />,
-});
+import Link from "next/link";
+import Navbar from "@/components/layout/navbar";
 
 interface AboutData {
   message: string;
 }
 
-const BLUR_FADE_DELAY = 0.08;
-
 export default function Page() {
-  // Dark mode detection
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    setIsDarkMode(document.documentElement.classList.contains("dark"));
-    const observer = new MutationObserver(() => {
-      setIsDarkMode(document.documentElement.classList.contains("dark"));
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
   // Data fetching
   const { data: profiles = [], isLoading: isProfilesLoading } = useProfiles();
   const { data: aboutData = { message: "" }, isLoading: isAboutLoading } = useAbout();
@@ -58,13 +31,12 @@ export default function Page() {
 
   const aboutMessage =
     (aboutData as AboutData)?.message ||
-    "I hold a degree in Computer Science from Bahria University, which gave me a solid foundation for my career as a full-stack engineer. I’m currently applying my skills at Pakistan Agriculture Research (PAR) through a collaboration with the US-based company DPSolutions. I’m passionate about solving real-world problems and focused on building high-quality, reliable software. My work is supported by strong skills in Data Structures and Algorithms, Database Management Systems (DBMS), and Agile development practices.";
+    "I am a dedicated Full Stack Engineer with a BS in Computer Science from Bahria University. Currently shaping the digital landscape at Pakistan Agriculture Research.";
 
   const highlightList = [
-    "BS in Computer Science", "Bahria University", "Full-stack engineer", "Pakistan Agriculture Research (PAR)", "DPSolutions (USA)", "Turn Figma designs into live apps", "Fast, reliable web apps", "Clean code", "Smooth UX", "Ships useful features", "Solves real-world problems", "End-to-end development", "Performance-focused", "Production-ready"
+    "BS in Computer Science", "Bahria University", "Full Stack Engineer", "Pakistan Agriculture Research", "high-performance applications", "refined user interfaces"
   ];
 
-  // Prepare structured data
   const profile = profiles[0];
   const sameAs = [
     DATA.contact.social.GitHub?.url,
@@ -72,7 +44,7 @@ export default function Page() {
   ].filter(Boolean);
 
   return (
-    <main className="relative flex flex-col min-h-screen overflow-x-hidden">
+    <main className="min-h-screen">
       {/* SEO: Structured Data */}
       {profile && (
         <PersonStructuredData
@@ -84,221 +56,262 @@ export default function Page() {
         />
       )}
 
-      {/* Background Animation */}
-      <div className="fixed inset-0 -z-10">
-        <Particles
-          particleColors={isDarkMode ? ["#1a0f2e", "#0f1a2e", "#2e0f1a", "#0f2e2e"] : ["#c8b6ff", "#b3e5ff", "#ffb3e6", "#b3d9ff"]}
-          particleCount={180}
-          particleSpread={12}
-          speed={0.12}
-          particleBaseSize={110}
-          moveParticlesOnHover={true}
-        />
-      </div>
-
       {/* Main Container */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8 sm:py-12 lg:py-16 space-y-12 sm:space-y-16 lg:space-y-20">
+      <div className="w-full mx-auto px-6 py-20 space-y-20 max-w-7xl">
         {/* Hero Section */}
-        <section id="hero" className="w-full">
+        <header className="flex flex-col md:flex-row items-center gap-10 w-full">
           {isProfilesLoading ? (
-            <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start text-center sm:text-left">
-              <Skeleton className="h-28 w-28 sm:h-32 sm:w-32 rounded-full" />
-              <div className="flex-1 space-y-4 w-full">
-                <Skeleton className="h-12 w-3/4 mx-auto sm:mx-0" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-5/6 mx-auto sm:mx-0" />
+            <>
+              <Skeleton className="w-full max-w-[160px] h-40 md:w-48 md:h-48 rounded-full dark:bg-white/10" />
+              <div className="flex-1 space-y-4 text-center md:text-left w-full">
+                <Skeleton className="h-8 w-48 mx-auto md:mx-0 dark:bg-white/10" />
+                <Skeleton className="h-16 w-full max-w-2xl mx-auto md:mx-0 dark:bg-white/10" />
+                <Skeleton className="h-6 w-full max-w-xl mx-auto md:mx-0 dark:bg-white/10" />
               </div>
-            </div>
+            </>
           ) : (
             profiles.map((profile) => (
-              <div key={profile._id} className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start text-center sm:text-left">
-                <BlurFade delay={BLUR_FADE_DELAY}>
-                  <Avatar className="size-28 sm:size-32 lg:size-36 border-4 border-primary/30 bg-card shadow-2xl ring-4 ring-background/50">
+              <React.Fragment key={profile._id}>
+                <div className="relative w-full md:w-auto flex justify-center md:block">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-purple-200 dark:from-blue-600 dark:to-purple-600 rounded-full blur-3xl opacity-40 dark:opacity-40"></div>
+                  <Avatar className="relative w-40 h-40 md:w-48 md:h-48 md:w-56 md:h-56 border-8 border-white dark:border-white/20 object-cover shadow-2xl">
                     <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
-                    <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-primary/10 text-primary">{profile.initials}</AvatarFallback>
+                    <AvatarFallback className="text-4xl font-bold bg-indigo-50 dark:bg-blue-900 text-indigo-600 dark:text-blue-300">
+                      {profile.initials}
+                    </AvatarFallback>
                   </Avatar>
-                </BlurFade>
-                <div className="flex flex-col flex-1 space-y-2 sm:space-y-3 w-full">
-                  {/* Mobile: Show "Muhammad Muzammil" */}
-                  <h1 className="sm:hidden font-bold tracking-tight text-2xl leading-tight text-foreground">
-                    <SplitText
-                      text={`Hi, I'm ${profile.name.split(' ').slice(0, 2).join(' ')} 👋`}
-                      delay={80}
-                      duration={0.6}
-                      splitType="chars"
-                    />
-                  </h1>
-                  {/* Desktop: Show full name */}
-                  <h1 className="hidden sm:block font-bold tracking-tight text-2xl sm:text-3xl md:text-4xl lg:text-4xl leading-tight text-foreground">
-                    <SplitText
-                      text={`Hi, I'm ${profile.name} 👋`}
-                      delay={80}
-                      duration={0.6}
-                      splitType="chars"
-                    />
-                  </h1>
-                  <BlurText
-                    text={profile.description}
-                    delay={100}
-                    className="max-w-3xl text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed font-normal"
-                  />
                 </div>
-              </div>
+                <div className="text-center md:text-left space-y-4 w-full flex-1">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-blue-500/10 border border-indigo-100 dark:border-blue-400/30 text-indigo-600 dark:text-blue-300 text-xs font-bold uppercase tracking-widest">
+                    <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-blue-400 hidden dark:block"></span>
+                    Available for opportunities
+                  </div>
+                  <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.1]">
+                    Hi, I'm <span className="text-[#FFB902]">{profile.name.replace(' Khan', '')}</span> 👋
+                  </h1>
+                  <p className="text-lg sm:text-xl text-slate-500 dark:text-slate-300 w-full leading-relaxed font-light">
+                    Full Stack Web Developer focused on building <span className="text-slate-900 dark:text-white font-medium">scalable web apps</span> with great user experience and strong backend performance.
+                  </p>
+                </div>
+              </React.Fragment>
             ))
           )}
-        </section>
+        </header>
 
         {/* About Section */}
-        <section id="about" className="w-full">
-          <div className="space-y-4 sm:space-y-5">
-            <BlurFade delay={BLUR_FADE_DELAY * 2}>
-              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">About Me</h2>
-              </div>
-            </BlurFade>
+        <section id="about" className="grid md:grid-cols-3 gap-12 items-start">
+          <div className="md:col-span-1">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+              About Me
+            </h2>
+          </div>
+          <div className="md:col-span-2 space-y-6">
             {isAboutLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-11/12" />
-                <Skeleton className="h-5 w-5/6" />
-              </div>
+              <>
+                <Skeleton className="h-5 w-full dark:bg-white/10" />
+                <Skeleton className="h-5 w-11/12 dark:bg-white/10" />
+                <Skeleton className="h-5 w-5/6 dark:bg-white/10" />
+              </>
             ) : (
               <BlurText
                 text={aboutMessage}
                 delay={200}
-                className="max-w-4xl text-sm sm:text-base text-muted-foreground leading-relaxed pl-4"
+                className="text-slate-600 dark:text-slate-200 leading-relaxed text-lg font-light"
                 emphasizeKeywords={highlightList}
-                emphasizeClassName="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4"
+                emphasizeClassName="font-semibold text-slate-900 dark:text-blue-400 underline decoration-indigo-600 dark:decoration-blue-400 decoration-2 underline-offset-4"
               />
             )}
           </div>
         </section>
 
-        {/* Work Section */}
-        <section id="work" className="w-full">
-          <div className="space-y-4 sm:space-y-5">
-            <BlurFade delay={BLUR_FADE_DELAY * 3}>
-              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Work Experience</h2>
-              </div>
-            </BlurFade>
-            <div className="flex flex-col gap-4">
-              {isWorkLoading ? (
-                [...Array(2)].map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)
-              ) : (
-                workData.map((work: any, id: number) => (
-                  <BlurFade key={work._id} delay={BLUR_FADE_DELAY * 4 + id * 0.05}>
-                    <ResumeCard
-                      logoUrl={work.logoUrl}
-                      altText={work.company}
-                      title={work.company}
-                      subtitle={work.title}
-                      href={work.href}
-                      badges={work.badges}
-                      period={`${work.start} - ${work.end ?? "Present"}`}
-                      description={work.description}
-                    />
-                  </BlurFade>
-                ))
-              )}
-            </div>
+        {/* Work Experience Section */}
+        <section id="experience" className="grid md:grid-cols-3 gap-12 items-start">
+          <div className="md:col-span-1">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+              Work Experience
+            </h2>
+          </div>
+          <div className="md:col-span-2 space-y-8">
+            {isWorkLoading ? (
+              <>
+                <Skeleton className="h-32 w-full rounded-xl dark:bg-white/10" />
+                <Skeleton className="h-32 w-full rounded-xl dark:bg-white/10" />
+              </>
+            ) : (
+              workData.map((work: any, index: number) => (
+                <div key={work._id} className="relative pl-8 border-l border-slate-200 dark:border-white/20 py-2">
+                  <div className={`absolute ${index === 0 ? 'w-3 h-3 bg-indigo-500 dark:bg-blue-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] dark:shadow-[0_0_10px_rgba(96,165,250,0.5)]' : 'w-3 h-3 bg-slate-300 dark:bg-slate-600'} rounded-full -left-[6.5px] top-4`}></div>
+                  <ResumeCard
+                    logoUrl={work.logoUrl}
+                    altText={work.company}
+                    title={work.company}
+                    subtitle={work.title}
+                    href={work.href}
+                    badges={work.badges}
+                    period={`${work.start} - ${work.end ?? "Present"}`}
+                    description={work.description}
+                  />
+                </div>
+              ))
+            )}
           </div>
         </section>
 
         {/* Education Section */}
-        <section id="education" className="w-full">
-          <div className="space-y-4 sm:space-y-5">
-            <BlurFade delay={BLUR_FADE_DELAY * 4.5}>
-              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Education</h2>
-              </div>
-            </BlurFade>
-            <div className="flex flex-col gap-4">
-              {isEducationLoading ? (
-                [...Array(2)].map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)
-              ) : (
-                educationData.map((edu: any, id: number) => (
-                  <BlurFade key={edu._id} delay={BLUR_FADE_DELAY * 5 + id * 0.05}>
-                    <ResumeCard
-                      href={edu.href}
-                      logoUrl={edu.logoUrl}
-                      altText={edu.school}
-                      title={edu.school}
-                      subtitle={edu.degree}
-                      period={`${edu.start} - ${edu.end || "Present"}`}
-                    />
-                  </BlurFade>
-                ))
-              )}
-            </div>
+        <section id="education" className="grid md:grid-cols-3 gap-12 items-start">
+          <div className="md:col-span-1">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+              Education
+            </h2>
+          </div>
+          <div className="md:col-span-2 space-y-4">
+            {isEducationLoading ? (
+              <Skeleton className="h-32 w-full rounded-xl dark:bg-white/10" />
+            ) : (
+              educationData.map((edu: any) => (
+                <ResumeCard
+                  key={edu._id}
+                  href={edu.href}
+                  logoUrl={edu.logoUrl}
+                  altText={edu.school}
+                  title={edu.school}
+                  subtitle={edu.degree}
+                  period={`${edu.start} - ${edu.end || "Present"}`}
+                />
+              ))
+            )}
           </div>
         </section>
 
         {/* Skills Section */}
-        <section id="skills" className="w-full">
-          <div className="space-y-4 sm:space-y-5">
-            <BlurFade delay={BLUR_FADE_DELAY * 6}>
-              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Skills & Technologies</h2>
-              </div>
-            </BlurFade>
-            <div className="flex flex-wrap gap-2 sm:gap-2.5 pl-4">
-              {isSkillsLoading ? (
-                [...Array(12)].map((_, i) => <Skeleton key={i} className="h-9 w-20 rounded-lg" />)
-              ) : (
-                skillsData.map((skill: string, idx: number) => (
-                  <Badge
-                    key={skill}
-                    variant="secondary"
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-card hover:bg-primary hover:text-primary-foreground border border-border hover:border-primary transition-all duration-300 cursor-default shadow-sm hover:shadow-md"
-                  >
-                    {skill}
-                  </Badge>
-                ))
-              )}
-              {skillsData.length === 0 && !isSkillsLoading && (
-                <p className="text-muted-foreground text-xs sm:text-sm italic">No skills listed yet.</p>
-              )}
-            </div>
+        <section id="skills" className="grid md:grid-cols-3 gap-12 items-start">
+          <div className="md:col-span-1">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+              Expertise
+            </h2>
           </div>
-        </section>
-
-        {/* Projects Section */}
-        <section id="projects" className="w-full pb-16">
-          <div className="space-y-4 sm:space-y-6">
-            <BlurFade delay={BLUR_FADE_DELAY * 7}>
-              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Featured Projects</h2>
-              </div>
-            </BlurFade>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-              {isProjectsLoading ? (
-                [...Array(6)].map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)
+          <div className="md:col-span-2">
+            <div className="flex flex-wrap gap-3">
+              {isSkillsLoading ? (
+                <>
+                  {[...Array(8)].map((_, i) => (
+                    <Skeleton key={i} className="h-10 w-24 rounded-2xl dark:bg-white/10" />
+                  ))}
+                </>
               ) : (
-                projectsData.map((project: any, id: number) => (
-                  <BlurFade key={project._id} delay={BLUR_FADE_DELAY * 8 + id * 0.05}>
-                    <ProjectCardPublic
-                      title={project.title}
-                      href={project.href}
-                      description={project.description}
-                      dates={project.dates}
-                      tags={project.technologies}
-                      image={project.image}
-                      video={project.video}
-                      links={project.links?.map((l: any) => ({
-                        type: l.type,
-                        href: l.href,
-                        icon: l.type.toLowerCase().includes("github") || l.type.toLowerCase().includes("source") ? <Icons.github className="size-3" /> : <Icons.globe className="size-3" />
-                      }))}
-                    />
-                  </BlurFade>
-                ))
+                skillsData.map((skill: string) => {
+                  // Color mapping for different technologies
+                  const colorMap: Record<string, string> = {
+                    'React.js': 'bg-blue-500',
+                    'React': 'bg-blue-500',
+                    'Next.js': 'bg-black',
+                    'Node.js': 'bg-green-500',
+                    'JavaScript': 'bg-yellow-400',
+                    'TypeScript': 'bg-blue-400',
+                    'Tailwind CSS': 'bg-indigo-500',
+                    'Docker': 'bg-orange-500',
+                    'Prisma': 'bg-purple-500',
+                  };
+                  const dotColor = colorMap[skill] || 'bg-slate-500';
+
+                  return (
+                    <span
+                      key={skill}
+                      className="px-5 py-2.5 rounded-2xl bg-white dark:bg-transparent border border-slate-100 dark:border-white/10 shadow-sm text-slate-600 dark:text-white font-medium flex items-center gap-2 hover:shadow-md dark:hover:scale-105 transition-all glass-card"
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${dotColor} dark:shadow-[0_0_10px_currentColor]`}></span>
+                      {skill}
+                    </span>
+                  );
+                })
               )}
             </div>
           </div>
         </section>
       </div>
+
+      {/* Projects Section - Full Width Carousel */}
+      <section className="py-32 overflow-hidden" id="projects">
+        <div className="w-full max-w-7xl mx-auto px-6 mb-12">
+          <h2 className="font-[family-name:var(--font-display)] text-4xl font-extrabold text-slate-900 dark:text-white">
+            Featured Projects
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 font-light">Swipe or scroll to explore my latest works</p>
+        </div>
+        <div className="project-carousel-container relative">
+          <div className="flex gap-8 overflow-x-auto px-[calc(50vw-160px)] md:px-[calc(50vw-300px)] lg:px-[calc(50vw-225px)] pb-12 hide-scrollbar snap-x snap-mandatory">
+            {isProjectsLoading ? (
+              <>
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="flex-none w-[320px] md:w-[600px] h-[500px] rounded-[32px] dark:bg-white/10" />
+                ))}
+              </>
+            ) : (
+              projectsData.map((project: any) => (
+                <div key={project._id} className="flex-none w-[320px] md:w-[600px] snap-center">
+                  <div className="relative group h-full">
+                    <div className="absolute -inset-4 bg-indigo-500/5 rounded-[40px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/10 bg-white dark:bg-transparent shadow-xl h-full flex flex-col">
+                      <div className="aspect-video relative overflow-hidden">
+                        {project.image && (
+                          <img
+                            src={project.image}
+                            alt={project.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                      </div>
+                      <div className="p-8 flex flex-col flex-grow glass-card -mt-12 relative z-10 m-4 rounded-3xl">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{project.title}</h3>
+                          <span className="text-xs font-bold text-indigo-600 dark:text-blue-300 bg-indigo-50 dark:bg-blue-500/10 px-2 py-1 rounded">
+                            {project.dates}
+                          </span>
+                        </div>
+                        <p className="text-slate-500 dark:text-slate-300 font-light mb-6 line-clamp-2">
+                          {project.description}
+                        </p>
+                        <div className="mt-auto">
+                          <div className="flex flex-wrap gap-2 mb-6">
+                            {project.technologies?.slice(0, 3).map((tech: string) => (
+                              <span
+                                key={tech}
+                                className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 rounded-lg"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                          {project.links && project.links[0] && (
+                            <Link
+                              href={project.links[0].href || '#'}
+                              className="inline-flex items-center gap-2 text-indigo-600 dark:text-blue-400 font-bold group/link hover:gap-3 transition-all"
+                            >
+                              Visit Website
+                              <span className="text-lg group-hover/link:translate-x-1 transition-transform">→</span>
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Navigation Dock */}
+      <Navbar />
+
+      {/* Footer */}
+      <footer className="text-center py-20 border-t border-slate-100 dark:border-white/10 dark:bg-black/10">
+        <p className="text-slate-400 dark:text-slate-400 font-light text-sm">
+          © {new Date().getFullYear()} {profile?.name?.replace(' Khan', '') || 'Muhammad Muzammil'} • Built with precision.
+        </p>
+      </footer>
     </main>
   );
 }
-

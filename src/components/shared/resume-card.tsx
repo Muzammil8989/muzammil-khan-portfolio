@@ -68,10 +68,8 @@ export const ResumeCard = ({
         layout
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
         className={cn(
-          "border border-border bg-card/50 backdrop-blur-sm rounded-xl p-4 sm:p-5 md:p-6",
-          "hover:shadow-lg hover:border-primary/50 hover:bg-card/80 transition-all duration-300",
-          isExpanded &&
-            "shadow-xl border-primary/60 bg-card/90"
+          "p-4 sm:p-5 md:p-6",
+          "transition-all duration-300"
         )}
       >
         <div className="flex items-start gap-3 sm:gap-4">

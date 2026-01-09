@@ -3,13 +3,21 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import { Providers } from "./providers/providers";
 import { DATA } from "@/data/resume";
-import { Inter as FontSans } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 
-// ✅ Font setup with display swap for performance
-const fontSans = FontSans({
+// Font setup with display swap for performance
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap", // Prevent CLS from font loading
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const fontDisplay = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["700", "800"],
+  display: "swap",
 });
 
 // ✅ Fetch profile data (single object)
@@ -99,18 +107,23 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// ✅ Root Layout
+// Root Layout
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased mx-auto",
-          fontSans.variable
+          "min-h-screen bg-white dark:bg-[#000045] font-sans antialiased mx-auto transition-colors duration-300",
+          fontSans.variable,
+          fontDisplay.variable
         )}
         suppressHydrationWarning
       >
