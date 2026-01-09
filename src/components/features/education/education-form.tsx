@@ -81,7 +81,7 @@ export const EducationForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* School */}
       <div>
-        <label htmlFor="school" className="block text-sm font-medium mb-1">
+        <label htmlFor="school" className="block text-sm font-medium mb-1 dark:text-slate-200">
           School *
         </label>
         <Input
@@ -96,7 +96,7 @@ export const EducationForm = ({
 
       {/* Degree */}
       <div>
-        <label htmlFor="degree" className="block text-sm font-medium mb-1">
+        <label htmlFor="degree" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Degree *
         </label>
         <Input
@@ -112,7 +112,7 @@ export const EducationForm = ({
       {/* Duration */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="start" className="block text-sm font-medium mb-1">
+          <label htmlFor="start" className="block text-sm font-medium mb-1 dark:text-slate-200">
             Start *
           </label>
           <Input
@@ -125,7 +125,7 @@ export const EducationForm = ({
           />
         </div>
         <div>
-          <label htmlFor="end" className="block text-sm font-medium mb-1">
+          <label htmlFor="end" className="block text-sm font-medium mb-1 dark:text-slate-200">
             End
           </label>
           <Input
@@ -140,7 +140,7 @@ export const EducationForm = ({
 
       {/* School URL */}
       <div>
-        <label htmlFor="href" className="block text-sm font-medium mb-1">
+        <label htmlFor="href" className="block text-sm font-medium mb-1 dark:text-slate-200">
           School Website
         </label>
         <Input
@@ -155,7 +155,7 @@ export const EducationForm = ({
 
       {/* Logo Upload */}
       <div>
-        <label className="block text-sm font-medium mb-1">School Logo</label>
+        <label className="block text-sm font-medium mb-1 dark:text-slate-200">School Logo</label>
         <CloudinaryUploader
           buttonText={formData.logoUrl ? "Change Logo" : "Upload Logo"}
           label=""

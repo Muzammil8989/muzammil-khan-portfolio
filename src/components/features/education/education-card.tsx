@@ -37,7 +37,7 @@ export const EducationCard = ({
             />
           </div>
         ) : (
-          <div className="w-20 h-20 mb-4 flex items-center justify-center bg-gray-100 rounded-md text-gray-500 text-xl font-semibold">
+          <div className="w-20 h-20 mb-4 flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-md text-gray-500 dark:text-slate-400 text-xl font-semibold">
             {school?.charAt(0) || "U"}
           </div>
         )}
@@ -57,12 +57,12 @@ export const EducationCard = ({
           </h3>
         )}
 
-        <p className="text-sm text-gray-500 text-center mt-1">{degree}</p>
+        <p className="text-sm text-gray-500 dark:text-slate-400 text-center mt-1">{degree}</p>
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="text-center text-gray-600 flex-grow">
-        <p className="text-xs text-gray-500">
+      <CardContent className="text-center text-gray-600 dark:text-slate-300 flex-grow">
+        <p className="text-xs text-gray-500 dark:text-slate-400">
           {start} – {end || "Present"}
         </p>
       </CardContent>

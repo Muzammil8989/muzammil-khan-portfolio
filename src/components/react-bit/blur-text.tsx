@@ -2,6 +2,7 @@
 
 import { motion, Transition, Easing } from "motion/react";
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 type BlurTextProps = {
   text?: string;
@@ -92,6 +93,7 @@ const BlurText: React.FC<BlurTextProps> = ({
   emphasizeClassName = "font-bold underline underline-offset-2 decoration-gray-700",
 }) => {
   const useEmphasis = Array.isArray(emphasizeKeywords) && emphasizeKeywords.length > 0;
+  const prefersReducedMotion = useReducedMotion();
 
   // Build elements: if emphasis is requested, split by phrases; else by words/letters
   const elements = useMemo(() => {
@@ -125,22 +127,27 @@ const BlurText: React.FC<BlurTextProps> = ({
   // Use marginTop instead of translateY for inline justification stability
   const defaultFrom = useMemo(
     () =>
-      direction === "top"
+      prefersReducedMotion
+        ? { filter: "blur(0px)", opacity: 0, marginTop: 0 }
+        : direction === "top"
         ? { filter: "blur(6px)", opacity: 0, marginTop: -14 }
         : { filter: "blur(6px)", opacity: 0, marginTop: 14 },
-    [direction]
+    [direction, prefersReducedMotion]
   );
 
   const defaultTo = useMemo(
-    () => [
-      {
-        filter: "blur(3px)",
-        opacity: 0.5,
-        marginTop: direction === "top" ? 4 : -4,
-      },
-      { filter: "blur(0px)", opacity: 1, marginTop: 0 },
-    ],
-    [direction]
+    () =>
+      prefersReducedMotion
+        ? [{ filter: "blur(0px)", opacity: 1, marginTop: 0 }]
+        : [
+            {
+              filter: "blur(3px)",
+              opacity: 0.5,
+              marginTop: direction === "top" ? 4 : -4,
+            },
+            { filter: "blur(0px)", opacity: 1, marginTop: 0 },
+          ],
+    [direction, prefersReducedMotion]
   );
 
   const fromSnapshot = animationFrom ?? defaultFrom;
@@ -167,9 +174,9 @@ const BlurText: React.FC<BlurTextProps> = ({
         const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
 
         const spanTransition: Transition = {
-          duration: totalDuration,
+          duration: prefersReducedMotion ? 0.1 : totalDuration,
           times,
-          delay: (index * delay) / 1000,
+          delay: prefersReducedMotion ? 0 : (index * delay) / 1000,
           ease: easing,
         };
 

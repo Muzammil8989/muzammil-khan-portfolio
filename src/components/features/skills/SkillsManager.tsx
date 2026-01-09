@@ -15,10 +15,10 @@ export function SkillsManager() {
     const [inputValue, setInputValue] = useState("");
 
     useEffect(() => {
-        if (initialSkills) {
+        if (initialSkills && initialSkills.length > 0) {
             setSkills(initialSkills);
         }
-    }, [initialSkills]);
+    }, [initialSkills.length]);
 
     const addSkill = () => {
         const trimmed = inputValue.trim();
@@ -49,13 +49,13 @@ export function SkillsManager() {
 
     return (
         <div className="space-y-8">
-            <div className="bg-white/50 p-6 rounded-2xl border border-gray-100 backdrop-blur-sm space-y-4">
+            <div className="bg-white/50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm space-y-4">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
                         <Sparkles className="size-5 text-blue-500" />
                         Tech Stack & Skills
                     </h2>
-                    <p className="text-sm text-gray-500">Manage the technologies you use. Press Enter to add a skill.</p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">Manage the technologies you use. Press Enter to add a skill.</p>
                 </div>
 
                 <div className="flex gap-2">
@@ -73,18 +73,18 @@ export function SkillsManager() {
 
                 <div className="flex flex-wrap gap-2 pt-2 min-h-[100px] items-start transition-all">
                     {skills.map((skill) => (
-                        <Badge key={skill} variant="secondary" className="pl-3 pr-1 py-1.5 text-sm gap-1 group bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 font-medium">
+                        <Badge key={skill} variant="secondary" className="pl-3 pr-1 py-1.5 text-sm gap-1 group bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">
                             {skill}
                             <button
                                 onClick={() => removeSkill(skill)}
-                                className="ml-1 p-0.5 rounded-full hover:bg-slate-300 transition-colors"
+                                className="ml-1 p-0.5 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
                             >
-                                <X className="size-3 text-slate-400 group-hover:text-slate-600" />
+                                <X className="size-3 text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
                             </button>
                         </Badge>
                     ))}
                     {skills.length === 0 && (
-                        <p className="text-sm text-slate-400 italic py-4">No skills added yet. Type above to start.</p>
+                        <p className="text-sm text-slate-400 dark:text-slate-500 italic py-4">No skills added yet. Type above to start.</p>
                     )}
                 </div>
             </div>

@@ -32,7 +32,7 @@ export const ProfileCard = ({
           {profile.name}
         </h3>
       </CardHeader>
-      <CardContent className="text-center text-gray-600 flex-grow">
+      <CardContent className="text-center text-gray-600 dark:text-slate-300 flex-grow">
         <p className="line-clamp-3">{profile.description}</p>
       </CardContent>
       <CardFooter className="flex justify-center gap-2 pt-2 pb-4">

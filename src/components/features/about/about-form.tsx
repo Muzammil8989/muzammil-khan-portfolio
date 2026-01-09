@@ -50,7 +50,7 @@ export const AboutForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Message */}
       <div>
-        <label htmlFor="message" className="block text-sm font-medium mb-1">
+        <label htmlFor="message" className="block text-sm font-medium mb-1 dark:text-slate-200">
           About Message *
         </label>
         <Textarea

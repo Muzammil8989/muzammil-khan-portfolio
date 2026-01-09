@@ -88,7 +88,7 @@ export const ProfileForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium mb-1">
+        <label htmlFor="name" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Name *
         </label>
         <Input
@@ -103,7 +103,7 @@ export const ProfileForm = ({
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1">
+        <label htmlFor="description" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Description *
         </label>
         <Textarea
@@ -119,7 +119,7 @@ export const ProfileForm = ({
 
       {/* Initials */}
       <div>
-        <label htmlFor="initials" className="block text-sm font-medium mb-1">
+        <label htmlFor="initials" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Initials *
         </label>
         <Input
@@ -139,7 +139,7 @@ export const ProfileForm = ({
 
       {/* Avatar Upload */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium mb-1 dark:text-slate-200">
           Profile Picture
         </label>
         <CloudinaryUploader

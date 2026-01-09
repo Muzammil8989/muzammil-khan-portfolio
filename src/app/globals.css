@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark * ));
 
 @theme inline {
   --color-background: var(--background);
@@ -32,100 +32,102 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Light Mode */
+/* LIGHT MODE */
 :root {
-  --background: oklch(0.95 0.01 250);
-  /* Soft off-white */
-  --foreground: oklch(0.15 0.02 260);
-  /* Darker text for better contrast */
-  --card: oklch(0.98 0.01 250);
-  /* White card */
-  --card-foreground: oklch(0.15 0.02 260);
-  --border: oklch(0.88 0.01 250);
-  /* Soft border */
-  --input: oklch(0.93 0.01 250);
-  /* Light input background */
-  --ring: oklch(0.55 0.18 280);
-  /* Indigo ring */
-  --primary: oklch(0.55 0.18 280);
-  /* Indigo accent */
-  --primary-foreground: oklch(0.95 0.01 250);
-  --secondary: oklch(0.88 0.02 250);
-  /* Gray secondary */
-  --secondary-foreground: oklch(0.35 0.01 260);
-  --accent: oklch(0.95 0.2 90);
-  /* Yellow accent */
-  --accent-foreground: oklch(0.2 0.01 260);
-  --muted: oklch(0.93 0.01 250);
-  --muted-foreground: oklch(0.55 0.02 260);
-  --destructive: oklch(0.6 0.25 30);
-  /* Red */
+  --background: oklch(0.99 0.01 255);
+  --foreground: oklch(0.15 0.03 260);
+
+  --card: oklch(0.99 0.005 255);
+  --card-foreground: oklch(0.15 0.03 260);
+
+  --border: oklch(0.90 0.02 250);
+
+  --input: oklch(0.96 0.015 250);
+
+  /* PRIMARY updated to #0f0d9e */
+  --primary: oklch(0.38 0.20 268);
+  --primary-foreground: oklch(0.98 0.01 250);
+
+  --ring: oklch(0.38 0.20 268);
+
+  --secondary: oklch(0.95 0.01 250);
+  --secondary-foreground: oklch(0.25 0.02 260);
+
+  --accent: oklch(0.94 0.12 95);
+  --accent-foreground: oklch(0.20 0.02 260);
+
+  --muted: oklch(0.97 0.01 250);
+  --muted-foreground: oklch(0.40 0.03 260);
+
+  --destructive: oklch(0.58 0.23 30);
+
   --sidebar: oklch(0.98 0.01 250);
-  /* Soft white */
-  --sidebar-foreground: oklch(0.2 0.01 260);
-  /* Dark slate */
-  --sidebar-primary: oklch(0.55 0.18 280);
-  /* Indigo accent */
-  --sidebar-primary-foreground: oklch(0.95 0.01 250);
-  --sidebar-accent: oklch(0.95 0.2 90);
-  /* Yellow accent */
-  --sidebar-accent-foreground: oklch(0.2 0.01 260);
-  --sidebar-border: oklch(0.88 0.01 250);
-  /* Soft border */
-  --sidebar-ring: oklch(0.55 0.18 280);
-  /* Indigo ring */
+  --sidebar-foreground: oklch(0.18 0.02 260);
+
+  --sidebar-primary: oklch(0.38 0.20 268);
+  --sidebar-primary-foreground: oklch(0.99 0.01 250);
+
+  --sidebar-accent: oklch(0.94 0.12 95);
+  --sidebar-accent-foreground: oklch(0.20 0.02 260);
+
+  --sidebar-border: oklch(0.90 0.02 250);
+  --sidebar-ring: oklch(0.38 0.20 268);
 }
 
-/* Dark Mode */
+
+/* DARK MODE */
 .dark {
-  --background: oklch(0.15 0.11 295.34);
-  /* Equivalent to #0D005A */
-  --foreground: oklch(0.96 0.01 250);
-  /* Softer white text */
-  --card: oklch(0.18 0.06 260);
-  /* Slightly lighter card */
-  --card-foreground: oklch(0.96 0.01 250);
-  /* Softer card text */
-  --border: oklch(0.3 0.02 260);
-  /* Soft border */
-  --input: oklch(0.25 0.02 260);
-  /* Dark input background */
-  --ring: oklch(0.55 0.18 280);
-  /* Indigo ring */
-  --primary: oklch(0.55 0.18 280);
-  /* Indigo accent */
-  --primary-foreground: oklch(0.95 0.01 250);
-  --secondary: oklch(0.2 0.05 260);
-  /* Soft gray */
-  --secondary-foreground: oklch(0.95 0.01 250);
-  /* Light text */
-  --accent: oklch(0.3 0.2 90);
-  /* Warm accent */
-  --accent-foreground: oklch(0.95 0.01 250);
-  /* Light accent foreground */
-  --muted: oklch(0.25 0.02 260);
-  /* Dark muted */
-  --muted-foreground: oklch(0.6 0.01 260);
-  /* Light muted foreground */
-  --destructive: oklch(0.6 0.25 30);
-  /* Red */
-  --sidebar: oklch(0.12 0.03 260);
-  /* Dark sidebar */
-  --sidebar-foreground: oklch(0.95 0.01 250);
-  /* Light sidebar text */
-  --sidebar-primary: oklch(0.55 0.18 280);
-  /* Indigo primary sidebar */
-  --sidebar-primary-foreground: oklch(0.95 0.01 250);
-  /* Light primary text */
-  --sidebar-accent: oklch(0.3 0.2 90);
-  /* Warm accent */
-  --sidebar-accent-foreground: oklch(0.95 0.01 250);
-  /* Light accent foreground */
-  --sidebar-border: oklch(0.3 0.02 260);
-  /* Soft dark border */
-  --sidebar-ring: oklch(0.55 0.18 280);
-  /* Indigo sidebar ring */
+  /* PRIMARY BACKGROUND — exact value you provided */
+  --background: oklch(20.86% 0.124 269.80);
+  --foreground: oklch(0.97 0.02 255);
+
+  /* Cards: slightly lighter for clear elevation */
+  --card: oklch(28% 0.11 269.80);
+  --card-foreground: oklch(0.98 0.02 255);
+
+  /* Borders: subtle but visible */
+  --border: oklch(40% 0.10 269.80);
+
+  /* Inputs: same elevation tier as card but more muted */
+  --input: oklch(25% 0.10 269.80);
+
+  /* Primary buttons and focus states */
+  --primary: oklch(65% 0.25 269.80);
+  --primary-foreground: oklch(0.99 0.01 250);
+
+  /* Rings for focus outlines */
+  --ring: oklch(65% 0.25 269.80);
+
+  /* Secondary surface — neutral, low saturation for UI elements */
+  --secondary: oklch(32% 0.08 269.80);
+  --secondary-foreground: oklch(0.97 0.02 255);
+
+  /* Accent: warm contrasting highlight for badges/alerts */
+  --accent: oklch(70% 0.18 90);
+  --accent-foreground: oklch(0.99 0.01 250);
+
+  /* Muted blocks, code blocks, skeleton loading backgrounds */
+  --muted: oklch(26% 0.07 269.80);
+  --muted-foreground: oklch(85% 0.03 260);
+
+  /* Destructive (alerts, error states) */
+  --destructive: oklch(60% 0.24 30);
+
+  /* Sidebar — slightly darker than card to create contrast */
+  --sidebar: oklch(23% 0.12 269.80);
+  --sidebar-foreground: oklch(0.97 0.02 255);
+
+  --sidebar-primary: oklch(65% 0.25 269.80);
+  --sidebar-primary-foreground: oklch(0.99 0.01 250);
+
+  --sidebar-accent: oklch(70% 0.18 90);
+  --sidebar-accent-foreground: oklch(0.99 0.01 250);
+
+  --sidebar-border: oklch(38% 0.10 269.80);
+  --sidebar-ring: oklch(65% 0.25 269.80);
 }
+
+
 
 @layer base {
   * {
@@ -134,58 +136,61 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply antialiased font-bold;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold antialiased;
     letter-spacing: -0.025em;
     line-height: 1.2;
   }
 
   p {
     @apply antialiased;
-    font-feature-settings: 'liga' 1, 'calt' 1;
     line-height: 1.7;
   }
 
-  /* Improve container width for better readability */
-  .container {
-    @apply mx-auto;
-  }
-
-  /* Better scrollbar styling */
+  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
-
   ::-webkit-scrollbar-track {
     @apply bg-background;
   }
-
   ::-webkit-scrollbar-thumb {
     @apply bg-muted-foreground/20 rounded-full;
   }
-
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/30;
   }
 
-  /* Selection colors */
+  /* Text selection */
   ::selection {
     @apply bg-primary/20 text-foreground;
   }
-
   ::-moz-selection {
     @apply bg-primary/20 text-foreground;
+  }
+
+  /* Buttons and links animation */
+  button:not(:disabled),
+  a[role="button"] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  button:not(:disabled):hover,
+  a[role="button"]:hover {
+    transform: translateY(-2px);
+  }
+  button:not(:disabled):active,
+  a[role="button"]:active {
+    transform: translateY(0);
+  }
+
+  /* Performance enhancements */
+  [class*="transform"],
+  [class*="translate"],
+  [class*="scale"],
+  [class*="rotate"] {
+    will-change: transform;
   }
 }

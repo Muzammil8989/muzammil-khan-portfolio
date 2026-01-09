@@ -83,10 +83,10 @@ export function ProjectManager() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white/50 p-4 rounded-xl border border-gray-100 backdrop-blur-sm">
+            <div className="flex justify-between items-center bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-800">Portfolio Projects</h2>
-                    <p className="text-sm text-gray-500">Showcase your best work and side projects</p>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">Portfolio Projects</h2>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">Showcase your best work and side projects</p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
@@ -124,10 +124,10 @@ export function ProjectManager() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-20 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
-                    <Layout className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900">No projects yet</h3>
-                    <p className="text-gray-500 mb-6">Start building your portfolio by adding a project.</p>
+                <div className="text-center py-20 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
+                    <Layout className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">No projects yet</h3>
+                    <p className="text-gray-500 dark:text-slate-400 mb-6">Start building your portfolio by adding a project.</p>
                     <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline">
                         <Plus className="mr-2 h-4 w-4" /> Add First Project
                     </Button>

@@ -98,33 +98,33 @@ export const ProjectForm = ({
         <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto px-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="text-sm font-medium mb-1 block">Title *</label>
+                    <label className="text-sm font-medium mb-1 block dark:text-slate-200">Title *</label>
                     <Input name="title" value={formData.title} onChange={handleChange} required placeholder="Chat Collect" />
                 </div>
                 <div>
-                    <label className="text-sm font-medium mb-1 block">Dates *</label>
+                    <label className="text-sm font-medium mb-1 block dark:text-slate-200">Dates *</label>
                     <Input name="dates" value={formData.dates} onChange={handleChange} required placeholder="Jan 2024 - Feb 2024" />
                 </div>
             </div>
 
             <div>
-                <label className="text-sm font-medium mb-1 block">Project URL (Main)</label>
+                <label className="text-sm font-medium mb-1 block dark:text-slate-200">Project URL (Main)</label>
                 <Input name="href" value={formData.href} onChange={handleChange} type="url" placeholder="https://chatcollect.com" />
             </div>
 
             <div>
-                <label className="text-sm font-medium mb-1 block">Technologies (comma separated) *</label>
+                <label className="text-sm font-medium mb-1 block dark:text-slate-200">Technologies (comma separated) *</label>
                 <Input value={techInput} onChange={handleTechChange} placeholder="Next.js, Typescript, TailwindCSS" />
             </div>
 
             <div>
-                <label className="text-sm font-medium mb-1 block">Description *</label>
+                <label className="text-sm font-medium mb-1 block dark:text-slate-200">Description *</label>
                 <Textarea name="description" value={formData.description} onChange={handleChange} rows={4} placeholder="Describe your masterpiece..." />
             </div>
 
             <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium">Project Links</label>
+                    <label className="text-sm font-medium dark:text-slate-200">Project Links</label>
                     <Button type="button" variant="outline" size="sm" onClick={addLink}>
                         <Plus className="h-4 w-4 mr-1" /> Add Link
                     </Button>
@@ -152,7 +152,7 @@ export const ProjectForm = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                 <div>
-                    <label className="text-sm font-medium mb-2 block">Project Image</label>
+                    <label className="text-sm font-medium mb-2 block dark:text-slate-200">Project Image</label>
                     <CloudinaryUploader
                         buttonText={formData.image ? "Change Image" : "Upload Image"}
                         onSuccess={(res: any) => setFormData(p => ({ ...p, image: res.secure_url }))}
@@ -172,9 +172,9 @@ export const ProjectForm = ({
                     )}
                 </div>
                 <div>
-                    <label className="text-sm font-medium mb-2 block">Project Video URL (Direct link)</label>
+                    <label className="text-sm font-medium mb-2 block dark:text-slate-200">Project Video URL (Direct link)</label>
                     <Input name="video" value={formData.video} onChange={handleChange} placeholder="https://example.com/demo.mp4" />
-                    <p className="text-[10px] text-gray-500 mt-1">Direct URL to an mp4 file for the video preview.</p>
+                    <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">Direct URL to an mp4 file for the video preview.</p>
                 </div>
             </div>
 

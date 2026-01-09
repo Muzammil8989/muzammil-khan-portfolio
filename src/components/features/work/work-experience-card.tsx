@@ -29,7 +29,7 @@ export const WorkExperienceCard = ({
             />
           </div>
         ) : (
-          <div className="w-20 h-20 mb-4 flex items-center justify-center bg-gray-100 rounded-md text-gray-500 text-xl font-semibold">
+          <div className="w-20 h-20 mb-4 flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-md text-gray-500 dark:text-slate-400 text-xl font-semibold">
             {work.company.charAt(0)}
           </div>
         )}
@@ -49,17 +49,17 @@ export const WorkExperienceCard = ({
           </h3>
         )}
 
-        <p className="text-sm text-gray-500 text-center mt-1">
+        <p className="text-sm text-gray-500 dark:text-slate-400 text-center mt-1">
           {work.title}
         </p>
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="text-center text-gray-600 flex-grow">
-        <p className="text-sm mb-2 font-medium text-gray-700">
+      <CardContent className="text-center text-gray-600 dark:text-slate-300 flex-grow">
+        <p className="text-sm mb-2 font-medium text-gray-700 dark:text-slate-300">
           {work.location}
         </p>
-        <p className="text-xs text-gray-500 mb-3">
+        <p className="text-xs text-gray-500 dark:text-slate-400 mb-3">
           {work.start} – {work.end || "Present"}
         </p>
         <p className="line-clamp-3">{work.description}</p>

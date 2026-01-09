@@ -9,7 +9,6 @@ import { useProjects } from "@/app/hooks/useProjects";
 import { useSkills } from "@/app/hooks/useSkills";
 import { Skeleton } from "@/components/ui/skeleton";
 import SplitText from "@/components/react-bit/split-text";
-import Particles from "@/components/react-bit/particles";
 import BlurText from "@/components/react-bit/blur-text";
 import { Badge } from "@/components/ui/badge";
 import { BlurFade } from "@/components/magicui/blur-fade";
@@ -17,6 +16,15 @@ import { ResumeCard } from "@/components/shared";
 import { ProjectCardPublic } from "@/components/features/projects";
 import { Icons } from "@/components/shared";
 import React, { useEffect, useState } from "react";
+import { PersonStructuredData } from "@/components/seo/structured-data";
+import { DATA } from "@/data/resume";
+import dynamic from "next/dynamic";
+
+// Lazy load Particles for better initial page load performance
+const Particles = dynamic(() => import("@/components/react-bit/particles"), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 -z-10 bg-background" />,
+});
 
 interface AboutData {
   message: string;
@@ -56,8 +64,26 @@ export default function Page() {
     "BS in Computer Science", "Bahria University", "Full-stack engineer", "Pakistan Agriculture Research (PAR)", "DPSolutions (USA)", "Turn Figma designs into live apps", "Fast, reliable web apps", "Clean code", "Smooth UX", "Ships useful features", "Solves real-world problems", "End-to-end development", "Performance-focused", "Production-ready"
   ];
 
+  // Prepare structured data
+  const profile = profiles[0];
+  const sameAs = [
+    DATA.contact.social.GitHub?.url,
+    DATA.contact.social.LinkedIn?.url,
+  ].filter(Boolean);
+
   return (
     <main className="relative flex flex-col min-h-screen overflow-x-hidden">
+      {/* SEO: Structured Data */}
+      {profile && (
+        <PersonStructuredData
+          name={profile.name}
+          description={profile.description}
+          url={DATA.url}
+          image={profile.avatarUrl}
+          sameAs={sameAs as string[]}
+        />
+      )}
+
       {/* Background Animation */}
       <div className="fixed inset-0 -z-10">
         <Particles
@@ -71,7 +97,7 @@ export default function Page() {
       </div>
 
       {/* Main Container */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-6 sm:py-10 lg:py-12 space-y-10 sm:space-y-14 lg:space-y-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8 sm:py-12 lg:py-16 space-y-12 sm:space-y-16 lg:space-y-20">
         {/* Hero Section */}
         <section id="hero" className="w-full">
           {isProfilesLoading ? (
@@ -85,15 +111,25 @@ export default function Page() {
             </div>
           ) : (
             profiles.map((profile) => (
-              <div key={profile._id} className="flex flex-col sm:flex-row gap-6 sm:gap-8 lg:gap-10 items-center sm:items-start text-center sm:text-left">
+              <div key={profile._id} className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start text-center sm:text-left">
                 <BlurFade delay={BLUR_FADE_DELAY}>
-                  <Avatar className="size-28 sm:size-32 lg:size-36 border-4 border-primary/20 bg-background shadow-2xl ring-2 ring-background">
+                  <Avatar className="size-28 sm:size-32 lg:size-36 border-4 border-primary/30 bg-card shadow-2xl ring-4 ring-background/50">
                     <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
-                    <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-muted">{profile.initials}</AvatarFallback>
+                    <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-primary/10 text-primary">{profile.initials}</AvatarFallback>
                   </Avatar>
                 </BlurFade>
-                <div className="flex flex-col flex-1 space-y-4 sm:space-y-5 w-full">
-                  <h1 className="font-bold tracking-tight text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-tight break-words">
+                <div className="flex flex-col flex-1 space-y-2 sm:space-y-3 w-full">
+                  {/* Mobile: Show "Muhammad Muzammil" */}
+                  <h1 className="sm:hidden font-bold tracking-tight text-2xl leading-tight text-foreground">
+                    <SplitText
+                      text={`Hi, I'm ${profile.name.split(' ').slice(0, 2).join(' ')} 👋`}
+                      delay={80}
+                      duration={0.6}
+                      splitType="chars"
+                    />
+                  </h1>
+                  {/* Desktop: Show full name */}
+                  <h1 className="hidden sm:block font-bold tracking-tight text-2xl sm:text-3xl md:text-4xl lg:text-4xl leading-tight text-foreground">
                     <SplitText
                       text={`Hi, I'm ${profile.name} 👋`}
                       delay={80}
@@ -104,7 +140,7 @@ export default function Page() {
                   <BlurText
                     text={profile.description}
                     delay={100}
-                    className="max-w-3xl text-base sm:text-lg lg:text-xl text-foreground/85 leading-relaxed font-normal"
+                    className="max-w-3xl text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed font-normal"
                   />
                 </div>
               </div>
@@ -116,7 +152,9 @@ export default function Page() {
         <section id="about" className="w-full">
           <div className="space-y-4 sm:space-y-5">
             <BlurFade delay={BLUR_FADE_DELAY * 2}>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">About Me</h2>
+              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">About Me</h2>
+              </div>
             </BlurFade>
             {isAboutLoading ? (
               <div className="space-y-3">
@@ -128,9 +166,9 @@ export default function Page() {
               <BlurText
                 text={aboutMessage}
                 delay={200}
-                className="max-w-4xl text-base sm:text-lg text-foreground/85 leading-relaxed"
+                className="max-w-4xl text-sm sm:text-base text-muted-foreground leading-relaxed pl-4"
                 emphasizeKeywords={highlightList}
-                emphasizeClassName="font-bold text-foreground underline decoration-2 underline-offset-4"
+                emphasizeClassName="font-semibold text-foreground underline decoration-primary decoration-2 underline-offset-4"
               />
             )}
           </div>
@@ -140,9 +178,11 @@ export default function Page() {
         <section id="work" className="w-full">
           <div className="space-y-4 sm:space-y-5">
             <BlurFade delay={BLUR_FADE_DELAY * 3}>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Work Experience</h2>
+              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Work Experience</h2>
+              </div>
             </BlurFade>
-            <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col gap-4">
               {isWorkLoading ? (
                 [...Array(2)].map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)
               ) : (
@@ -169,9 +209,11 @@ export default function Page() {
         <section id="education" className="w-full">
           <div className="space-y-4 sm:space-y-5">
             <BlurFade delay={BLUR_FADE_DELAY * 4.5}>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Education</h2>
+              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Education</h2>
+              </div>
             </BlurFade>
-            <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col gap-4">
               {isEducationLoading ? (
                 [...Array(2)].map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)
               ) : (
@@ -196,36 +238,40 @@ export default function Page() {
         <section id="skills" className="w-full">
           <div className="space-y-4 sm:space-y-5">
             <BlurFade delay={BLUR_FADE_DELAY * 6}>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Skills & Technologies</h2>
+              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Skills & Technologies</h2>
+              </div>
             </BlurFade>
-            <div className="flex flex-wrap gap-2 sm:gap-2.5">
+            <div className="flex flex-wrap gap-2 sm:gap-2.5 pl-4">
               {isSkillsLoading ? (
-                [...Array(12)].map((_, i) => <Skeleton key={i} className="h-9 w-24 rounded-full" />)
+                [...Array(12)].map((_, i) => <Skeleton key={i} className="h-9 w-20 rounded-lg" />)
               ) : (
                 skillsData.map((skill: string, idx: number) => (
                   <Badge
                     key={skill}
                     variant="secondary"
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base font-medium hover:bg-primary hover:text-primary-foreground transition-all cursor-default"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-card hover:bg-primary hover:text-primary-foreground border border-border hover:border-primary transition-all duration-300 cursor-default shadow-sm hover:shadow-md"
                   >
                     {skill}
                   </Badge>
                 ))
               )}
               {skillsData.length === 0 && !isSkillsLoading && (
-                <p className="text-muted-foreground text-sm sm:text-base italic">No skills listed yet.</p>
+                <p className="text-muted-foreground text-xs sm:text-sm italic">No skills listed yet.</p>
               )}
             </div>
           </div>
         </section>
 
         {/* Projects Section */}
-        <section id="projects" className="w-full pb-12">
-          <div className="space-y-4 sm:space-y-5">
+        <section id="projects" className="w-full pb-16">
+          <div className="space-y-4 sm:space-y-6">
             <BlurFade delay={BLUR_FADE_DELAY * 7}>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Featured Projects</h2>
+              <div className="flex items-center gap-3 border-l-4 border-primary pl-4">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">Featured Projects</h2>
+              </div>
             </BlurFade>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {isProjectsLoading ? (
                 [...Array(6)].map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)
               ) : (

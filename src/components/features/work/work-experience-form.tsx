@@ -100,7 +100,7 @@ export const WorkExperienceForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Company */}
       <div>
-        <label htmlFor="company" className="block text-sm font-medium mb-1">
+        <label htmlFor="company" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Company *
         </label>
         <Input
@@ -115,7 +115,7 @@ export const WorkExperienceForm = ({
 
       {/* Title */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium mb-1">
+        <label htmlFor="title" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Title *
         </label>
         <Input
@@ -130,7 +130,7 @@ export const WorkExperienceForm = ({
 
       {/* Location */}
       <div>
-        <label htmlFor="location" className="block text-sm font-medium mb-1">
+        <label htmlFor="location" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Location
         </label>
         <Input
@@ -145,7 +145,7 @@ export const WorkExperienceForm = ({
       {/* Duration */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="start" className="block text-sm font-medium mb-1">
+          <label htmlFor="start" className="block text-sm font-medium mb-1 dark:text-slate-200">
             Start *
           </label>
           <Input
@@ -158,7 +158,7 @@ export const WorkExperienceForm = ({
           />
         </div>
         <div>
-          <label htmlFor="end" className="block text-sm font-medium mb-1">
+          <label htmlFor="end" className="block text-sm font-medium mb-1 dark:text-slate-200">
             End
           </label>
           <Input
@@ -173,7 +173,7 @@ export const WorkExperienceForm = ({
 
       {/* Company URL */}
       <div>
-        <label htmlFor="href" className="block text-sm font-medium mb-1">
+        <label htmlFor="href" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Company Website
         </label>
         <Input
@@ -188,7 +188,7 @@ export const WorkExperienceForm = ({
 
       {/* Badges (comma-separated) */}
       <div>
-        <label htmlFor="badges" className="block text-sm font-medium mb-1">
+        <label htmlFor="badges" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Badges (comma separated)
         </label>
         <Input
@@ -205,7 +205,7 @@ export const WorkExperienceForm = ({
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1">
+        <label htmlFor="description" className="block text-sm font-medium mb-1 dark:text-slate-200">
           Description
         </label>
         <Textarea
@@ -220,7 +220,7 @@ export const WorkExperienceForm = ({
 
       {/* Logo Upload */}
       <div>
-        <label className="block text-sm font-medium mb-1">Company Logo</label>
+        <label className="block text-sm font-medium mb-1 dark:text-slate-200">Company Logo</label>
         <CloudinaryUploader
           buttonText={formData.logoUrl ? "Change Logo" : "Upload Logo"}
           label=""

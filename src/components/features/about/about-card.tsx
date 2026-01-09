@@ -29,7 +29,7 @@ export const AboutCard = ({
           About Us
         </h3>
       </CardHeader>
-      <CardContent className="text-center text-gray-600 flex-grow">
+      <CardContent className="text-center text-gray-600 dark:text-slate-300 flex-grow">
         <p className="line-clamp-3">{about.message}</p>
       </CardContent>
       {showActions && onEdit && onDelete && (

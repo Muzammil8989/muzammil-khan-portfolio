@@ -5,10 +5,11 @@ import { Providers } from "./providers/providers";
 import { DATA } from "@/data/resume";
 import { Inter as FontSans } from "next/font/google";
 
-// ✅ Font setup
+// ✅ Font setup with display swap for performance
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap", // Prevent CLS from font loading
 });
 
 // ✅ Fetch profile data (single object)
@@ -42,8 +43,19 @@ export async function generateMetadata(): Promise<Metadata> {
       default: profile.name,
       template: `%s | ${profile.name}`,
     },
-    
     description: profile.description,
+    keywords: [
+      "Full Stack Developer",
+      "Web Developer",
+      "Next.js Developer",
+      "React Developer",
+      "TypeScript",
+      "Portfolio",
+      "Software Engineer",
+      profile.name,
+    ],
+    authors: [{ name: profile.name }],
+    creator: profile.name,
     openGraph: {
       title: profile.name,
       description: profile.description,
@@ -51,6 +63,20 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: profile.name,
       locale: "en_US",
       type: "website",
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${profile.name} - Portfolio`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: profile.name,
+      description: profile.description,
+      images: ["/og-image.png"],
     },
     robots: {
       index: true,
@@ -66,6 +92,9 @@ export async function generateMetadata(): Promise<Metadata> {
     verification: {
       google: "",
       yandex: "",
+    },
+    alternates: {
+      canonical: DATA.url,
     },
   };
 }

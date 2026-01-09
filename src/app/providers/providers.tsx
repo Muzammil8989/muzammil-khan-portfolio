@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Navbar } from "@/components/layout";
 import { ThemeProvider } from "@/components/shared";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 
 const queryClient = new QueryClient();
 
@@ -36,11 +37,13 @@ export function Providers({ children }: { children: ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
-        <TooltipProvider delayDuration={0}>
-          {children}
-          <Toaster />
-          {isRoot && <Navbar />}
-        </TooltipProvider>
+        <SmoothScrollProvider>
+          <TooltipProvider delayDuration={0}>
+            {children}
+            <Toaster />
+            {isRoot && <Navbar />}
+          </TooltipProvider>
+        </SmoothScrollProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

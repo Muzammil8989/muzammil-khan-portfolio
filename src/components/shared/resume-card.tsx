@@ -68,10 +68,10 @@ export const ResumeCard = ({
         layout
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
         className={cn(
-          "border border-transparent bg-transparent backdrop-blur-md p-3 sm:p-4 md:p-5",
-          "hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] hover:border-emerald-400/30",
+          "border border-border bg-card/50 backdrop-blur-sm rounded-xl p-4 sm:p-5 md:p-6",
+          "hover:shadow-lg hover:border-primary/50 hover:bg-card/80 transition-all duration-300",
           isExpanded &&
-            "shadow-[0_0_20px_rgba(34,197,94,0.4)] border-emerald-400/50"
+            "shadow-xl border-primary/60 bg-card/90"
         )}
       >
         <div className="flex items-start gap-3 sm:gap-4">
@@ -79,7 +79,7 @@ export const ResumeCard = ({
           <img
             src={logoUrl}
             alt={altText}
-            className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover bg-muted flex-shrink-0 ring-2 ring-background shadow-md"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover bg-muted flex-shrink-0 ring-2 ring-border shadow-md"
           />
 
           <div className="flex-grow min-w-0">
@@ -171,9 +171,9 @@ export const ResumeCard = ({
               </div>
 
               {/* Subtitle + period row */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 sm:mt-3 gap-1 sm:gap-3 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 sm:mt-3 gap-1.5 sm:gap-2 min-w-0">
                 {subtitle && (
-                  <div className="text-sm sm:text-base text-foreground/80 font-medium line-clamp-2 min-w-0">
+                  <div className="text-sm sm:text-base text-muted-foreground font-medium line-clamp-2 min-w-0">
                     <BlurText
                       text={subtitle}
                       delay={160}
@@ -183,7 +183,7 @@ export const ResumeCard = ({
                     />
                   </div>
                 )}
-                <div className="text-sm sm:text-base text-muted-foreground font-normal whitespace-nowrap">
+                <div className="text-xs sm:text-sm text-muted-foreground/80 font-medium whitespace-nowrap">
                   {period}
                 </div>
               </div>
@@ -205,9 +205,9 @@ export const ResumeCard = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="border-l-3 border-primary/50 pl-3 sm:pl-4 py-1"
+                    className="border-l-4 border-primary/60 pl-3 sm:pl-4 py-1.5 bg-muted/30 rounded-r-md"
                   >
-                    {description}
+                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">{description}</p>
                   </motion.div>
                 </motion.div>
               )}

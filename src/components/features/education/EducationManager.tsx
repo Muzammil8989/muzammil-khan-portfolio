@@ -98,10 +98,10 @@ export function EducationManager() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white/50 p-4 rounded-xl border border-gray-100 backdrop-blur-sm">
+            <div className="flex justify-between items-center bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-800">Education</h2>
-                    <p className="text-sm text-gray-500">Your academic background</p>
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">Education</h2>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">Your academic background</p>
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
                     <DialogTrigger asChild>
@@ -142,10 +142,10 @@ export function EducationManager() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-20 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
-                    <GraduationCap className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900">No education entries</h3>
-                    <p className="text-gray-500 mb-6">Display your academic achievements.</p>
+                <div className="text-center py-20 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
+                    <GraduationCap className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">No education entries</h3>
+                    <p className="text-gray-500 dark:text-slate-400 mb-6">Display your academic achievements.</p>
                     <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline">
                         <Plus className="mr-2 h-4 w-4" /> Add Education
                     </Button>
