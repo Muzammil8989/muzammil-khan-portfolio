@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Heart, Clock, BookOpen, ArrowRight } from "lucide-react";
 import { Blog } from "@/services/blog";
+import { useLikeBlog } from "@/app/hooks/useBlogs";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface BlogCardProps {
   blog: Blog;
@@ -21,7 +23,10 @@ export function BlogCard({
   onDelete,
   showActions = true,
 }: BlogCardProps) {
+  const queryClient = useQueryClient();
+  const likeMutation = useLikeBlog();
   const [hasLiked, setHasLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(blog.likes || 0);
 
   useEffect(() => {
     if (blog?._id) {
@@ -29,6 +34,38 @@ export function BlogCard({
       setHasLiked(likedBlogs.includes(blog._id));
     }
   }, [blog?._id]);
+
+  useEffect(() => {
+    setLikesCount(blog.likes || 0);
+  }, [blog.likes]);
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!blog?._id || hasLiked) return;
+
+    // Optimistic update
+    setLikesCount(prev => prev + 1);
+    setHasLiked(true);
+
+    likeMutation.mutate(blog._id, {
+      onSuccess: () => {
+        const likedBlogs = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
+        if (!likedBlogs.includes(blog._id)) {
+          likedBlogs.push(blog._id);
+          localStorage.setItem("liked_blogs", JSON.stringify(likedBlogs));
+        }
+        // Invalidate queries to sync with other components
+        queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      },
+      onError: () => {
+        // Rollback
+        setLikesCount(prev => prev - 1);
+        setHasLiked(false);
+      }
+    });
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -77,6 +114,18 @@ export function BlogCard({
               <Clock className="h-3.5 w-3.5" />
               {blog.readingTime || 5}m
             </span>
+            <span className="h-1 w-1 rounded-full bg-slate-300" />
+            <button
+              onClick={handleLike}
+              disabled={hasLiked || likeMutation.isPending}
+              className={`flex items-center gap-1 transition-colors ${hasLiked
+                  ? "text-red-500 font-bold"
+                  : "hover:text-red-500"
+                }`}
+            >
+              <Heart className={`h-3.5 w-3.5 ${hasLiked ? "fill-red-500" : ""}`} />
+              {likesCount}
+            </button>
           </div>
         </div>
 

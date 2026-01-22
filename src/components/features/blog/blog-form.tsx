@@ -26,11 +26,7 @@ interface BlogFormProps {
   isSubmitting: boolean;
 }
 
-export function BlogForm({
-  blog,
-  onSubmit,
-  isSubmitting,
-}: BlogFormProps) {
+export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
   const [formData, setFormData] = useState<BlogInput>({
     title: "",
     slug: "",
@@ -93,14 +89,14 @@ export function BlogForm({
   }, [formData.title, blog]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSeoChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -173,123 +169,124 @@ export function BlogForm({
     const dummyData: BlogInput = {
       title: "Building a Modern Full-Stack Blog with Next.js 15 and MongoDB",
       slug: "building-modern-fullstack-blog-nextjs-mongodb",
-      excerpt: "Learn how to build a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Complete with code syntax highlighting and markdown support.",
+      excerpt:
+        "Learn how to build a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Complete with code syntax highlighting and markdown support.",
       content: `# Introduction
 
-In this comprehensive guide, we'll build a modern, full-stack blog system using the latest web technologies. This tutorial covers everything from database design to deployment.
+In this comprehensive guide, we'll build a modern, full-stack blog system using the latest web technologies. This tutorial covers everything from database design to deployment strategy.
 
 ## Why Next.js 15?
 
-Next.js 15 brings significant improvements:
-- **React Server Components** for better performance
-- **Improved routing** with the App Router
-- **Built-in optimization** for images and fonts
-- **Enhanced TypeScript** support
+Next.js 15 brings significant improvements to the developer experience and application performance. We leverage React Server Components to reduce client-side bundle size and use the new App Router for robust, nested layouts.
 
 ## Project Architecture
 
-Our blog system includes:
+Our blog system is built on a modular architecture:
 
-1. **Database Layer** - MongoDB for flexible document storage
-2. **API Routes** - RESTful endpoints for CRUD operations
-3. **Frontend** - React components with TypeScript
-4. **Styling** - Tailwind CSS for rapid development
+1. **Database Layer** - We use MongoDB for flexible document storage, allowing us to store complex blog objects with metadata and code blocks.
+2. **API Routes** - Clean, RESTful endpoints handle all CRUD operations securely.
+3. **Frontend** - A high-performance React interface built with TypeScript for type safety.
+4. **Styling** - Tailwind CSS provides a utility-first approach for premium aesthetics.
 
 ## Setting Up the Database
 
-First, let's create our MongoDB schema. We'll use Zod for validation:
-
-\`\`\`typescript
-const BlogSchema = z.object({
-  title: z.string().min(1),
-  content: z.string().min(1),
-  tags: z.array(z.string()),
-});
-\`\`\`
+Data integrity starts with strict validation. We implement a master schema that defines the structure of every blog post, including validation rules for titles, slugs, and status states.
 
 ## Creating API Endpoints
 
-Next.js makes it easy to create API routes. Here's our blog endpoint:
-
-\`\`\`typescript
-export async function GET(request: NextRequest) {
-  const blogs = await BlogService.getAll();
-  return NextResponse.json({ success: true, data: blogs });
-}
-\`\`\`
+Next.js allows us to define server-side logic close to our data. By creating dedicated route handlers, we can fetch, filter, and serve our blog posts with high efficiency and built-in caching.
 
 ## Adding Code Highlighting
 
-We use react-syntax-highlighter for beautiful code blocks:
+To provide a premium developer experience, we integrate advanced syntax highlighting. This allows users to read and copy code snippets with the same clarity they get in their IDE.
 
-\`\`\`javascript
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+---
 
-function CodeBlock({ code, language }) {
-  return (
-    <SyntaxHighlighter language={language}>
-      {code}
-    </SyntaxHighlighter>
-  );
-}
-\`\`\`
-
-## Conclusion
-
-You now have a fully functional blog system! This architecture is scalable, maintainable, and production-ready.
-
-**Happy coding!** 🚀`,
+### Implementation Details
+For the complete technical implementation, including the schemas, API logic, and UI components, please refer to the **Code Lab** section below.`,
       codeBlocks: [
         {
           language: "typescript",
-          code: `interface Blog {
-  title: string;
-  slug: string;
-  content: string;
-  tags: string[];
-  status: "draft" | "published" | "archived";
-}
+          code: `import { z } from "zod";
 
-export async function createBlog(data: Blog) {
-  const result = await db.collection("blogs").insertOne(data);
-  return result;
-}`,
-          filename: "blog-service.ts",
-          highlightedLines: [1, 2, 3, 8],
+export const BlogSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().min(1, "Slug is required"),
+  excerpt: z.string().min(1, "Excerpt is required"),
+  content: z.string().min(1, "Content is required"),
+  tags: z.array(z.string()),
+  difficulty: z.enum(["beginner", "intermediate", "advanced"]),
+  author: z.string(),
+  status: z.enum(["draft", "published", "archived"]),
+  likes: z.number().default(0),
+});`,
+          filename: "src/core/validation/blog.ts",
+          highlightedLines: [3, 10, 11],
         },
         {
-          language: "javascript",
-          code: `// React Query hook for fetching blogs
-export const useBlogs = () => {
-  return useQuery({
-    queryKey: ["blogs"],
-    queryFn: fetchBlogs,
-  });
-};
+          language: "typescript",
+          code: `import { NextRequest, NextResponse } from "next/server";
+import { BlogService } from "@/services/blog-service";
 
-// Mutation for creating blogs
-export const useCreateBlog = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createBlog,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      toast.success("Blog created!");
-    },
-  });
-};`,
-          filename: "useBlogs.ts",
-          highlightedLines: [14, 15, 16],
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status") as any;
+    
+    const blogs = await BlogService.getAll({ 
+      status: status || "published" 
+    });
+    
+    return NextResponse.json({ success: true, data: blogs });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch blogs" },
+      { status: 500 }
+    );
+  }
+}`,
+          filename: "src/app/api/blogs/route.ts",
+          highlightedLines: [4, 11, 14],
+        },
+        {
+          language: "tsx",
+          code: `import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+export function CodeBlock({ code, language, filename }) {
+  return (
+    <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl">
+      <div className="bg-slate-800/50 px-4 py-3 border-b flex justify-between">
+        <span className="text-xs font-mono">{language}</span>
+        {filename && <span className="text-xs italic">{filename}</span>}
+      </div>
+      <SyntaxHighlighter language={language} style={vscDarkPlus}>
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
+}`,
+          filename: "src/components/shared/code-block.tsx",
+          highlightedLines: [1, 11],
         },
       ],
       languages: ["TypeScript", "JavaScript"],
       frameworks: ["Next.js", "React", "MongoDB", "Tailwind CSS"],
       difficulty: "intermediate",
       author: "Muhammad Muzammil Khan",
-      tags: ["Next.js", "React", "MongoDB", "TypeScript", "Tutorial", "Full-Stack"],
+      tags: [
+        "Next.js",
+        "React",
+        "MongoDB",
+        "TypeScript",
+        "Tutorial",
+        "Full-Stack",
+      ],
       seo: {
-        metaTitle: "Build a Modern Blog with Next.js 15 and MongoDB | Complete Guide",
-        metaDescription: "Step-by-step tutorial on building a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Includes code syntax highlighting and markdown support.",
+        metaTitle:
+          "Build a Modern Blog with Next.js 15 and MongoDB | Complete Guide",
+        metaDescription:
+          "Step-by-step tutorial on building a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Includes code syntax highlighting and markdown support.",
         canonicalUrl: "",
       },
       status: "draft",

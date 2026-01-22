@@ -8,6 +8,7 @@ import {
     Volume2,
     Share2,
     Heart,
+    BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLikeBlog } from "@/app/hooks/useBlogs";
@@ -21,6 +22,12 @@ interface BlogActionsProps {
 export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
     const likeMutation = useLikeBlog();
     const [hasLiked, setHasLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(blog.likes || 0);
+
+    // Sync likes count if blog prop updates
+    useEffect(() => {
+        setLikesCount(blog.likes || 0);
+    }, [blog.likes]);
 
     // Text-to-speech state
     const [isPlaying, setIsPlaying] = useState(false);
@@ -55,6 +62,11 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
 
     const handleLike = () => {
         if (!blog || hasLiked) return;
+
+        // Optimistic update for immediate feedback
+        setLikesCount(prev => prev + 1);
+        setHasLiked(true);
+
         likeMutation.mutate(blog._id, {
             onSuccess: () => {
                 const likedBlogs = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
@@ -62,8 +74,12 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
                     likedBlogs.push(blog._id);
                     localStorage.setItem("liked_blogs", JSON.stringify(likedBlogs));
                 }
-                setHasLiked(true);
             },
+            onError: () => {
+                // Rollback if error
+                setLikesCount(prev => prev - 1);
+                setHasLiked(false);
+            }
         });
     };
 
@@ -197,7 +213,7 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
                     }`}
             >
                 <Heart className={`w-4 h-4 ${hasLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                {blog.likes || 0} {hasLiked ? 'Liked' : 'Likes'}
+                {likesCount} {hasLiked ? 'Liked' : 'Likes'}
             </Button>
         </div>
     );

@@ -1,4 +1,6 @@
 import { BlogService } from "@/services/blog-service";
+import { ProfileService } from "@/services/profile-service";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CodeBlock } from "@/components/shared/code-block";
@@ -73,6 +75,21 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       .slice(0, 3)
       .map((b: any) => ({ ...b, _id: b._id.toString() } as Blog));
 
+    // Fetch author profile
+    const rawProfiles = await ProfileService.getAll();
+    const rawAuthorProfile = rawProfiles.find(p => p.name === blog.author) || rawProfiles[0];
+
+    // Serialize to plain object for Client Component compatibility
+    if (rawAuthorProfile) {
+      (blog as any).authorProfile = {
+        _id: rawAuthorProfile._id.toString(),
+        name: rawAuthorProfile.name,
+        avatarUrl: rawAuthorProfile.avatarUrl,
+        initials: rawAuthorProfile.initials,
+        description: rawAuthorProfile.description,
+      };
+    }
+
   } catch (error) {
     console.error("Error fetching blog:", error);
     notFound();
@@ -139,9 +156,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 py-8 border-y border-slate-100 dark:border-white/5">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-400 flex items-center justify-center text-white shadow-lg">
-                  <User className="h-6 w-6" />
-                </div>
+                <Avatar className="h-12 w-12 border-2 border-indigo-100 dark:border-blue-900/50 shadow-lg">
+                  <AvatarImage src={(blog as any).authorProfile?.avatarUrl} alt={blog.author} className="object-cover" />
+                  <AvatarFallback className="bg-indigo-50 dark:bg-blue-900 text-indigo-600 dark:text-blue-300 font-bold">
+                    {(blog as any).authorProfile?.initials || <User className="h-6 w-6" />}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <p className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">{blog.author}</p>
                   <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -157,7 +177,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-3">
                 <BlogActions blog={blog} contentToRead={contentToRead} />
               </div>
             </div>
@@ -173,12 +193,26 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                 h1: ({ children }) => <h1 className="text-3xl sm:text-4xl mt-12 mb-6">{children}</h1>,
                 h2: ({ children }) => <h2 className="text-2xl sm:text-3xl mt-10 mb-5 pb-2 border-b border-slate-100 dark:border-white/5">{children}</h2>,
                 h3: ({ children }) => <h3 className="text-xl sm:text-2xl mt-8 mb-4">{children}</h3>,
-                code: ({ children }) => (
-                  <code className="bg-indigo-50 dark:bg-blue-500/10 text-indigo-700 dark:text-blue-300 px-1.5 py-0.5 rounded text-sm font-mono font-medium">
-                    {children}
-                  </code>
-                ),
-                pre: ({ children }) => <div className="not-prose">{children}</div>,
+                code({ inline, className, children, ...props }: any) {
+                  const match = /language-(\w+)/.exec(className || "");
+                  return !inline && match ? (
+                    <div className="not-prose my-8">
+                      <CodeBlock
+                        code={String(children).replace(/\n$/, "")}
+                        language={match[1]}
+                        {...props}
+                      />
+                    </div>
+                  ) : (
+                    <code
+                      className="bg-indigo-50 dark:bg-blue-500/10 text-indigo-700 dark:text-blue-300 px-1.5 py-0.5 rounded text-sm font-mono font-medium"
+                      {...props}
+                    >
+                      {children}
+                    </code>
+                  );
+                },
+                pre: ({ children }) => <>{children}</>,
               }}
             >
               {blog.content}
@@ -186,18 +220,19 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           </div>
 
           {blog.codeBlocks && blog.codeBlocks.length > 0 && (
-            <div className="mt-16 space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+            <div id="code-lab" className="mt-16 space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300 scroll-mt-24">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-8 w-1 bg-indigo-500 rounded-full" />
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Code Lab</h2>
               </div>
               {blog.codeBlocks.map((codeBlock: any, index: number) => (
-                <div key={index} className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 group">
+                <div key={index} className="not-prose">
                   <CodeBlock
                     code={codeBlock.code}
                     language={codeBlock.language}
                     filename={codeBlock.filename}
                     highlightedLines={codeBlock.highlightedLines}
+                    showLineNumbers={true}
                   />
                 </div>
               ))}
