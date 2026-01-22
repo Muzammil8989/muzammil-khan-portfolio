@@ -35,7 +35,7 @@ export function EducationManager() {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [selectedEducation, setSelectedEducation] = useState<Education | null>(null);
+    const [selectedEducation, setSelectedEducation] = useState<any>(null);
     const [logoUrl, setLogoUrl] = useState("");
 
     const { data: educations = [], isLoading, refetch } = useEducations();
@@ -105,7 +105,7 @@ export function EducationManager() {
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
                     <DialogTrigger asChild>
-                        <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md transition-all duration-300">
+                        <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md transition-all duration-300">
                             <Plus className="mr-2 h-4 w-4" /> Add Education
                         </Button>
                     </DialogTrigger>

@@ -35,7 +35,7 @@ export function WorkManager() {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [selectedWork, setSelectedWork] = useState<WorkExperience | null>(null);
+    const [selectedWork, setSelectedWork] = useState<any>(null);
     const [logoUrl, setLogoUrl] = useState("");
 
     const { data: workExperiences = [], isLoading, refetch } = useWorkExperiences();

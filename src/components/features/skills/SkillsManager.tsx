@@ -93,7 +93,7 @@ export function SkillsManager() {
                 <Button
                     onClick={handleSave}
                     disabled={updateSkills.isPending || JSON.stringify(skills) === JSON.stringify(initialSkills)}
-                    className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-100 min-w-[140px]"
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md transition-all duration-300 min-w-[140px]"
                 >
                     {updateSkills.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : <Save className="size-4 mr-2" />}
                     Save Changes

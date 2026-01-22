@@ -30,13 +30,13 @@ export function AboutManager() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-    const { data: about, isLoading, refetch } = useAbout();
+    const { data: aboutContent, isLoading, refetch } = useAbout();
     const createAbout = useCreateAbout();
     const updateAbout = useUpdateAbout();
     const deleteAboutMutation = useDeleteAbout();
 
     const handleAboutSubmit = (data: Omit<About, "_id">) => {
-        const action = about ? updateAbout : createAbout;
+        const action = aboutContent ? updateAbout : createAbout;
         action.mutate(data, {
             onSuccess: () => {
                 setIsDialogOpen(false);
@@ -65,10 +65,10 @@ export function AboutManager() {
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">About Me</h2>
                     <p className="text-sm text-gray-500 dark:text-slate-400">Your personal story and introduction</p>
                 </div>
-                {!about && (
+                {!aboutContent && (
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 shadow-md">
+                            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md transition-all duration-300">
                                 <Plus className="mr-2 h-4 w-4" /> Create About
                             </Button>
                         </DialogTrigger>
@@ -85,9 +85,9 @@ export function AboutManager() {
                 )}
             </div>
 
-            {about ? (
+            {aboutContent ? (
                 <AboutCard
-                    about={about}
+                    about={aboutContent}
                     onEdit={() => setIsDialogOpen(true)}
                     onDelete={() => setIsDeleteDialogOpen(true)}
                 />
@@ -109,7 +109,7 @@ export function AboutManager() {
                         <DialogTitle>Edit About Section</DialogTitle>
                     </DialogHeader>
                     <AboutForm
-                        about={about || undefined}
+                        about={aboutContent || undefined}
                         onSubmit={handleAboutSubmit}
                         isSubmitting={updateAbout.isPending || createAbout.isPending}
                     />

@@ -8,10 +8,12 @@ import {
 import { toast } from "sonner";
 
 /** Fetch all work experiences */
-export const useWorkExperiences = () => {
+export const useWorkExperiences = (options?: { initialData?: WorkExperience[] }) => {
   return useQuery<WorkExperience[]>({
     queryKey: ["workExperiences"],
     queryFn: fetchWorkExperiences,
+    initialData: options?.initialData,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

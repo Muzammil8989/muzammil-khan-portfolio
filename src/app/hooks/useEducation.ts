@@ -8,10 +8,12 @@ import {
 import { toast } from "sonner";
 
 /** Fetch all education items */
-export const useEducations = () => {
+export const useEducations = (options?: { initialData?: Education[] }) => {
   return useQuery<Education[]>({
     queryKey: ["educations"],
     queryFn: fetchEducations,
+    initialData: options?.initialData,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

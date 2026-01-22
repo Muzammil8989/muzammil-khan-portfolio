@@ -3,10 +3,12 @@ import { fetchSkills } from "@/services/skill";
 import { updateSkillsAction } from "@/actions/skill-actions";
 import { toast } from "sonner";
 
-export const useSkills = () => {
+export const useSkills = (options?: { initialData?: any[] }) => {
     return useQuery({
         queryKey: ["skills"],
         queryFn: fetchSkills,
+        initialData: options?.initialData,
+        staleTime: 5 * 60 * 1000,
     });
 };
 

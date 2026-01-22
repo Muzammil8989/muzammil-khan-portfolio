@@ -3,10 +3,12 @@ import { fetchAbout } from "@/services/about";
 import { upsertAboutAction, deleteAboutAction } from "@/actions/about-actions";
 import { toast } from "sonner";
 
-export const useAbout = () => {
+export const useAbout = (options?: { initialData?: any }) => {
   return useQuery({
     queryKey: ["about"],
     queryFn: fetchAbout,
+    initialData: options?.initialData,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

@@ -1,0 +1,685 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { Blog } from "@/services/blog";
+import { BlogInput } from "@/core/validation/blog";
+import { generateSlug } from "@/lib/blog-utils";
+import { toast } from "sonner";
+import { CodeBlockEditor } from "./code-block-editor";
+
+interface BlogFormProps {
+  blog?: Blog;
+  onSubmit: (data: BlogInput) => void;
+  isSubmitting: boolean;
+}
+
+export function BlogForm({
+  blog,
+  onSubmit,
+  isSubmitting,
+}: BlogFormProps) {
+  const [formData, setFormData] = useState<BlogInput>({
+    title: "",
+    slug: "",
+    excerpt: "",
+    content: "",
+    codeBlocks: [],
+    languages: [],
+    frameworks: [],
+    difficulty: "beginner",
+    author: "Muhammad Muzammil Khan",
+    tags: [],
+    seo: {
+      metaTitle: "",
+      metaDescription: "",
+      canonicalUrl: "",
+    },
+    status: "draft",
+    publishedAt: "",
+    likes: 0,
+    version: 1,
+  });
+
+  const [tagInput, setTagInput] = useState("");
+  const [languageInput, setLanguageInput] = useState("");
+  const [frameworkInput, setFrameworkInput] = useState("");
+
+  // Populate form when editing
+  useEffect(() => {
+    if (blog) {
+      setFormData({
+        title: blog.title,
+        slug: blog.slug,
+        excerpt: blog.excerpt,
+        content: blog.content,
+        codeBlocks: blog.codeBlocks || [],
+        languages: blog.languages || [],
+        frameworks: blog.frameworks || [],
+        difficulty: blog.difficulty,
+        author: blog.author,
+        tags: blog.tags,
+        seo: blog.seo || {
+          metaTitle: "",
+          metaDescription: "",
+          canonicalUrl: "",
+        },
+        status: blog.status,
+        publishedAt: blog.publishedAt,
+        likes: blog.likes || 0,
+        version: blog.version || 1,
+      });
+    }
+  }, [blog]);
+
+  // Auto-generate slug from title
+  useEffect(() => {
+    if (formData.title && !blog) {
+      const autoSlug = generateSlug(formData.title);
+      setFormData((prev) => ({ ...prev, slug: autoSlug }));
+    }
+  }, [formData.title, blog]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSeoChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      seo: {
+        ...prev.seo,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleAddTag = () => {
+    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        tags: [...prev.tags, tagInput.trim()],
+      }));
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((t) => t !== tag),
+    }));
+  };
+
+  const handleAddLanguage = () => {
+    if (
+      languageInput.trim() &&
+      !formData.languages?.includes(languageInput.trim())
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        languages: [...(prev.languages || []), languageInput.trim()],
+      }));
+      setLanguageInput("");
+    }
+  };
+
+  const handleRemoveLanguage = (lang: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      languages: prev.languages?.filter((l) => l !== lang) || [],
+    }));
+  };
+
+  const handleAddFramework = () => {
+    if (
+      frameworkInput.trim() &&
+      !formData.frameworks?.includes(frameworkInput.trim())
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        frameworks: [...(prev.frameworks || []), frameworkInput.trim()],
+      }));
+      setFrameworkInput("");
+    }
+  };
+
+  const handleRemoveFramework = (framework: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      frameworks: prev.frameworks?.filter((f) => f !== framework) || [],
+    }));
+  };
+
+  const handleFillDummyData = () => {
+    const dummyData: BlogInput = {
+      title: "Building a Modern Full-Stack Blog with Next.js 15 and MongoDB",
+      slug: "building-modern-fullstack-blog-nextjs-mongodb",
+      excerpt: "Learn how to build a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Complete with code syntax highlighting and markdown support.",
+      content: `# Introduction
+
+In this comprehensive guide, we'll build a modern, full-stack blog system using the latest web technologies. This tutorial covers everything from database design to deployment.
+
+## Why Next.js 15?
+
+Next.js 15 brings significant improvements:
+- **React Server Components** for better performance
+- **Improved routing** with the App Router
+- **Built-in optimization** for images and fonts
+- **Enhanced TypeScript** support
+
+## Project Architecture
+
+Our blog system includes:
+
+1. **Database Layer** - MongoDB for flexible document storage
+2. **API Routes** - RESTful endpoints for CRUD operations
+3. **Frontend** - React components with TypeScript
+4. **Styling** - Tailwind CSS for rapid development
+
+## Setting Up the Database
+
+First, let's create our MongoDB schema. We'll use Zod for validation:
+
+\`\`\`typescript
+const BlogSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  tags: z.array(z.string()),
+});
+\`\`\`
+
+## Creating API Endpoints
+
+Next.js makes it easy to create API routes. Here's our blog endpoint:
+
+\`\`\`typescript
+export async function GET(request: NextRequest) {
+  const blogs = await BlogService.getAll();
+  return NextResponse.json({ success: true, data: blogs });
+}
+\`\`\`
+
+## Adding Code Highlighting
+
+We use react-syntax-highlighter for beautiful code blocks:
+
+\`\`\`javascript
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+
+function CodeBlock({ code, language }) {
+  return (
+    <SyntaxHighlighter language={language}>
+      {code}
+    </SyntaxHighlighter>
+  );
+}
+\`\`\`
+
+## Conclusion
+
+You now have a fully functional blog system! This architecture is scalable, maintainable, and production-ready.
+
+**Happy coding!** 🚀`,
+      codeBlocks: [
+        {
+          language: "typescript",
+          code: `interface Blog {
+  title: string;
+  slug: string;
+  content: string;
+  tags: string[];
+  status: "draft" | "published" | "archived";
+}
+
+export async function createBlog(data: Blog) {
+  const result = await db.collection("blogs").insertOne(data);
+  return result;
+}`,
+          filename: "blog-service.ts",
+          highlightedLines: [1, 2, 3, 8],
+        },
+        {
+          language: "javascript",
+          code: `// React Query hook for fetching blogs
+export const useBlogs = () => {
+  return useQuery({
+    queryKey: ["blogs"],
+    queryFn: fetchBlogs,
+  });
+};
+
+// Mutation for creating blogs
+export const useCreateBlog = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      toast.success("Blog created!");
+    },
+  });
+};`,
+          filename: "useBlogs.ts",
+          highlightedLines: [14, 15, 16],
+        },
+      ],
+      languages: ["TypeScript", "JavaScript"],
+      frameworks: ["Next.js", "React", "MongoDB", "Tailwind CSS"],
+      difficulty: "intermediate",
+      author: "Muhammad Muzammil Khan",
+      tags: ["Next.js", "React", "MongoDB", "TypeScript", "Tutorial", "Full-Stack"],
+      seo: {
+        metaTitle: "Build a Modern Blog with Next.js 15 and MongoDB | Complete Guide",
+        metaDescription: "Step-by-step tutorial on building a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Includes code syntax highlighting and markdown support.",
+        canonicalUrl: "",
+      },
+      status: "draft",
+      publishedAt: "",
+      likes: 0,
+      version: 1,
+    };
+
+    setFormData(dummyData);
+    toast.success("Dummy data filled! Review and publish when ready.");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Client-side validation
+    if (!formData.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!formData.slug.trim()) {
+      toast.error("Slug is required");
+      return;
+    }
+
+    if (!formData.excerpt.trim()) {
+      toast.error("Excerpt is required");
+      return;
+    }
+
+    if (!formData.content.trim()) {
+      toast.error("Content is required");
+      return;
+    }
+
+    if (formData.tags.length === 0) {
+      toast.error("At least one tag is required");
+      return;
+    }
+
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Fill Dummy Data Button - For Testing */}
+      {!blog && (
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleFillDummyData}
+            className="gap-2"
+          >
+            <span className="text-lg">🎲</span>
+            Fill Dummy Data (For Testing)
+          </Button>
+        </div>
+      )}
+
+      {/* Basic Information */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Basic Information</h3>
+
+        <div className="space-y-2">
+          <Label htmlFor="title">Title *</Label>
+          <Input
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            placeholder="How to Build a Modern Web App with Next.js"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="slug">Slug *</Label>
+          <Input
+            id="slug"
+            name="slug"
+            value={formData.slug}
+            onChange={handleChange}
+            required
+            placeholder="how-to-build-modern-web-app-nextjs"
+          />
+          <p className="text-xs text-muted-foreground">
+            URL-friendly version (auto-generated from title)
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="excerpt">Excerpt *</Label>
+          <Textarea
+            id="excerpt"
+            name="excerpt"
+            value={formData.excerpt}
+            onChange={handleChange}
+            required
+            rows={2}
+            placeholder="A brief summary of your blog post (1-2 sentences)"
+            maxLength={300}
+          />
+          <p className="text-xs text-muted-foreground">
+            {formData.excerpt.length}/300 characters
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="author">Author</Label>
+          <Input
+            id="author"
+            name="author"
+            value={formData.author}
+            onChange={handleChange}
+            placeholder="Muhammad Muzammil Khan"
+          />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Content</h3>
+
+        <div className="space-y-2">
+          <Label htmlFor="content">Blog Content (Markdown) *</Label>
+          <Textarea
+            id="content"
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            required
+            rows={15}
+            placeholder="Write your blog content in Markdown format..."
+            className="font-mono"
+          />
+          <p className="text-xs text-muted-foreground">
+            Supports Markdown syntax
+          </p>
+        </div>
+
+        {/* Code Blocks */}
+        <CodeBlockEditor
+          codeBlocks={formData.codeBlocks || []}
+          onChange={(blocks) =>
+            setFormData((prev) => ({ ...prev, codeBlocks: blocks }))
+          }
+        />
+      </div>
+
+      {/* Categories & Tags */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Categories & Tags</h3>
+
+        <div className="space-y-2">
+          <Label htmlFor="difficulty">Difficulty Level</Label>
+          <Select
+            value={formData.difficulty}
+            onValueChange={(value: "beginner" | "intermediate" | "advanced") =>
+              setFormData((prev) => ({ ...prev, difficulty: value }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="beginner">Beginner</SelectItem>
+              <SelectItem value="intermediate">Intermediate</SelectItem>
+              <SelectItem value="advanced">Advanced</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-2">
+          <Label>Tags *</Label>
+          <div className="flex gap-2">
+            <Input
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddTag();
+                }
+              }}
+              placeholder="Add a tag and press Enter"
+            />
+            <Button type="button" onClick={handleAddTag} variant="secondary">
+              Add
+            </Button>
+          </div>
+          {formData.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="pr-1">
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(tag)}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Languages */}
+        <div className="space-y-2">
+          <Label>Programming Languages (optional)</Label>
+          <div className="flex gap-2">
+            <Input
+              value={languageInput}
+              onChange={(e) => setLanguageInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddLanguage();
+                }
+              }}
+              placeholder="e.g., JavaScript, Python"
+            />
+            <Button
+              type="button"
+              onClick={handleAddLanguage}
+              variant="secondary"
+            >
+              Add
+            </Button>
+          </div>
+          {formData.languages && formData.languages.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.languages.map((lang) => (
+                <Badge key={lang} variant="outline" className="pr-1">
+                  {lang}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLanguage(lang)}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Frameworks */}
+        <div className="space-y-2">
+          <Label>Frameworks/Libraries (optional)</Label>
+          <div className="flex gap-2">
+            <Input
+              value={frameworkInput}
+              onChange={(e) => setFrameworkInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddFramework();
+                }
+              }}
+              placeholder="e.g., React, Next.js"
+            />
+            <Button
+              type="button"
+              onClick={handleAddFramework}
+              variant="secondary"
+            >
+              Add
+            </Button>
+          </div>
+          {formData.frameworks && formData.frameworks.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.frameworks.map((framework) => (
+                <Badge key={framework} variant="outline" className="pr-1">
+                  {framework}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFramework(framework)}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SEO Settings */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">SEO Settings (optional)</h3>
+
+        <div className="space-y-2">
+          <Label htmlFor="metaTitle">Meta Title</Label>
+          <Input
+            id="metaTitle"
+            name="metaTitle"
+            value={formData.seo?.metaTitle || ""}
+            onChange={handleSeoChange}
+            placeholder="Leave empty to use blog title"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="metaDescription">Meta Description</Label>
+          <Textarea
+            id="metaDescription"
+            name="metaDescription"
+            value={formData.seo?.metaDescription || ""}
+            onChange={handleSeoChange}
+            rows={3}
+            placeholder="Leave empty to use excerpt"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="canonicalUrl">Canonical URL</Label>
+          <Input
+            id="canonicalUrl"
+            name="canonicalUrl"
+            type="url"
+            value={formData.seo?.canonicalUrl || ""}
+            onChange={handleSeoChange}
+            placeholder="https://yoursite.com/blog/slug"
+          />
+        </div>
+      </div>
+
+      {/* Publishing Options */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Publishing</h3>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select
+            value={formData.status}
+            onValueChange={(value: "draft" | "published" | "archived") =>
+              setFormData((prev) => ({ ...prev, status: value }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {formData.status === "published" && (
+          <div className="space-y-2">
+            <Label htmlFor="publishedAt">Published Date</Label>
+            <Input
+              id="publishedAt"
+              name="publishedAt"
+              type="datetime-local"
+              value={
+                formData.publishedAt
+                  ? new Date(formData.publishedAt).toISOString().slice(0, 16)
+                  : ""
+              }
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  publishedAt: new Date(e.target.value).toISOString(),
+                }))
+              }
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex gap-2 pt-4">
+        <Button type="submit" disabled={isSubmitting} className="flex-1">
+          {isSubmitting
+            ? "Processing..."
+            : blog
+              ? "Update Blog"
+              : "Create Blog"}
+        </Button>
+      </div>
+    </form>
+  );
+}

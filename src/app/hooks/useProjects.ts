@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchProjects } from "@/services/project";
+import { fetchProjects, Project } from "@/services/project";
 import {
     createProjectAction,
     updateProjectAction,
@@ -8,10 +8,12 @@ import {
 import { toast } from "sonner";
 
 /** Fetch all projects */
-export const useProjects = () => {
-    return useQuery({
+export const useProjects = (options?: { initialData?: Project[] }) => {
+    return useQuery<Project[]>({
         queryKey: ["projects"],
         queryFn: fetchProjects,
+        initialData: options?.initialData,
+        staleTime: 5 * 60 * 1000,
     });
 };
 
