@@ -76,6 +76,9 @@
   /* Organic gradient colors */
   --soft-lavender: #f3f0ff;
   --soft-blue: #eef2ff;
+
+  --popover: #ffffff;
+  --popover-foreground: #1e293b;
 }
 
 
@@ -135,6 +138,9 @@
   --soft-blue: #60a5fa;
   --royal-blue: #2563eb;
   --soft-violet: #8b5cf6;
+
+  --popover: #00001a;
+  --popover-foreground: #e2e8f0;
 }
 
 

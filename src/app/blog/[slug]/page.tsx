@@ -37,6 +37,8 @@ const extractTextFromMarkdown = (markdown: string): string => {
     .trim();
 };
 
+import { ReadingProgressBar } from "@/components/features/blog/reading-progress";
+
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
 
@@ -66,9 +68,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const contentToRead = `${blog.title}. ${blog.excerpt}. ${extractTextFromMarkdown(blog.content)}`;
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#00001a]">
+    <main className="min-h-screen bg-white dark:bg-[#00001a] relative">
+      <ReadingProgressBar />
       {/* Back Button */}
-      <div className="w-full max-w-4xl mx-auto px-6 pt-20 pb-8">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-20 pb-8">
         <Link href="/blog">
           <Button
             variant="ghost"
@@ -81,7 +84,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       </div>
 
       {/* Article Container */}
-      <article className="w-full max-w-4xl mx-auto px-6 pb-20">
+      <article className="w-full max-w-4xl mx-auto px-4 sm:px-6 pb-20 break-words">
         <header className="mb-12">
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-6">

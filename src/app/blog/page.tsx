@@ -70,25 +70,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           initialDifficulty={difficulty}
         />
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-          <div className="glass-card p-4 rounded-xl border border-slate-200 dark:border-white/10 text-center">
-            <p className="text-2xl font-bold text-[#FFB902]">{blogsArray.length}</p>
-            <p className="text-sm text-muted-foreground">Total Posts</p>
-          </div>
-          <div className="glass-card p-4 rounded-xl border border-slate-200 dark:border-white/10 text-center">
-            <p className="text-2xl font-bold text-[#FFB902]">{allTags.length}</p>
-            <p className="text-sm text-muted-foreground">Topics</p>
-          </div>
-          <div className="glass-card p-4 rounded-xl border border-slate-200 dark:border-white/10 text-center">
-            <p className="text-2xl font-bold text-[#FFB902]">
-              {blogsArray.length > 0
-                ? Math.round(blogsArray.reduce((acc, b) => acc + (b.readingTime || 0), 0) / blogsArray.length)
-                : 0}
-            </p>
-            <p className="text-sm text-muted-foreground">Avg. Read Time</p>
-          </div>
-        </div>
 
         {/* Blog Grid */}
         {filteredBlogs.length > 0 ? (
