@@ -7,6 +7,9 @@ import {
   Calendar,
   Clock,
   BookOpen,
+  ChevronRight,
+  User,
+  Share2,
 } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -15,6 +18,8 @@ import { BlogActions } from "@/components/features/blog/blog-actions";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { Blog } from "@/services/blog";
+import { ReadingProgressBar } from "@/components/features/blog/reading-progress";
+import { BlogCard } from "@/components/features/blog/blog-card";
 
 export const dynamic = "force-dynamic";
 
@@ -37,8 +42,6 @@ const extractTextFromMarkdown = (markdown: string): string => {
     .trim();
 };
 
-import { ReadingProgressBar } from "@/components/features/blog/reading-progress";
-
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
 
@@ -49,6 +52,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   // Fetch blog data directly on the server
   let blog: Blog;
+  let relatedBlogs: Blog[] = [];
+
   try {
     const rawBlog = await BlogService.getBySlug(slug) as any;
     if (!rawBlog) notFound();
@@ -60,6 +65,14 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       isLiked: rawBlog.likedBy?.includes(ip) || false,
       likedBy: undefined, // Don't leak other IPs
     } as Blog;
+
+    // Fetch related blogs based on tags
+    const allBlogs = await BlogService.getAll({ status: "published" });
+    relatedBlogs = allBlogs
+      .filter((b: any) => b.slug !== slug && b.tags.some((t: string) => blog.tags.includes(t)))
+      .slice(0, 3)
+      .map((b: any) => ({ ...b, _id: b._id.toString() } as Blog));
+
   } catch (error) {
     console.error("Error fetching blog:", error);
     notFound();
@@ -70,198 +83,194 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   return (
     <main className="min-h-screen bg-white dark:bg-[#00001a] relative">
       <ReadingProgressBar />
-      {/* Back Button */}
-      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-20 pb-8">
-        <Link href="/blog">
-          <Button
-            variant="ghost"
-            className="group hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Blog
-          </Button>
-        </Link>
+
+      {/* Premium Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Article Container */}
-      <article className="w-full max-w-4xl mx-auto px-4 sm:px-6 pb-20 break-words">
-        <header className="mb-12">
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {blog.tags?.map((tag: string) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="bg-indigo-50 dark:bg-blue-500/10 border-indigo-200 dark:border-blue-400/30 text-indigo-700 dark:text-blue-300"
-              >
-                #{tag}
-              </Badge>
-            ))}
-          </div>
-
-          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight">
-            {blog.title}
-          </h1>
-
-          <p className="text-xl text-slate-600 dark:text-slate-300 font-light leading-relaxed mb-8">
-            {blog.excerpt}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 dark:text-slate-400 pb-8 border-b border-slate-200 dark:border-white/10">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-900 dark:text-white">
-                {blog.author}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              {new Date(blog.publishedAt || blog.createdAt).toLocaleDateString(
-                "en-US",
-                {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                }
-              )}
-            </div>
-            {blog.readingTime && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                {blog.readingTime} min read
-              </div>
-            )}
-          </div>
-
-          {/* Client Side Actions (Audio, Like, Share) */}
-          <BlogActions blog={blog} contentToRead={contentToRead} />
-        </header>
-
-        <div className="prose prose-slate dark:prose-invert prose-lg max-w-none">
-          <ReactMarkdown
-            components={{
-              h1: ({ children }) => (
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-12 mb-6">
-                  {children}
-                </h1>
-              ),
-              h2: ({ children }) => (
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-10 mb-5">
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-8 mb-4">
-                  {children}
-                </h3>
-              ),
-              p: ({ children }) => (
-                <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
-                  {children}
-                </p>
-              ),
-              ul: ({ children }) => (
-                <ul className="list-disc list-inside space-y-2 mb-6 text-slate-700 dark:text-slate-300">
-                  {children}
-                </ul>
-              ),
-              ol: ({ children }) => (
-                <ol className="list-decimal list-inside space-y-2 mb-6 text-slate-700 dark:text-slate-300">
-                  {children}
-                </ol>
-              ),
-              li: ({ children }) => <li className="ml-4">{children}</li>,
-              blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-[#FFB902] pl-6 py-2 my-6 italic text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-white/5 rounded-r-lg">
-                  {children}
-                </blockquote>
-              ),
-              code: ({ children }) => (
-                <code className="bg-slate-100 dark:bg-white/10 text-indigo-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-sm font-mono">
-                  {children}
-                </code>
-              ),
-              a: ({ href, children }) => (
-                <a
-                  href={href}
-                  className="text-indigo-600 dark:text-blue-400 hover:underline font-medium"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {children}
-                </a>
-              ),
-              strong: ({ children }) => (
-                <strong className="font-bold text-slate-900 dark:text-white">
-                  {children}
-                </strong>
-              ),
-            }}
-          >
-            {blog.content}
-          </ReactMarkdown>
-        </div>
-
-        {blog.codeBlocks && blog.codeBlocks.length > 0 && (
-          <div className="mt-12 space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-              Code Examples
-            </h2>
-            {blog.codeBlocks.map((codeBlock: any, index: number) => (
-              <CodeBlock
-                key={index}
-                code={codeBlock.code}
-                language={codeBlock.language}
-                filename={codeBlock.filename}
-                highlightedLines={codeBlock.highlightedLines}
-              />
-            ))}
-          </div>
-        )}
-
-        {((blog.languages?.length ?? 0) > 0 || (blog.frameworks?.length ?? 0) > 0) && (
-          <div className="mt-12 p-8 rounded-2xl glass-card border border-slate-200 dark:border-white/10">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              Technologies Covered
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {blog.languages?.map((lang: string) => (
-                <Badge
-                  key={lang}
-                  variant="outline"
-                  className="bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-400/30 text-blue-700 dark:text-blue-300"
-                >
-                  {lang}
-                </Badge>
-              ))}
-              {blog.frameworks?.map((framework: string) => (
-                <Badge
-                  key={framework}
-                  variant="outline"
-                  className="bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-400/30 text-purple-700 dark:text-purple-300"
-                >
-                  {framework}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-16 pt-12 border-t border-slate-200 dark:border-white/10 text-center">
+      <div className="relative z-10">
+        {/* Navigation / Breadcrumbs */}
+        <nav className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-8 flex items-center justify-between">
           <Link href="/blog">
-            <Button variant="outline" className="gap-2 group">
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Back to All Posts
+            <Button
+              variant="ghost"
+              size="sm"
+              className="group hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+              Back to Blog
             </Button>
           </Link>
-        </div>
-      </article>
+
+          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">
+            <Link href="/" className="hover:text-indigo-600 dark:hover:text-blue-400 transition-colors">Home</Link>
+            <ChevronRight className="h-3 w-3" />
+            <Link href="/blog" className="hover:text-indigo-600 dark:hover:text-blue-400 transition-colors">Blog</Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-slate-600 dark:text-slate-300 truncate max-w-[150px]">{blog.title}</span>
+          </div>
+        </nav>
+
+        {/* Article Container */}
+        <article className="w-full max-w-4xl mx-auto px-4 sm:px-6 pb-20 break-words">
+          <header className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              {blog.tags?.map((tag: string) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="bg-indigo-50/50 dark:bg-blue-500/10 border-indigo-100 dark:border-blue-400/20 text-indigo-600 dark:text-blue-300 py-1 px-3 rounded-full text-xs font-bold uppercase tracking-wider"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+
+            <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white mb-8 leading-[1.15] tracking-tight">
+              {blog.title}
+            </h1>
+
+            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 font-light leading-relaxed mb-10 border-l-4 border-indigo-500/30 dark:border-blue-500/30 pl-6 italic">
+              {blog.excerpt}
+            </p>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 py-8 border-y border-slate-100 dark:border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-indigo-500 to-blue-400 flex items-center justify-center text-white shadow-lg">
+                  <User className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">{blog.author}</p>
+                  <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(blog.publishedAt || blog.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="h-3 w-3" />
+                      {blog.readingTime || 5} min read
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <BlogActions blog={blog} contentToRead={contentToRead} />
+              </div>
+            </div>
+          </header>
+
+          <div className="prose prose-slate dark:prose-invert prose-lg max-w-none 
+            prose-headings:font-[family-name:var(--font-display)] prose-headings:font-bold prose-headings:tracking-tight
+            prose-a:text-indigo-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+            prose-blockquote:border-indigo-500 dark:prose-blockquote:border-blue-500 prose-blockquote:bg-indigo-50/30 dark:prose-blockquote:bg-blue-500/5 prose-blockquote:rounded-r-xl
+            prose-img:rounded-2xl prose-img:shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => <h1 className="text-3xl sm:text-4xl mt-12 mb-6">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-2xl sm:text-3xl mt-10 mb-5 pb-2 border-b border-slate-100 dark:border-white/5">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-xl sm:text-2xl mt-8 mb-4">{children}</h3>,
+                code: ({ children }) => (
+                  <code className="bg-indigo-50 dark:bg-blue-500/10 text-indigo-700 dark:text-blue-300 px-1.5 py-0.5 rounded text-sm font-mono font-medium">
+                    {children}
+                  </code>
+                ),
+                pre: ({ children }) => <div className="not-prose">{children}</div>,
+              }}
+            >
+              {blog.content}
+            </ReactMarkdown>
+          </div>
+
+          {blog.codeBlocks && blog.codeBlocks.length > 0 && (
+            <div className="mt-16 space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-8 w-1 bg-indigo-500 rounded-full" />
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white uppercase tracking-tighter">Code Lab</h2>
+              </div>
+              {blog.codeBlocks.map((codeBlock: any, index: number) => (
+                <div key={index} className="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 group">
+                  <CodeBlock
+                    code={codeBlock.code}
+                    language={codeBlock.language}
+                    filename={codeBlock.filename}
+                    highlightedLines={codeBlock.highlightedLines}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Tech Footer */}
+          {((blog.languages?.length ?? 0) > 0 || (blog.frameworks?.length ?? 0) > 0) && (
+            <div className="mt-20 p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Share2 className="h-24 w-24 -rotate-12" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-indigo-500" />
+                Stack Context
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {blog.languages?.map((lang: string) => (
+                  <Badge key={lang} className="bg-white dark:bg-slate-800 text-indigo-600 dark:text-blue-400 border-indigo-100 dark:border-blue-900/50 shadow-sm px-4 py-1.5 rounded-xl hover:scale-105 transition-transform">
+                    {lang}
+                  </Badge>
+                ))}
+                {blog.frameworks?.map((framework: string) => (
+                  <Badge key={framework} className="bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/50 shadow-sm px-4 py-1.5 rounded-xl hover:scale-105 transition-transform">
+                    {framework}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Related Posts */}
+          {relatedBlogs.length > 0 && (
+            <div className="mt-24 pt-16 border-t border-slate-100 dark:border-white/5">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-10 flex items-center gap-3 tracking-tight">
+                Continue Reading
+                <div className="h-px flex-1 bg-gradient-to-r from-slate-200 dark:from-white/10 to-transparent" />
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {relatedBlogs.map((rBlog) => (
+                  <div key={rBlog._id} className="scale-95 hover:scale-100 transition-transform duration-300">
+                    <BlogCard blog={rBlog} showActions={false} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-20 pt-12 border-t border-slate-100 dark:border-white/5 text-center">
+            <Link href="/blog">
+              <Button variant="outline" size="lg" className="rounded-2xl px-8 gap-3 group border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                All Programming Articles
+              </Button>
+            </Link>
+          </div>
+        </article>
+      </div>
 
       <Navbar />
 
-      <footer className="text-center py-20 border-t border-slate-100 dark:border-white/10 dark:bg-black/10">
-        <p className="text-slate-400 dark:text-slate-400 font-light text-sm">
-          © {new Date().getFullYear()} {blog.author} • Built with precision.
-        </p>
+      <footer className="text-center py-24 border-t border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/30">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="h-12 w-12 rounded-2xl bg-[#FFB902]/20 border border-[#FFB902]/30 flex items-center justify-center text-[#FFB902] mx-auto mb-6">
+            <BookOpen className="h-6 w-6" />
+          </div>
+          <p className="text-slate-400 dark:text-slate-500 font-medium text-sm tracking-widest uppercase">
+            End of Transmission
+          </p>
+          <p className="text-xs text-slate-300 dark:text-slate-600 mt-4 italic">
+            Thoughtfully crafted by Muhammad Muzammil
+          </p>
+        </div>
       </footer>
     </main>
   );
