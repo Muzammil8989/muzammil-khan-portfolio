@@ -17,7 +17,7 @@ export function useLenis() {
   useEffect(() => {
     // Initialize Lenis
     const lenis = new Lenis({
-      duration: 1.2, // Smooth scroll duration
+      duration: 1.5, // Smooth scroll duration (increased for smoother feel)
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing
       orientation: "vertical",
       gestureOrientation: "vertical",
@@ -25,6 +25,8 @@ export function useLenis() {
       wheelMultiplier: 1,
       touchMultiplier: 2,
       infinite: false,
+      syncTouch: true, // Enable touch device sync
+      syncTouchLerp: 0.1, // Smooth touch scrolling
     });
 
     lenisRef.current = lenis;

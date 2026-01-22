@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -94,6 +95,8 @@ export const ProfileForm = ({
         <Input
           id="name"
           name="name"
+          type="text"
+          autoComplete="name"
           value={formData.name}
           onChange={handleChange}
           required
@@ -109,6 +112,7 @@ export const ProfileForm = ({
         <Textarea
           id="description"
           name="description"
+          autoComplete="off"
           value={formData.description}
           onChange={handleChange}
           required
@@ -125,6 +129,8 @@ export const ProfileForm = ({
         <Input
           id="initials"
           name="initials"
+          type="text"
+          autoComplete="off"
           value={formData.initials}
           onChange={handleChange}
           required
@@ -159,11 +165,15 @@ export const ProfileForm = ({
 
         {formData.avatarUrl && (
           <div className="mt-2 flex items-center gap-4">
-            <img
-              src={formData.avatarUrl}
-              alt="Profile preview"
-              className="w-16 h-16 rounded-full object-cover border"
-            />
+            <div className="relative w-16 h-16 rounded-full overflow-hidden border">
+              <Image
+                src={formData.avatarUrl}
+                alt="Profile preview"
+                fill
+                sizes="64px"
+                className="object-cover"
+              />
+            </div>
             <Button
               variant="outline"
               size="sm"

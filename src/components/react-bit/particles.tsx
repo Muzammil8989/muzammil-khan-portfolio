@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Renderer, Camera, Geometry, Program, Mesh } from 'ogl';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface ParticlesProps {
   particleCount?: number;
@@ -115,10 +116,16 @@ const Particles: React.FC<ParticlesProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    // Skip animation if user prefers reduced motion
+    if (prefersReducedMotion) {
+      return;
+    }
 
     const renderer = new Renderer({ depth: false, alpha: true });
     const gl = renderer.gl;
@@ -232,18 +239,19 @@ const Particles: React.FC<ParticlesProps> = ({
         container.removeChild(gl.canvas);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     particleCount,
     particleSpread,
     speed,
+    particleColors,
     moveParticlesOnHover,
     particleHoverFactor,
     alphaParticles,
     particleBaseSize,
     sizeRandomness,
     cameraDistance,
-    disableRotation
+    disableRotation,
+    prefersReducedMotion
   ]);
 
   return <div ref={containerRef} className={`relative w-full h-full ${className}`} />;

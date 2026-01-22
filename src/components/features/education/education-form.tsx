@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CloudinaryUploader } from "@/components/ui/cloudinary-uploader";
@@ -87,6 +88,8 @@ export const EducationForm = ({
         <Input
           id="school"
           name="school"
+          type="text"
+          autoComplete="off"
           value={formData.school}
           onChange={handleChange}
           required
@@ -102,6 +105,8 @@ export const EducationForm = ({
         <Input
           id="degree"
           name="degree"
+          type="text"
+          autoComplete="off"
           value={formData.degree}
           onChange={handleChange}
           required
@@ -118,6 +123,8 @@ export const EducationForm = ({
           <Input
             id="start"
             name="start"
+            type="text"
+            autoComplete="off"
             value={formData.start}
             onChange={handleChange}
             required
@@ -131,6 +138,8 @@ export const EducationForm = ({
           <Input
             id="end"
             name="end"
+            type="text"
+            autoComplete="off"
             value={formData.end}
             onChange={handleChange}
             placeholder='2021 (or leave blank for "Present")'
@@ -147,6 +156,7 @@ export const EducationForm = ({
           id="href"
           name="href"
           type="url"
+          autoComplete="url"
           value={formData.href}
           onChange={handleChange}
           placeholder="https://wlu.ca"
@@ -178,12 +188,15 @@ export const EducationForm = ({
 
         {formData.logoUrl && (
           <div className="mt-2 flex items-center gap-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={formData.logoUrl}
-              alt="Logo preview"
-              className="w-16 h-16 rounded-md object-contain border bg-white"
-            />
+            <div className="relative w-16 h-16 rounded-md overflow-hidden border bg-white">
+              <Image
+                src={formData.logoUrl}
+                alt="Logo preview"
+                fill
+                sizes="64px"
+                className="object-contain"
+              />
+            </div>
             <Button
               variant="outline"
               size="sm"

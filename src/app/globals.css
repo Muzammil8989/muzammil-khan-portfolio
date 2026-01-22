@@ -82,7 +82,7 @@
 /* DARK MODE */
 .dark {
   /* Deep blue background */
-  --background: #000045;
+  --background: #00001a;
   --foreground: #e2e8f0;
 
   /* Glass cards */
@@ -118,7 +118,7 @@
   --destructive: #ef4444;
 
   /* Sidebar */
-  --sidebar: rgba(0, 0, 69, 0.8);
+  --sidebar: rgba(0, 0, 26, 0.8);
   --sidebar-foreground: #e2e8f0;
 
   --sidebar-primary: #60a5fa;
@@ -144,6 +144,31 @@
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-scrolling iframe {
+    pointer-events: none;
+  }
+
   body {
     @apply bg-white text-slate-800 antialiased;
     background:
@@ -157,7 +182,7 @@
   /* Dark mode misty background */
   .dark body {
     @apply text-slate-200;
-    background-color: #000045;
+    background-color: #00001a;
     background-image:
       radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),

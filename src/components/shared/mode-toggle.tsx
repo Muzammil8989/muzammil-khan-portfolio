@@ -5,15 +5,18 @@ import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { useRef } from "react";
 import { flushSync } from "react-dom";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
   const ref = useRef<HTMLButtonElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const toggleTheme = async () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
 
-    if (!ref.current || !("startViewTransition" in document)) {
+    // Skip animation if user prefers reduced motion or browser doesn't support View Transitions
+    if (!ref.current || !("startViewTransition" in document) || prefersReducedMotion) {
       setTheme(nextTheme);
       return;
     }

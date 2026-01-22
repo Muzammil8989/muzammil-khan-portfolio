@@ -1,15 +1,31 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SignOutButton } from "@/components/features/auth";
-import { ProfileManager } from "@/components/features/profile";
-import { WorkManager } from "@/components/features/work";
-import { EducationManager } from "@/components/features/education";
-import { AboutManager } from "@/components/features/about";
-import { ProjectManager } from "@/components/features/projects";
-import { SkillsManager } from "@/components/features/skills";
 import { ModeToggle } from "@/components/shared";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LayoutDashboard, User, Briefcase, GraduationCap, FileText, Code2, Wrench } from "lucide-react";
+
+// Lazy load manager components for better performance
+const ProfileManager = dynamic(() => import("@/components/features/profile").then(mod => ({ default: mod.ProfileManager })), {
+  loading: () => <Skeleton className="h-96 w-full rounded-xl dark:bg-white/10" />,
+});
+const WorkManager = dynamic(() => import("@/components/features/work").then(mod => ({ default: mod.WorkManager })), {
+  loading: () => <Skeleton className="h-96 w-full rounded-xl dark:bg-white/10" />,
+});
+const EducationManager = dynamic(() => import("@/components/features/education").then(mod => ({ default: mod.EducationManager })), {
+  loading: () => <Skeleton className="h-96 w-full rounded-xl dark:bg-white/10" />,
+});
+const AboutManager = dynamic(() => import("@/components/features/about").then(mod => ({ default: mod.AboutManager })), {
+  loading: () => <Skeleton className="h-96 w-full rounded-xl dark:bg-white/10" />,
+});
+const ProjectManager = dynamic(() => import("@/components/features/projects").then(mod => ({ default: mod.ProjectManager })), {
+  loading: () => <Skeleton className="h-96 w-full rounded-xl dark:bg-white/10" />,
+});
+const SkillsManager = dynamic(() => import("@/components/features/skills").then(mod => ({ default: mod.SkillsManager })), {
+  loading: () => <Skeleton className="h-96 w-full rounded-xl dark:bg-white/10" />,
+});
 
 export default function DashboardManager() {
   return (

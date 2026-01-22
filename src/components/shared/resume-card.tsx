@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import BlurText from "@/components/react-bit/blur-text";
 
@@ -26,7 +27,7 @@ interface ResumeCardProps {
   description?: string;
 }
 
-export const ResumeCard = ({
+export const ResumeCard = React.memo(({
   logoUrl,
   altText,
   title,
@@ -74,11 +75,15 @@ export const ResumeCard = ({
       >
         <div className="flex items-start gap-3 sm:gap-4">
           {/* Logo */}
-          <img
-            src={logoUrl}
-            alt={altText}
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover bg-muted flex-shrink-0 ring-2 ring-border shadow-md"
-          />
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0 ring-2 ring-border shadow-md">
+            <Image
+              src={logoUrl}
+              alt={altText}
+              fill
+              sizes="(max-width: 640px) 56px, 64px"
+              className="object-cover"
+            />
+          </div>
 
           <div className="flex-grow min-w-0">
             <CardHeader className="p-0">
@@ -181,7 +186,7 @@ export const ResumeCard = ({
                     />
                   </div>
                 )}
-                <div className="text-xs sm:text-sm text-muted-foreground/80 font-medium whitespace-nowrap">
+                <div className="text-xs sm:text-sm text-muted-foreground/80 font-medium whitespace-nowrap tabular-nums">
                   {period}
                 </div>
               </div>
@@ -203,9 +208,9 @@ export const ResumeCard = ({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="border-l-4 border-primary/60 pl-3 sm:pl-4 py-1.5 bg-muted/30 rounded-r-md"
+                    className="border-l-4 border-primary/60 pl-4 sm:pl-6 pr-3 sm:pr-4 py-3 sm:py-4 bg-muted/30 rounded-r-md"
                   >
-                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed">{description}</p>
+                    <p className="text-sm sm:text-base text-foreground/90 leading-relaxed text-justify">{description}</p>
                   </motion.div>
                 </motion.div>
               )}
@@ -215,4 +220,6 @@ export const ResumeCard = ({
       </motion.div>
     </Link>
   );
-};
+});
+
+ResumeCard.displayName = 'ResumeCard';

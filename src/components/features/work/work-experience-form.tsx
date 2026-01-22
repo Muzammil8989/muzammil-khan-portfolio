@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -106,6 +107,8 @@ export const WorkExperienceForm = ({
         <Input
           id="company"
           name="company"
+          type="text"
+          autoComplete="organization"
           value={formData.company}
           onChange={handleChange}
           required
@@ -121,6 +124,8 @@ export const WorkExperienceForm = ({
         <Input
           id="title"
           name="title"
+          type="text"
+          autoComplete="organization-title"
           value={formData.title}
           onChange={handleChange}
           required
@@ -136,6 +141,8 @@ export const WorkExperienceForm = ({
         <Input
           id="location"
           name="location"
+          type="text"
+          autoComplete="off"
           value={formData.location}
           onChange={handleChange}
           placeholder="Remote / City, Country"
@@ -151,6 +158,8 @@ export const WorkExperienceForm = ({
           <Input
             id="start"
             name="start"
+            type="text"
+            autoComplete="off"
             value={formData.start}
             onChange={handleChange}
             required
@@ -164,6 +173,8 @@ export const WorkExperienceForm = ({
           <Input
             id="end"
             name="end"
+            type="text"
+            autoComplete="off"
             value={formData.end}
             onChange={handleChange}
             placeholder='Oct 2022 (or leave blank for "Present")'
@@ -180,6 +191,7 @@ export const WorkExperienceForm = ({
           id="href"
           name="href"
           type="url"
+          autoComplete="url"
           value={formData.href}
           onChange={handleChange}
           placeholder="https://atomic.finance"
@@ -194,6 +206,8 @@ export const WorkExperienceForm = ({
         <Input
           id="badges"
           name="badges"
+          type="text"
+          autoComplete="off"
           value={formData.badges.join(", ")}
           onChange={handleChange}
           placeholder="Remote, Full-time, Contract"
@@ -211,6 +225,7 @@ export const WorkExperienceForm = ({
         <Textarea
           id="description"
           name="description"
+          autoComplete="off"
           value={formData.description}
           onChange={handleChange}
           placeholder="What did you build, ship, or own?"
@@ -243,12 +258,15 @@ export const WorkExperienceForm = ({
 
         {formData.logoUrl && (
           <div className="mt-2 flex items-center gap-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={formData.logoUrl}
-              alt="Logo preview"
-              className="w-16 h-16 rounded-md object-contain border bg-white"
-            />
+            <div className="relative w-16 h-16 rounded-md overflow-hidden border bg-white">
+              <Image
+                src={formData.logoUrl}
+                alt="Logo preview"
+                fill
+                sizes="64px"
+                className="object-contain"
+              />
+            </div>
             <Button
               variant="outline"
               size="sm"

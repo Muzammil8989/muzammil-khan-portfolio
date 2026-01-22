@@ -1,7 +1,7 @@
 "use client";
 
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { motion, Transition, Easing } from "motion/react";
-import { useEffect, useRef, useState, useMemo } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 type BlurTextProps = {
@@ -76,7 +76,7 @@ const buildKeyframes = (
   return keyframes;
 };
 
-const BlurText: React.FC<BlurTextProps> = ({
+const BlurText: React.FC<BlurTextProps> = React.memo(({
   text = "",
   delay = 200,
   className = "",
@@ -207,6 +207,8 @@ const BlurText: React.FC<BlurTextProps> = ({
       })}
     </p>
   );
-};
+});
+
+BlurText.displayName = 'BlurText';
 
 export default BlurText;

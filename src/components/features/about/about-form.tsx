@@ -56,6 +56,7 @@ export const AboutForm = ({
         <Textarea
           id="message"
           name="message"
+          autoComplete="off"
           value={formData.message}
           onChange={handleChange}
           required

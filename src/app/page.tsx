@@ -14,6 +14,7 @@ import React from "react";
 import { PersonStructuredData } from "@/components/seo/structured-data";
 import { DATA } from "@/data/resume";
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/layout/navbar";
 
 interface AboutData {
@@ -89,7 +90,7 @@ export default function Page() {
                   <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.1]">
                     Hi, I'm <span className="text-[#FFB902]">{profile.name.replace(' Khan', '')}</span> 👋
                   </h1>
-                  <p className="text-lg sm:text-xl text-slate-500 dark:text-slate-300 w-full leading-relaxed font-light">
+                  <p className="text-xl sm:text-2xl text-slate-500 dark:text-slate-300 w-full leading-relaxed font-light">
                     Full Stack Web Developer focused on building <span className="text-slate-900 dark:text-white font-medium">scalable web apps</span> with great user experience and strong backend performance.
                   </p>
                 </div>
@@ -99,7 +100,7 @@ export default function Page() {
         </header>
 
         {/* About Section */}
-        <section id="about" className="grid md:grid-cols-3 gap-12 items-start">
+        <section id="about" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               About Me
@@ -125,7 +126,7 @@ export default function Page() {
         </section>
 
         {/* Work Experience Section */}
-        <section id="experience" className="grid md:grid-cols-3 gap-12 items-start">
+        <section id="experience" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               Work Experience
@@ -158,7 +159,7 @@ export default function Page() {
         </section>
 
         {/* Education Section */}
-        <section id="education" className="grid md:grid-cols-3 gap-12 items-start">
+        <section id="education" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               Education
@@ -184,7 +185,7 @@ export default function Page() {
         </section>
 
         {/* Skills Section */}
-        <section id="skills" className="grid md:grid-cols-3 gap-12 items-start">
+        <section id="skills" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
             <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               Expertise
@@ -231,9 +232,9 @@ export default function Page() {
       </div>
 
       {/* Projects Section - Full Width Carousel */}
-      <section className="py-32 overflow-hidden" id="projects">
+      <section className="py-32 overflow-hidden scroll-mt-20" id="projects">
         <div className="w-full max-w-7xl mx-auto px-6 mb-12">
-          <h2 className="font-[family-name:var(--font-display)] text-4xl font-extrabold text-slate-900 dark:text-white">
+          <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white">
             Featured Projects
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 font-light">Swipe or scroll to explore my latest works</p>
@@ -254,18 +255,21 @@ export default function Page() {
                     <div className="relative overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/10 bg-white dark:bg-transparent shadow-xl h-full flex flex-col">
                       <div className="aspect-video relative overflow-hidden">
                         {project.image && (
-                          <img
+                          <Image
                             src={project.image}
                             alt={project.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            fill
+                            sizes="(max-width: 768px) 320px, 600px"
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                            loading="lazy"
                           />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       </div>
                       <div className="p-8 flex flex-col flex-grow glass-card -mt-12 relative z-10 m-4 rounded-3xl">
                         <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{project.title}</h3>
-                          <span className="text-xs font-bold text-indigo-600 dark:text-blue-300 bg-indigo-50 dark:bg-blue-500/10 px-2 py-1 rounded">
+                          <h3 className="text-2xl font-bold text-[#FFB902]">{project.title}</h3>
+                          <span className="text-xs font-bold text-indigo-600 dark:text-blue-300 bg-indigo-50 dark:bg-blue-500/10 px-2 py-1 rounded tabular-nums">
                             {project.dates}
                           </span>
                         </div>
@@ -308,7 +312,7 @@ export default function Page() {
 
       {/* Footer */}
       <footer className="text-center py-20 border-t border-slate-100 dark:border-white/10 dark:bg-black/10">
-        <p className="text-slate-400 dark:text-slate-400 font-light text-sm">
+        <p className="text-slate-400 dark:text-slate-400 font-light text-sm" suppressHydrationWarning>
           © {new Date().getFullYear()} {profile?.name?.replace(' Khan', '') || 'Muhammad Muzammil'} • Built with precision.
         </p>
       </footer>
