@@ -46,6 +46,7 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
     const [isPaused, setIsPaused] = useState(false);
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
     const [isSupported, setIsSupported] = useState(true);
+    const isManuallyStopped = useRef(false);
 
     useEffect(() => {
         if (typeof window !== "undefined" && !window.speechSynthesis) {
@@ -107,6 +108,7 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
             setIsPaused(false);
             toast.info("Audio resumed");
         } else {
+            isManuallyStopped.current = false;
             const utterance = new SpeechSynthesisUtterance(contentToRead);
             utteranceRef.current = utterance;
             utterance.rate = 1.0;
@@ -122,13 +124,18 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
             utterance.onend = () => {
                 setIsPlaying(false);
                 setIsPaused(false);
-                toast.success("Audio finished");
+                if (!isManuallyStopped.current) {
+                    toast.success("Audio finished");
+                }
             };
 
-            utterance.onerror = () => {
+            utterance.onerror = (event) => {
+                // Don't show error if manually stopped or cancelled
+                if (!isManuallyStopped.current && event.error !== "canceled" && event.error !== "interrupted") {
+                    toast.error("Audio playback failed");
+                }
                 setIsPlaying(false);
                 setIsPaused(false);
-                toast.error("Audio playback failed");
             };
 
             window.speechSynthesis.speak(utterance);
@@ -137,6 +144,7 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
 
     const handleStop = () => {
         if (window.speechSynthesis) {
+            isManuallyStopped.current = true;
             window.speechSynthesis.cancel();
             setIsPlaying(false);
             setIsPaused(false);
