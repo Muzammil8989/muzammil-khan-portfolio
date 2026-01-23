@@ -7,7 +7,7 @@ import { getToken } from "next-auth/jwt";
 
 /**
  * GET /api/blogs - Get all blogs with optional filters
- * Query params: status, tag, difficulty, search, slug
+ * Query params: type, isPublished, tag, difficulty, search, slug
  */
 export async function GET(request: NextRequest) {
   return apiWrapper(async () => {
@@ -15,7 +15,9 @@ export async function GET(request: NextRequest) {
 
     const slug = searchParams.get("slug");
     const search = searchParams.get("search");
-    const status = searchParams.get("status") as "draft" | "published" | "archived" | null;
+    const type = searchParams.get("type") as "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide" | null;
+    const isPublishedParam = searchParams.get("isPublished");
+    const isPublished = isPublishedParam === "true" ? true : isPublishedParam === "false" ? false : undefined;
     const tag = searchParams.get("tag");
     const difficulty = searchParams.get("difficulty") as "beginner" | "intermediate" | "advanced" | null;
 
@@ -44,7 +46,8 @@ export async function GET(request: NextRequest) {
 
     // Get all blogs with filters
     const filters: any = {};
-    if (status) filters.status = status;
+    if (type) filters.type = type;
+    if (isPublished !== undefined) filters.isPublished = isPublished;
     if (tag) filters.tag = tag;
     if (difficulty) filters.difficulty = difficulty;
 

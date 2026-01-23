@@ -14,7 +14,8 @@ export class BlogService {
    * Get all blogs with optional filtering
    */
   static async getAll(filters?: {
-    status?: "draft" | "published" | "archived";
+    type?: "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide";
+    isPublished?: boolean;
     tag?: string;
     difficulty?: "beginner" | "intermediate" | "advanced";
   }) {
@@ -23,8 +24,12 @@ export class BlogService {
 
     const query: any = {};
 
-    if (filters?.status) {
-      query.status = filters.status;
+    if (filters?.type) {
+      query.type = filters.type;
+    }
+
+    if (filters?.isPublished !== undefined) {
+      query.isPublished = filters.isPublished;
     }
 
     if (filters?.tag) {
@@ -110,7 +115,7 @@ export class BlogService {
           { content: { $regex: query, $options: "i" } },
           { tags: { $in: [new RegExp(query, "i")] } },
         ],
-        status: "published",
+        isPublished: true,
       })
       .sort({ publishedAt: -1 })
       .toArray();
@@ -255,7 +260,7 @@ export class BlogService {
       { _id: new ObjectId(id) },
       {
         $set: {
-          status: "published",
+          isPublished: true,
           publishedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         },
@@ -326,7 +331,7 @@ export class BlogService {
     const { db } = await connectToDatabase();
     const collection = db.collection(COLLECTION_NAME);
 
-    const tags = await collection.distinct("tags", { status: "published" });
+    const tags = await collection.distinct("tags", { isPublished: true });
     return tags;
   }
 
@@ -338,7 +343,7 @@ export class BlogService {
     const collection = db.collection(COLLECTION_NAME);
 
     const blogs = await collection
-      .find({ status: "published" })
+      .find({ isPublished: true })
       .sort({ likes: -1, createdAt: -1 })
       .limit(limit)
       .toArray();

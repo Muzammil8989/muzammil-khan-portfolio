@@ -9,10 +9,22 @@ import {
     Share2,
     Heart,
     BookOpen,
+    Copy,
+    Twitter,
+    Linkedin,
+    Facebook,
+    ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLikeBlog } from "@/app/hooks/useBlogs";
 import { Blog } from "@/services/blog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface BlogActionsProps {
     blog: Blog;
@@ -133,18 +145,25 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
     };
 
     const handleShare = async () => {
+        if (!blog) {
+            toast.error("Blog data not available");
+            return;
+        }
+
         const shareData = {
-            title: blog.title,
-            text: blog.excerpt,
-            url: window.location.href,
+            title: blog.title || "Check out this blog post",
+            text: blog.excerpt || blog.title || "Interesting article",
+            url: typeof window !== "undefined" ? window.location.href : "",
         };
 
-        if (navigator.share) {
+        if (typeof navigator !== "undefined" && navigator.share) {
             try {
                 await navigator.share(shareData);
                 toast.success("Shared successfully!");
             } catch (err) {
-                if ((err as Error).name !== "AbortError") copyToLink();
+                if ((err as Error).name !== "AbortError") {
+                    copyToLink();
+                }
             }
         } else {
             copyToLink();
@@ -152,8 +171,37 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
     };
 
     const copyToLink = () => {
-        navigator.clipboard.writeText(window.location.href);
-        toast.success("Link copied to clipboard!");
+        if (typeof window === "undefined" || typeof navigator === "undefined") {
+            toast.error("Sharing not available");
+            return;
+        }
+
+        navigator.clipboard.writeText(window.location.href).then(
+            () => toast.success("Link copied to clipboard!"),
+            () => toast.error("Failed to copy link")
+        );
+    };
+
+    const shareToTwitter = () => {
+        if (!blog || typeof window === "undefined") return;
+
+        const text = encodeURIComponent(`${blog.title || "Check out this article"}`);
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+    };
+
+    const shareToLinkedIn = () => {
+        if (typeof window === "undefined") return;
+
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+    };
+
+    const shareToFacebook = () => {
+        if (typeof window === "undefined") return;
+
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
     };
 
     return (
@@ -198,10 +246,42 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
                     )}
                 </>
             )}
-            <Button onClick={handleShare} variant="outline" className="gap-2">
-                <Share2 className="w-4 h-4" />
-                Share
-            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                        <Share2 className="w-4 h-4" />
+                        Share
+                        <ChevronDown className="w-3 h-3 ml-1 opacity-50" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem onClick={copyToLink} className="gap-2 cursor-pointer">
+                        <Copy className="w-4 h-4" />
+                        <span>Copy Link</span>
+                    </DropdownMenuItem>
+                    {typeof navigator !== "undefined" && navigator.share && (
+                        <>
+                            <DropdownMenuItem onClick={handleShare} className="gap-2 cursor-pointer">
+                                <Share2 className="w-4 h-4" />
+                                <span>Share via...</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        </>
+                    )}
+                    <DropdownMenuItem onClick={shareToTwitter} className="gap-2 cursor-pointer">
+                        <Twitter className="w-4 h-4" />
+                        <span>Share on Twitter</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={shareToLinkedIn} className="gap-2 cursor-pointer">
+                        <Linkedin className="w-4 h-4" />
+                        <span>Share on LinkedIn</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={shareToFacebook} className="gap-2 cursor-pointer">
+                        <Facebook className="w-4 h-4" />
+                        <span>Share on Facebook</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
             <Button
                 onClick={handleLike}

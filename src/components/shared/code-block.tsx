@@ -106,7 +106,7 @@ export function CodeBlock({
           }}
           customStyle={{
             ...customStyle,
-            backgroundColor: "transparent",
+            background: "transparent",
             padding: "1.5rem 1.25rem",
             margin: 0,
             width: "100%",

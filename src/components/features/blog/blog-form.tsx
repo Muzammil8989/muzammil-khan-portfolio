@@ -43,7 +43,8 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
       metaDescription: "",
       canonicalUrl: "",
     },
-    status: "draft",
+    type: "Article",
+    isPublished: false,
     publishedAt: "",
     likes: 0,
     version: 1,
@@ -72,7 +73,8 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
           metaDescription: "",
           canonicalUrl: "",
         },
-        status: blog.status,
+        type: blog.type,
+        isPublished: blog.isPublished,
         publishedAt: blog.publishedAt,
         likes: blog.likes || 0,
         version: blog.version || 1,
@@ -289,7 +291,8 @@ export function CodeBlock({ code, language, filename }) {
           "Step-by-step tutorial on building a production-ready blog system with Next.js 15, React 19, MongoDB, and TypeScript. Includes code syntax highlighting and markdown support.",
         canonicalUrl: "",
       },
-      status: "draft",
+      type: "Tutorial",
+      isPublished: false,
       publishedAt: "",
       likes: 0,
       version: 1,
@@ -626,11 +629,39 @@ export function CodeBlock({ code, language, filename }) {
         <h3 className="text-lg font-semibold">Publishing</h3>
 
         <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="type">Blog Type</Label>
           <Select
-            value={formData.status}
-            onValueChange={(value: "draft" | "published" | "archived") =>
-              setFormData((prev) => ({ ...prev, status: value }))
+            value={formData.type}
+            onValueChange={(value: "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide") =>
+              setFormData((prev) => ({ ...prev, type: value }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Article">Article</SelectItem>
+              <SelectItem value="Case Study">Case Study</SelectItem>
+              <SelectItem value="Tutorial">Tutorial</SelectItem>
+              <SelectItem value="Deep Dive">Deep Dive</SelectItem>
+              <SelectItem value="Quick Tip">Quick Tip</SelectItem>
+              <SelectItem value="Guide">Guide</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="isPublished">Publish Status</Label>
+          <Select
+            value={formData.isPublished ? "published" : "draft"}
+            onValueChange={(value) =>
+              setFormData((prev) => ({
+                ...prev,
+                isPublished: value === "published",
+                publishedAt: value === "published" && !prev.publishedAt
+                  ? new Date().toISOString()
+                  : prev.publishedAt
+              }))
             }
           >
             <SelectTrigger>
@@ -639,12 +670,11 @@ export function CodeBlock({ code, language, filename }) {
             <SelectContent>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {formData.status === "published" && (
+        {formData.isPublished && (
           <div className="space-y-2">
             <Label htmlFor="publishedAt">Published Date</Label>
             <Input

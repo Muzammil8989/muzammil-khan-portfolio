@@ -19,7 +19,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { search, tag, difficulty } = await searchParams;
 
   // Fetch all published blogs
-  const allBlogsData = await BlogService.getAll({ status: "published" });
+  const allBlogsData = await BlogService.getAll({ isPublished: true });
 
   // Ensure we have a clean array (handling Mongo results)
   const blogsArray: Blog[] = allBlogsData.map((blog: any) => ({

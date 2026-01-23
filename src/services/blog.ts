@@ -16,7 +16,8 @@ export interface Blog {
   author: string;
   tags: string[];
   seo?: BlogSeo;
-  status: "draft" | "published" | "archived";
+  type: "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide";
+  isPublished: boolean;
   publishedAt?: string;
   likes: number;
   likedBy?: string[];
@@ -31,13 +32,15 @@ export interface Blog {
  * Fetch all blogs with optional filters
  */
 export const fetchBlogs = async (filters?: {
-  status?: "draft" | "published" | "archived";
+  isPublished?: boolean;
+  type?: "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide";
   tag?: string;
   difficulty?: "beginner" | "intermediate" | "advanced";
 }): Promise<Blog[]> => {
   try {
     const params = new URLSearchParams();
-    if (filters?.status) params.append("status", filters.status);
+    if (filters?.isPublished !== undefined) params.append("isPublished", filters.isPublished.toString());
+    if (filters?.type) params.append("type", filters.type);
     if (filters?.tag) params.append("tag", filters.tag);
     if (filters?.difficulty) params.append("difficulty", filters.difficulty);
 

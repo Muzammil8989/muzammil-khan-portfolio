@@ -48,7 +48,8 @@ export function BlogManager() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published" | "archived">("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide">("all");
+  const [publishFilter, setPublishFilter] = useState<"all" | "published" | "draft">("all");
 
   // Query hooks
   const { data: allBlogs = [], isLoading, refetch } = useBlogs();
@@ -68,12 +69,16 @@ export function BlogManager() {
   const blogsArray = Array.isArray(allBlogs) ? allBlogs : [];
   const searchResultsArray = Array.isArray(searchResults) ? searchResults : [];
 
-  // Filter blogs by status
+  // Filter blogs by type and publish status
   const filteredBlogs = searchQuery
     ? searchResultsArray
-    : statusFilter === "all"
-      ? blogsArray
-      : blogsArray.filter((blog) => blog.status === statusFilter);
+    : blogsArray.filter((blog) => {
+        const matchesType = typeFilter === "all" || blog.type === typeFilter;
+        const matchesPublish = publishFilter === "all" ||
+          (publishFilter === "published" && blog.isPublished) ||
+          (publishFilter === "draft" && !blog.isPublished);
+        return matchesType && matchesPublish;
+      });
 
   // Handlers
   const handleCreateSubmit = (data: any) => {
@@ -86,7 +91,8 @@ export function BlogManager() {
           setIsCreateDialogOpen(false);
           resetForm();
           // Reset filters and search to ensure newly created blog is visible
-          setStatusFilter("all");
+          setTypeFilter("all");
+          setPublishFilter("all");
           setSearchQuery("");
         },
       }
@@ -190,17 +196,34 @@ export function BlogManager() {
         </div>
 
         <Select
-          value={statusFilter}
-          onValueChange={(value: any) => setStatusFilter(value)}
+          value={typeFilter}
+          onValueChange={(value: any) => setTypeFilter(value)}
+        >
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="Article">Article</SelectItem>
+            <SelectItem value="Case Study">Case Study</SelectItem>
+            <SelectItem value="Tutorial">Tutorial</SelectItem>
+            <SelectItem value="Deep Dive">Deep Dive</SelectItem>
+            <SelectItem value="Quick Tip">Quick Tip</SelectItem>
+            <SelectItem value="Guide">Guide</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={publishFilter}
+          onValueChange={(value: any) => setPublishFilter(value)}
         >
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
             <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
+            <SelectItem value="draft">Draft</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -214,13 +237,13 @@ export function BlogManager() {
         <div className="glass-card p-4 rounded-xl border border-slate-200 dark:border-white/10">
           <p className="text-sm text-muted-foreground">Published</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {blogsArray.filter((b) => b.status === "published").length}
+            {blogsArray.filter((b) => b.isPublished).length}
           </p>
         </div>
         <div className="glass-card p-4 rounded-xl border border-slate-200 dark:border-white/10">
           <p className="text-sm text-muted-foreground">Drafts</p>
           <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-            {blogsArray.filter((b) => b.status === "draft").length}
+            {blogsArray.filter((b) => !b.isPublished).length}
           </p>
         </div>
         <div className="glass-card p-4 rounded-xl border border-slate-200 dark:border-white/10">
@@ -255,8 +278,8 @@ export function BlogManager() {
           <h3 className="text-lg font-semibold mb-2">
             {searchQuery
               ? "No blogs found"
-              : statusFilter !== "all"
-                ? `No ${statusFilter} blogs`
+              : typeFilter !== "all" || publishFilter !== "all"
+                ? `No ${publishFilter !== "all" ? publishFilter : ""} ${typeFilter !== "all" ? typeFilter : ""} blogs`.trim()
                 : "No blog posts yet"}
           </h3>
           <p className="text-muted-foreground mb-6">

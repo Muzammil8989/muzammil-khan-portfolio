@@ -22,6 +22,7 @@ import { headers } from "next/headers";
 import { Blog } from "@/services/blog";
 import { ReadingProgressBar } from "@/components/features/blog/reading-progress";
 import { BlogCard } from "@/components/features/blog/blog-card";
+import { PortfolioCTA } from "@/components/features/blog/portfolio-cta";
 
 export const dynamic = "force-dynamic";
 
@@ -69,7 +70,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     } as Blog;
 
     // Fetch related blogs based on tags
-    const allBlogs = await BlogService.getAll({ status: "published" });
+    const allBlogs = await BlogService.getAll({ isPublished: true });
     relatedBlogs = allBlogs
       .filter((b: any) => b.slug !== slug && b.tags.some((t: string) => blog.tags.includes(t)))
       .slice(0, 3)
@@ -263,6 +264,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               </div>
             </div>
           )}
+
+          {/* Portfolio CTA */}
+          <PortfolioCTA />
 
           {/* Related Posts */}
           {relatedBlogs.length > 0 && (

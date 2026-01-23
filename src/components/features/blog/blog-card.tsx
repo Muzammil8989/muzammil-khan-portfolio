@@ -80,17 +80,29 @@ export function BlogCard({
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "published":
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "Article":
         return "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400";
-      case "draft":
-        return "bg-gray-500/10 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400";
-      case "archived":
-        return "bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400";
+      case "Case Study":
+        return "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400";
+      case "Tutorial":
+        return "bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400";
+      case "Deep Dive":
+        return "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400";
+      case "Quick Tip":
+        return "bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400";
+      case "Guide":
+        return "bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400";
       default:
-        return "";
+        return "bg-slate-500/10 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400";
     }
+  };
+
+  const getPublishStatusColor = (isPublished: boolean) => {
+    return isPublished
+      ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+      : "bg-gray-500/10 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400";
   };
 
   return (
@@ -101,13 +113,18 @@ export function BlogCard({
       <CardHeader className="p-7 pb-0 space-y-6">
         <div className="flex items-center justify-between">
           {showActions ? (
-            <Badge className={`${getStatusColor(blog.status)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
-              {blog.status}
-            </Badge>
+            <div className="flex gap-2">
+              <Badge className={`${getTypeColor(blog.type)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
+                {blog.type}
+              </Badge>
+              <Badge className={`${getPublishStatusColor(blog.isPublished)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
+                {blog.isPublished ? "Published" : "Draft"}
+              </Badge>
+            </div>
           ) : (
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest group-hover:text-indigo-500 dark:group-hover:text-blue-400 transition-colors">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-blue-500 animate-pulse" />
-              Article
+              {blog.type}
             </div>
           )}
 
