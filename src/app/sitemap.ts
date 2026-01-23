@@ -6,7 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Get all published blogs
   let blogs: any[] = [];
   try {
-    blogs = await BlogService.getAll({ status: 'published' });
+    blogs = await BlogService.getAll({ isPublished: true });
   } catch (error) {
     console.error('Error fetching blogs for sitemap:', error);
   }

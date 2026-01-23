@@ -267,7 +267,7 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
                         <Copy className="w-4 h-4" />
                         <span>Copy Link</span>
                     </DropdownMenuItem>
-                    {typeof navigator !== "undefined" && navigator.share && (
+                    {typeof navigator !== "undefined" && "share" in navigator && (
                         <>
                             <DropdownMenuItem onClick={handleShare} className="gap-2 cursor-pointer">
                                 <Share2 className="w-4 h-4" />
