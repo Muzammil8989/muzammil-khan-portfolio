@@ -9,6 +9,7 @@ import { Blog } from "@/services/blog";
 import { useLikeBlog } from "@/app/hooks/useBlogs";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
+import { getTypeColorClasses, getDifficultyColorClasses, getPublishStatusColorClasses } from "@/lib/blog-colors";
 
 interface BlogCardProps {
   blog: Blog;
@@ -67,63 +68,28 @@ export function BlogCard({
     });
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400";
-      case "intermediate":
-        return "bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400";
-      case "advanced":
-        return "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400";
-      default:
-        return "";
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "Article":
-        return "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400";
-      case "Case Study":
-        return "bg-purple-500/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400";
-      case "Tutorial":
-        return "bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400";
-      case "Deep Dive":
-        return "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400";
-      case "Quick Tip":
-        return "bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400";
-      case "Guide":
-        return "bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400";
-      default:
-        return "bg-slate-500/10 text-slate-600 dark:bg-slate-500/20 dark:text-slate-400";
-    }
-  };
-
-  const getPublishStatusColor = (isPublished: boolean) => {
-    return isPublished
-      ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-      : "bg-gray-500/10 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400";
-  };
 
   return (
-    <Card className="group relative h-full flex flex-col overflow-hidden rounded-[2rem] border-slate-100 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md transition-all duration-500 hover:shadow-[0_20px_50px_rgba(79,70,229,0.15)] dark:hover:shadow-[0_20px_50px_rgba(59,130,246,0.1)] hover:-translate-y-1.5">
-      {/* Premium Gradient Top Border */}
-      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/40 dark:via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <Card className="group relative h-full flex flex-col overflow-hidden rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-sm shadow-lg dark:shadow-2xl transition-all duration-300 hover:shadow-xl dark:hover:shadow-[0_20px_50px_0_rgba(0,0,0,0.5)] hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-1">
 
       <CardHeader className="p-7 pb-0 space-y-6">
         <div className="flex items-center justify-between">
           {showActions ? (
             <div className="flex gap-2">
-              <Badge className={`${getTypeColor(blog.type)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
+              <Badge className={`${getTypeColorClasses(blog.type)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
                 {blog.type}
               </Badge>
-              <Badge className={`${getPublishStatusColor(blog.isPublished)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
+              <Badge className={`${getPublishStatusColorClasses(blog.isPublished)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
                 {blog.isPublished ? "Published" : "Draft"}
               </Badge>
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest group-hover:text-indigo-500 dark:group-hover:text-blue-400 transition-colors">
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-blue-500 animate-pulse" />
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors" style={{
+              backgroundColor: 'var(--surface-overlay)',
+              borderColor: 'var(--border-subtle)',
+              color: 'var(--text-secondary)'
+            }}>
+              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-brand-primary)' }} />
               {blog.type}
             </div>
           )}
@@ -155,7 +121,7 @@ export function BlogCard({
             </h3>
           ) : (
             <Link href={`/blog/${blog.slug}`}>
-              <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-blue-400 transition-all duration-300 tracking-tight leading-tight line-clamp-2">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 tracking-tight leading-tight line-clamp-2">
                 {blog.title}
               </h3>
             </Link>
@@ -191,7 +157,7 @@ export function BlogCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-7 pt-0">
+      <CardFooter className="p-7 pt-0 relative z-10">
         {showActions ? (
           <div className="flex items-center gap-3 w-full">
             <Button
@@ -214,11 +180,11 @@ export function BlogCard({
             </Button>
           </div>
         ) : (
-          <Link href={`/blog/${blog.slug}`} className="w-full">
-            <Button className="w-full group/btn bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.25rem] h-12 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-indigo-500/10 dark:shadow-none font-black text-sm uppercase tracking-widest">
-              Explore Article
-              <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-            </Button>
+          <Link href={`/blog/${blog.slug}`} className="w-full group/link">
+            <div className="w-full px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-colors duration-200 flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-sm">
+              Read Article
+              <ArrowRight className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform duration-200" />
+            </div>
           </Link>
         )}
       </CardFooter>

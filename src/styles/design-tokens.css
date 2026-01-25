@@ -1,0 +1,186 @@
+/**
+ * Design Tokens - Centralized Color System
+ * Portfolio Color Theme with Consistent Light/Dark Mode
+ */
+
+:root {
+  /* ============================================
+     BASE COLORS - LIGHT MODE
+     ============================================ */
+
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+
+  /* Text Colors */
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* Brand Colors */
+  --color-brand-primary: #4f46e5;        /* Indigo-600 */
+  --color-brand-secondary: #8b5cf6;      /* Violet-500 */
+  --color-brand-accent: #FFB902;         /* Gold */
+
+  /* Interactive Colors */
+  --color-interactive-primary: #4f46e5;
+  --color-interactive-hover: #4338ca;    /* Indigo-700 */
+  --color-interactive-active: #3730a3;   /* Indigo-800 */
+
+  /* Surface Colors (Cards, Containers) */
+  --surface-base: rgba(255, 255, 255, 0.8);
+  --surface-elevated: #ffffff;
+  --surface-overlay: rgba(255, 255, 255, 0.6);
+
+  /* Border Colors */
+  --border-subtle: #e2e8f0;              /* Slate-200 */
+  --border-default: #cbd5e1;             /* Slate-300 */
+  --border-emphasis: #94a3b8;            /* Slate-400 */
+
+  /* Decorative Gradients */
+  --gradient-bg-1: rgba(79, 70, 229, 0.05);    /* Indigo soft */
+  --gradient-bg-2: rgba(59, 130, 246, 0.05);   /* Blue soft */
+
+  /* Semantic Colors */
+  --color-success: #10b981;              /* Emerald-500 */
+  --color-warning: #f59e0b;              /* Amber-500 */
+  --color-error: #ef4444;                /* Red-500 */
+  --color-info: #3b82f6;                 /* Blue-500 */
+
+  /* Blog/Content Type Colors */
+  --color-article: #3b82f6;              /* Blue-500 */
+  --color-tutorial: #10b981;             /* Emerald-500 */
+  --color-case-study: #a855f7;           /* Purple-500 */
+  --color-deep-dive: #4f46e5;            /* Indigo-600 */
+  --color-guide: #14b8a6;                /* Teal-500 */
+  --color-quick-tip: #f59e0b;            /* Amber-500 */
+}
+
+.dark {
+  /* ============================================
+     BASE COLORS - DARK MODE
+     ============================================ */
+
+  /* Background Colors */
+  --bg-primary: #00001a;                 /* Deep Navy */
+  --bg-secondary: rgba(15, 23, 42, 0.8); /* Slate-900 with opacity */
+  --bg-tertiary: rgba(30, 41, 59, 0.6);  /* Slate-800 with opacity */
+
+  /* Text Colors */
+  --text-primary: #f1f5f9;               /* Slate-100 */
+  --text-secondary: #cbd5e1;             /* Slate-300 */
+  --text-tertiary: #94a3b8;              /* Slate-400 */
+  --text-inverse: #0f172a;               /* Slate-900 */
+
+  /* Brand Colors */
+  --color-brand-primary: #60a5fa;        /* Blue-400 */
+  --color-brand-secondary: #a78bfa;      /* Violet-400 */
+  --color-brand-accent: #FFB902;         /* Gold */
+
+  /* Interactive Colors */
+  --color-interactive-primary: #60a5fa;  /* Blue-400 */
+  --color-interactive-hover: #3b82f6;    /* Blue-500 */
+  --color-interactive-active: #2563eb;   /* Blue-600 */
+
+  /* Surface Colors (Cards, Containers) */
+  --surface-base: rgba(15, 23, 42, 0.8);       /* Slate-900 semi-transparent */
+  --surface-elevated: rgba(30, 41, 59, 0.9);   /* Slate-800 semi-transparent */
+  --surface-overlay: rgba(255, 255, 255, 0.05); /* White overlay for glass */
+
+  /* Border Colors */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-default: rgba(255, 255, 255, 0.15);
+  --border-emphasis: rgba(255, 255, 255, 0.25);
+
+  /* Decorative Gradients */
+  --gradient-bg-1: rgba(59, 130, 246, 0.1);   /* Blue soft */
+  --gradient-bg-2: rgba(99, 102, 241, 0.1);   /* Indigo soft */
+
+  /* Semantic Colors */
+  --color-success: #34d399;              /* Emerald-400 */
+  --color-warning: #fbbf24;              /* Amber-400 */
+  --color-error: #f87171;                /* Red-400 */
+  --color-info: #60a5fa;                 /* Blue-400 */
+
+  /* Blog/Content Type Colors (Lighter for dark mode) */
+  --color-article: #60a5fa;              /* Blue-400 */
+  --color-tutorial: #34d399;             /* Emerald-400 */
+  --color-case-study: #c084fc;           /* Purple-400 */
+  --color-deep-dive: #818cf8;            /* Indigo-400 */
+  --color-guide: #2dd4bf;                /* Teal-400 */
+  --color-quick-tip: #fbbf24;            /* Amber-400 */
+}
+
+/* ============================================
+   UTILITY CLASSES USING DESIGN TOKENS
+   ============================================ */
+
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.brand-primary {
+  color: var(--color-brand-primary);
+}
+
+.brand-accent {
+  color: var(--color-brand-accent);
+}
+
+.surface-glass {
+  background-color: var(--surface-overlay);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+}
+
+.border-subtle {
+  border-color: var(--border-subtle);
+}
+
+.border-default {
+  border-color: var(--border-default);
+}
+
+/* Gradient Backgrounds */
+.gradient-decorative-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gradient-decorative-bg::before,
+.gradient-decorative-bg::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  filter: blur(120px);
+}
+
+.gradient-decorative-bg::before {
+  top: -10%;
+  right: -10%;
+  background-color: var(--gradient-bg-1);
+}
+
+.gradient-decorative-bg::after {
+  bottom: -10%;
+  left: -10%;
+  background-color: var(--gradient-bg-2);
+}

@@ -46,24 +46,27 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   });
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#00001a] relative overflow-hidden">
+    <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {/* Background Decorative Elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 dark:bg-blue-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/5 dark:bg-indigo-500/10 rounded-full blur-[120px]" />
-      </div>
+      <div className="gradient-decorative-bg"></div>
 
       <div className="relative z-10 w-full mx-auto px-4 sm:px-6 py-24 space-y-16 max-w-7xl">
         {/* Hero Section */}
         <header className="text-center space-y-6 max-w-3xl mx-auto py-12 animate-in fade-in slide-in-from-top-4 duration-1000">
-          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full border text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{
+            backgroundColor: 'var(--surface-overlay)',
+            borderColor: 'var(--border-subtle)',
+            color: 'var(--text-secondary)'
+          }}>
+            <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-brand-primary)' }} />
             Engineering Journal
           </div>
-          <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.9]">
-            Insight & <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-blue-400 dark:to-indigo-400">Innovation</span>
+          <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-[0.9]" style={{ color: 'var(--text-primary)' }}>
+            Insight & <span className="text-transparent bg-clip-text bg-gradient-to-r" style={{
+              backgroundImage: 'linear-gradient(to right, var(--color-brand-primary), var(--color-info))'
+            }}>Innovation</span>
           </h1>
-          <p className="text-lg sm:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed font-light">
+          <p className="text-lg sm:text-xl max-w-xl mx-auto leading-relaxed font-light" style={{ color: 'var(--text-secondary)' }}>
             Deep dives into modern software architecture, technical leadership, and full-stack development.
           </p>
         </header>
@@ -79,11 +82,18 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* Blog Grid */}
-        <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+        <div>
           {filteredBlogs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredBlogs.map((blog) => (
-                <div key={blog._id} className="h-full">
+              {filteredBlogs.map((blog, index) => (
+                <div
+                  key={blog._id}
+                  className="h-full opacity-0 animate-fadeInUp"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animationFillMode: "forwards",
+                  }}
+                >
                   <BlogCard
                     blog={blog}
                     showActions={false}
@@ -115,6 +125,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           © {new Date().getFullYear()} MUHAMMAD MUZAMMIL • ALL RIGHTS RESERVED
         </p>
       </footer>
+
     </main>
   );
 }

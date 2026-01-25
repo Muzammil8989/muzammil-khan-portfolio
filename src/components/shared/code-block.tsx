@@ -39,10 +39,13 @@ export function CodeBlock({
 
   const customStyle = {
     margin: 0,
-
-    padding: "1.5rem",
+    padding: "1.5rem 1.25rem",
     fontSize: "0.875rem",
     lineHeight: "1.7",
+    backgroundColor: "transparent",
+    width: "100%",
+    minWidth: "100%",
+    fontFamily: "var(--font-mono), monospace",
   };
 
   return (
