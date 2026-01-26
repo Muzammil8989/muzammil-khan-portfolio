@@ -14,7 +14,9 @@ export const ProjectSchema = z.object({
     technologies: z.array(z.string()).min(1, "At least one technology is required"),
     links: z.array(ProjectLinkSchema).default([]),
     image: z.string().optional().or(z.literal("")),
-    video: z.string().optional().or(z.literal("")),
+    projectUrl: z.string().url().optional().or(z.literal("")),
+    githubUrl: z.string().url().optional().or(z.literal("")),
+    caseStudyUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export type ProjectInput = z.infer<typeof ProjectSchema>;

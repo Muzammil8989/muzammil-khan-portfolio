@@ -17,7 +17,9 @@ export interface Project {
     technologies: string[];
     links: ProjectLink[];
     image: string;
-    video: string;
+    projectUrl?: string;
+    githubUrl?: string;
+    caseStudyUrl?: string;
 }
 
 /** Fetch ALL projects */

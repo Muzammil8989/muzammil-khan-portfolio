@@ -9,7 +9,12 @@ export class ProjectService {
     static async getAll() {
         const client = await clientPromise;
         const db = client.db();
-        return db.collection(COLLECTION).find({}).toArray();
+        const projects = await db.collection(COLLECTION).find({}).toArray();
+        // Convert MongoDB documents to plain objects
+        return projects.map(project => ({
+            ...project,
+            _id: project._id.toString(),
+        }));
     }
 
     static async create(data: ProjectInput) {
@@ -19,7 +24,7 @@ export class ProjectService {
             ...data,
             createdAt: new Date(),
         });
-        return { _id: result.insertedId, ...data };
+        return { _id: result.insertedId.toString(), ...data };
     }
 
     static async update(id: string, data: Partial<ProjectInput>) {
@@ -31,7 +36,11 @@ export class ProjectService {
             { returnDocument: "after" }
         );
         if (!result) throw new AppError("NOT_FOUND", "Project not found", 404);
-        return result;
+        // Convert ObjectId to string
+        return {
+            ...result,
+            _id: result._id.toString(),
+        };
     }
 
     static async delete(id: string) {

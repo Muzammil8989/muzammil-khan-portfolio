@@ -30,7 +30,9 @@ export const ProjectForm = ({
         technologies: [],
         links: [],
         image: "",
-        video: "",
+        projectUrl: "",
+        githubUrl: "",
+        caseStudyUrl: "",
     });
 
     const [techInput, setTechInput] = useState("");
@@ -46,7 +48,9 @@ export const ProjectForm = ({
                 technologies: project.technologies || [],
                 links: project.links || [],
                 image: project.image || "",
-                video: project.video || "",
+                projectUrl: (project as any).projectUrl || "",
+                githubUrl: (project as any).githubUrl || "",
+                caseStudyUrl: (project as any).caseStudyUrl || "",
             });
             setTechInput(project.technologies.join(", "));
         }
@@ -109,80 +113,70 @@ export const ProjectForm = ({
             </div>
 
             <div>
-                <label htmlFor="href" className="text-sm font-medium mb-1 block dark:text-slate-200">Project URL (Main)</label>
-                <Input id="href" name="href" value={formData.href} onChange={handleChange} type="url" autoComplete="url" placeholder="https://chatcollect.com" />
-            </div>
-
-            <div>
-                <label htmlFor="technologies" className="text-sm font-medium mb-1 block dark:text-slate-200">Technologies (comma separated) *</label>
-                <Input id="technologies" name="technologies" type="text" autoComplete="off" value={techInput} onChange={handleTechChange} placeholder="Next.js, Typescript, TailwindCSS" />
-            </div>
-
-            <div>
                 <label htmlFor="description" className="text-sm font-medium mb-1 block dark:text-slate-200">Description *</label>
-                <Textarea id="description" name="description" autoComplete="off" value={formData.description} onChange={handleChange} rows={4} placeholder="Describe your masterpiece..." />
+                <Textarea id="description" name="description" autoComplete="off" value={formData.description} onChange={handleChange} rows={3} placeholder="Describe your project..." />
             </div>
 
-            <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium dark:text-slate-200">Project Links</label>
-                    <Button type="button" variant="outline" size="sm" onClick={addLink}>
-                        <Plus className="h-4 w-4 mr-1" /> Add Link
-                    </Button>
+            <div>
+                <label htmlFor="technologies" className="text-sm font-medium mb-1 block dark:text-slate-200">Technologies *</label>
+                <Input id="technologies" name="technologies" type="text" autoComplete="off" value={techInput} onChange={handleTechChange} placeholder="Next.js, TypeScript, TailwindCSS" />
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Comma separated list</p>
+            </div>
+
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                <h3 className="text-sm font-semibold mb-3 text-slate-900 dark:text-white">Project Links</h3>
+                <div className="grid grid-cols-1 gap-3">
+                    <div>
+                        <label htmlFor="projectUrl" className="text-xs font-medium mb-1.5 flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                            <Globe className="h-3.5 w-3.5" />
+                            Live Demo URL
+                        </label>
+                        <Input id="projectUrl" name="projectUrl" value={formData.projectUrl} onChange={handleChange} type="url" autoComplete="url" placeholder="https://your-project.com" />
+                    </div>
+                    <div>
+                        <label htmlFor="githubUrl" className="text-xs font-medium mb-1.5 flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                            <Github className="h-3.5 w-3.5" />
+                            GitHub Repository
+                        </label>
+                        <Input id="githubUrl" name="githubUrl" value={formData.githubUrl} onChange={handleChange} type="url" autoComplete="url" placeholder="https://github.com/username/repo" />
+                    </div>
+                    <div>
+                        <label htmlFor="caseStudyUrl" className="text-xs font-medium mb-1.5 flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Case Study / Article
+                        </label>
+                        <Input id="caseStudyUrl" name="caseStudyUrl" value={formData.caseStudyUrl} onChange={handleChange} type="url" autoComplete="url" placeholder="https://blog.com/case-study" />
+                    </div>
                 </div>
-                {formData.links.map((link, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                        <Input
-                            className="flex-1"
-                            placeholder="Label (e.g. Website, Source)"
-                            value={link.type}
-                            onChange={(e) => updateLink(index, "type", e.target.value)}
+            </div>
+
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                <label className="text-sm font-medium mb-2 block dark:text-slate-200">Project Image</label>
+                <CloudinaryUploader
+                    buttonText={formData.image ? "Change Image" : "Upload Image"}
+                    onSuccess={(res: any) => setFormData(p => ({ ...p, image: res.secure_url }))}
+                    folder="projects"
+                />
+                {formData.image && (
+                    <div className="mt-3 relative group w-full h-48 rounded-lg border overflow-hidden">
+                        <Image
+                            src={formData.image}
+                            alt="Preview"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 600px"
+                            className="object-cover"
                         />
-                        <Input
-                            className="flex-[2]"
-                            placeholder="https://..."
-                            value={link.href}
-                            onChange={(e) => updateLink(index, "href", e.target.value)}
-                        />
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeLink(index)}>
-                            <Trash2 className="h-4 w-4 text-red-500" />
+                        <Button
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            size="icon" variant="destructive"
+                            onClick={() => setFormData(p => ({ ...p, image: "" }))}
+                        >
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
-                ))}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                <div>
-                    <label className="text-sm font-medium mb-2 block dark:text-slate-200">Project Image</label>
-                    <CloudinaryUploader
-                        buttonText={formData.image ? "Change Image" : "Upload Image"}
-                        onSuccess={(res: any) => setFormData(p => ({ ...p, image: res.secure_url }))}
-                        folder="projects"
-                    />
-                    {formData.image && (
-                        <div className="mt-2 relative group w-full h-32 rounded-lg border overflow-hidden">
-                            <Image
-                                src={formData.image}
-                                alt="Preview"
-                                fill
-                                sizes="(max-width: 768px) 100vw, 50vw"
-                                className="object-cover"
-                            />
-                            <Button
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                size="icon" variant="destructive"
-                                onClick={() => setFormData(p => ({ ...p, image: "" }))}
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    )}
-                </div>
-                <div>
-                    <label htmlFor="video" className="text-sm font-medium mb-2 block dark:text-slate-200">Project Video URL (Direct link)</label>
-                    <Input id="video" name="video" type="url" autoComplete="url" value={formData.video} onChange={handleChange} placeholder="https://example.com/demo.mp4" />
-                    <p className="text-[10px] text-gray-500 dark:text-slate-400 mt-1">Direct URL to an mp4 file for the video preview.</p>
-                </div>
+                )}
             </div>
 
             <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600">

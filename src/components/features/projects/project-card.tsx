@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Project } from "@/services/project";
-import { Edit, Trash2, Globe, Github, Video, Code } from "lucide-react";
+import { Edit, Trash2, Code } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 
@@ -27,10 +27,6 @@ export const ProjectCard = ({
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                ) : project.video ? (
-                    <div className="flex items-center justify-center h-full text-slate-400 dark:text-slate-500">
-                        <Video className="w-12 h-12 opacity-50" />
-                    </div>
                 ) : (
                     <div className="flex items-center justify-center h-full text-slate-300 dark:text-slate-600">
                         <Code className="w-16 h-16 opacity-30" />
