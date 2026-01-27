@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const blob = await put(filename, file, {
       access: "public",
       addRandomSuffix: true,
-      token: process.env.MUHAMMAD_MUZAMMIL_BLOB_READ_WRITE_TOKEN,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     // Return response in Cloudinary-compatible format for backward compatibility
