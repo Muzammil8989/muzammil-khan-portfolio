@@ -1,4 +1,4 @@
-import clientPromise from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { ProjectInput } from "@/core/validation/project";
 import { AppError } from "@/core/errors/AppError";
@@ -7,8 +7,7 @@ const COLLECTION = "projects";
 
 export class ProjectService {
     static async getAll() {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const projects = await db.collection(COLLECTION).find({}).toArray();
         // Convert MongoDB documents to plain objects
         return projects.map(project => ({
@@ -18,8 +17,7 @@ export class ProjectService {
     }
 
     static async create(data: ProjectInput) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const result = await db.collection(COLLECTION).insertOne({
             ...data,
             createdAt: new Date(),
@@ -28,8 +26,7 @@ export class ProjectService {
     }
 
     static async update(id: string, data: Partial<ProjectInput>) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const result = await db.collection(COLLECTION).findOneAndUpdate(
             { _id: new ObjectId(id) },
             { $set: { ...data, updatedAt: new Date() } },
@@ -44,8 +41,7 @@ export class ProjectService {
     }
 
     static async delete(id: string) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const result = await db.collection(COLLECTION).deleteOne({
             _id: new ObjectId(id),
         });

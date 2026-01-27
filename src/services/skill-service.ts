@@ -1,4 +1,4 @@
-import clientPromise from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { SkillInput } from "@/core/validation/skill";
 import { AppError } from "@/core/errors/AppError";
@@ -7,14 +7,12 @@ const COLLECTION = "skills";
 
 export class SkillService {
     static async getAll() {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         return db.collection(COLLECTION).find({}).toArray();
     }
 
     static async create(data: SkillInput) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const result = await db.collection(COLLECTION).insertOne({
             ...data,
             createdAt: new Date(),
@@ -23,8 +21,7 @@ export class SkillService {
     }
 
     static async update(id: string, data: Partial<SkillInput>) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const result = await db.collection(COLLECTION).findOneAndUpdate(
             { _id: new ObjectId(id) },
             { $set: { ...data, updatedAt: new Date() } },
@@ -35,8 +32,7 @@ export class SkillService {
     }
 
     static async delete(id: string) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const result = await db.collection(COLLECTION).deleteOne({
             _id: new ObjectId(id),
         });
@@ -46,8 +42,7 @@ export class SkillService {
     }
 
     static async updateMany(skills: string[]) {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         // This is for a pattern where we just keep a list of strings
         await db.collection("metadata").updateOne(
             { key: "skills" },
@@ -58,8 +53,7 @@ export class SkillService {
     }
 
     static async getSkillsList() {
-        const client = await clientPromise;
-        const db = client.db();
+        const { db } = await connectToDatabase();
         const doc = await db.collection("metadata").findOne({ key: "skills" });
         return doc?.value || [];
     }
