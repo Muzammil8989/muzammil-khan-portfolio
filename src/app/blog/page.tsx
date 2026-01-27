@@ -4,8 +4,29 @@ import { BookOpen } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
 import { BlogFilter } from "@/components/features/blog/blog-filter";
 import { Blog } from "@/services/blog";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Engineering Blog | Software Development Insights & Tutorials",
+  description: "Deep dives into modern software architecture, technical leadership, full-stack development, and programming best practices. Explore tutorials on React, Next.js, Node.js, TypeScript, and more.",
+  keywords: ["software engineering blog", "web development tutorials", "full stack development", "react tutorials", "nextjs blog", "typescript guides", "programming articles", "technical writing", "software architecture", "code examples"],
+  openGraph: {
+    title: "Engineering Blog | Software Development Insights",
+    description: "Deep dives into modern software architecture, technical leadership, and full-stack development.",
+    type: "website",
+    url: "https://muzammilkhan.vercel.app/blog",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Engineering Blog | Software Development Insights",
+    description: "Deep dives into modern software architecture, technical leadership, and full-stack development.",
+  },
+  alternates: {
+    canonical: "https://muzammilkhan.vercel.app/blog",
+  },
+};
 
 interface BlogPageProps {
   searchParams: Promise<{

@@ -23,8 +23,67 @@ import { Blog } from "@/services/blog";
 import { ReadingProgressBar } from "@/components/features/blog/reading-progress";
 import { BlogCard } from "@/components/features/blog/blog-card";
 import { PortfolioCTA } from "@/components/features/blog/portfolio-cta";
+import { Metadata } from "next";
+import { BlogPostingStructuredData, BreadcrumbStructuredData } from "@/components/seo/structured-data";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  try {
+    const rawBlog = await BlogService.getBySlug(slug) as any;
+    if (!rawBlog) {
+      return {
+        title: "Blog Not Found",
+        description: "The requested blog post could not be found.",
+      };
+    }
+
+    const blog = { ...rawBlog, _id: rawBlog._id.toString() } as Blog;
+    const baseUrl = "https://muzammilkhan.vercel.app";
+    const blogUrl = `${baseUrl}/blog/${blog.slug}`;
+
+    return {
+      title: `${blog.title} | Muhammad Muzammil`,
+      description: blog.excerpt || blog.title,
+      keywords: [...(blog.tags || []), ...(blog.languages || []), ...(blog.frameworks || []), "programming", "tutorial", "software engineering"],
+      authors: [{ name: blog.author }],
+      openGraph: {
+        title: blog.title,
+        description: blog.excerpt || blog.title,
+        type: "article",
+        url: blogUrl,
+        publishedTime: blog.publishedAt || blog.createdAt,
+        modifiedTime: blog.updatedAt,
+        authors: [blog.author],
+        tags: blog.tags,
+        images: blog.coverImage ? [
+          {
+            url: blog.coverImage,
+            width: 1200,
+            height: 630,
+            alt: blog.title,
+          }
+        ] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: blog.title,
+        description: blog.excerpt || blog.title,
+        images: blog.coverImage ? [blog.coverImage] : [],
+      },
+      alternates: {
+        canonical: blogUrl,
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Blog Post | Muhammad Muzammil",
+      description: "Read this blog post on software development and engineering.",
+    };
+  }
+}
 
 interface BlogDetailPageProps {
   params: Promise<{
@@ -98,8 +157,32 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   const contentToRead = `${blog.title}. ${blog.excerpt}. ${extractTextFromMarkdown(blog.content)}`;
 
+  const baseUrl = "https://muzammilkhan.vercel.app";
+  const blogUrl = `${baseUrl}/blog/${blog.slug}`;
+
   return (
     <main className="min-h-screen relative" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      {/* SEO Structured Data */}
+      <BlogPostingStructuredData
+        title={blog.title}
+        description={blog.excerpt}
+        url={blogUrl}
+        image={blog.coverImage}
+        datePublished={blog.publishedAt || blog.createdAt}
+        dateModified={blog.updatedAt}
+        author={blog.author}
+        authorUrl={baseUrl}
+        keywords={[...(blog.tags || []), ...(blog.languages || []), ...(blog.frameworks || [])]}
+        readingTime={blog.readingTime}
+      />
+      <BreadcrumbStructuredData
+        items={[
+          { name: "Home", url: baseUrl },
+          { name: "Blog", url: `${baseUrl}/blog` },
+          { name: blog.title, url: blogUrl },
+        ]}
+      />
+
       <ReadingProgressBar />
 
       {/* Premium Background Elements */}

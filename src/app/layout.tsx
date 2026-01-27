@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers/providers";
 import { DATA } from "@/data/resume";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { OrganizationStructuredData, WebSiteStructuredData } from "@/components/seo/structured-data";
 
 // Font setup with display swap for performance
 const fontSans = Inter({
@@ -153,6 +154,22 @@ export default function RootLayout({
         )}
         suppressHydrationWarning
       >
+        {/* SEO: Organization & WebSite Structured Data */}
+        <OrganizationStructuredData
+          name="Muhammad Muzammil"
+          url={DATA.url}
+          description="Full Stack Developer specializing in modern web technologies and software architecture"
+          sameAs={[
+            DATA.contact.social.GitHub.url,
+            DATA.contact.social.LinkedIn.url,
+          ]}
+        />
+        <WebSiteStructuredData
+          name="Muhammad Muzammil - Full Stack Developer"
+          url={DATA.url}
+          description="Portfolio and blog of Muhammad Muzammil, showcasing software engineering projects and technical insights"
+        />
+
         <Providers>{children}</Providers>
       </body>
     </html>
