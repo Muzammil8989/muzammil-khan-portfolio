@@ -13,11 +13,19 @@ export class SkillService {
 
     static async create(data: SkillInput) {
         const { db } = await connectToDatabase();
-        const result = await db.collection(COLLECTION).insertOne({
+        const id = new ObjectId();
+        const now = new Date();
+        const newDoc = {
             ...data,
-            createdAt: new Date(),
-        });
-        return { _id: result.insertedId, ...data };
+            _id: id,
+            createdAt: now,
+        };
+        await db.collection(COLLECTION).insertOne(newDoc);
+        return {
+            ...data,
+            _id: id.toString(),
+            createdAt: now.toISOString(),
+        };
     }
 
     static async update(id: string, data: Partial<SkillInput>) {
@@ -28,7 +36,10 @@ export class SkillService {
             { returnDocument: "after" }
         );
         if (!result) throw new AppError("NOT_FOUND", "Skill not found", 404);
-        return result;
+        return {
+            ...result,
+            _id: result._id.toString(),
+        };
     }
 
     static async delete(id: string) {

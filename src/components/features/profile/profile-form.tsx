@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CloudinaryUploader } from "@/components/ui/cloudinary-uploader";
+import { BlobUploader } from "@/components/ui/blob-uploader";
 import { Profile } from "@/services/profile";
 
 interface ProfileFormProps {
@@ -148,7 +148,7 @@ export const ProfileForm = ({
         <label className="block text-sm font-medium mb-1 dark:text-slate-200">
           Profile Picture
         </label>
-        <CloudinaryUploader
+        <BlobUploader
           buttonText={formData.avatarUrl ? "Change Image" : "Upload Image"}
           label=""
           onSuccess={(result: any) => {

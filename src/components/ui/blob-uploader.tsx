@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { useCloudinaryUpload } from "@/app/hooks/useCloudinaryUpload";
+import { useBlobUpload } from "@/app/hooks/useBlobUpload";
 
 interface UploadResult {
   secure_url: string;
@@ -11,7 +11,7 @@ interface UploadResult {
   [key: string]: any;
 }
 
-interface CloudinaryUploaderProps {
+interface BlobUploaderProps {
   onSuccess?: (result: UploadResult) => void;
   onError?: (error: string) => void;
   folder?: string;
@@ -23,7 +23,7 @@ interface CloudinaryUploaderProps {
   loadingText?: string;
 }
 
-export const CloudinaryUploader: React.FC<CloudinaryUploaderProps> = ({
+export const BlobUploader: React.FC<BlobUploaderProps> = ({
   onSuccess,
   onError,
   folder = "uploads",
@@ -34,7 +34,7 @@ export const CloudinaryUploader: React.FC<CloudinaryUploaderProps> = ({
   buttonText = "Upload",
   loadingText = "Uploading...",
 }) => {
-  const { upload, loading, error } = useCloudinaryUpload();
+  const { upload, loading, error } = useBlobUpload();
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,10 +69,10 @@ export const CloudinaryUploader: React.FC<CloudinaryUploaderProps> = ({
             onChange={handleFileChange}
             disabled={disabled || loading}
             className="hidden"
-            id="cloudinary-upload"
+            id="blob-upload"
           />
           <label
-            htmlFor="cloudinary-upload"
+            htmlFor="blob-upload"
             className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer ${
               disabled || loading
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
