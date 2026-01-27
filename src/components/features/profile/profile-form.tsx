@@ -190,7 +190,7 @@ export const ProfileForm = ({
       </div>
 
       {/* Submit */}
-      <Button type="submit" disabled={isSubmitting} className="mt-4 w-full">
+      <Button type="submit" disabled={isSubmitting} className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

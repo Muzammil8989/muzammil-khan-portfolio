@@ -161,10 +161,9 @@ export function BlogCard({
         {showActions ? (
           <div className="flex items-center gap-3 w-full">
             <Button
-              variant="outline"
               size="sm"
               onClick={() => onEdit?.(blog)}
-              className="flex-1 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-blue-500/5 transition-all font-bold text-xs h-10"
+              className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-bold text-xs h-10"
             >
               <Edit className="mr-2 h-4 w-4" />
               Edit

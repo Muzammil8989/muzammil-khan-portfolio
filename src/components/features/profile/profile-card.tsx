@@ -37,10 +37,9 @@ export const ProfileCard = ({
       </CardContent>
       <CardFooter className="flex justify-center gap-2 pt-2 pb-4">
         <Button
-          variant="outline"
           size="sm"
           onClick={() => onEdit(profile)}
-          className="flex-1"
+          className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300"
         >
           <Edit className="mr-2 h-4 w-4" />
           Edit

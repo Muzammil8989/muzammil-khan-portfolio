@@ -66,7 +66,7 @@ export function SkillsManager() {
                         placeholder="Add a skill (e.g. Docker, Rust, GSAP)"
                         className="flex-1"
                     />
-                    <Button onClick={addSkill} variant="secondary">
+                    <Button onClick={addSkill} className="bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
                         <Plus className="size-4" />
                     </Button>
                 </div>

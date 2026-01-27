@@ -64,19 +64,18 @@ export const ProjectCard = ({
 
             <CardFooter className="p-5 pt-0 flex gap-3">
                 <Button
-                    variant="secondary"
                     size="sm"
                     onClick={() => onEdit(project)}
-                    className="flex-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border-none shadow-none font-semibold transition-all"
+                    className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-semibold"
                 >
                     <Edit className="mr-2 h-4 w-4" />
                     Edit
                 </Button>
                 <Button
-                    variant="ghost"
+                    variant="destructive"
                     size="sm"
                     onClick={() => onDelete(project)}
-                    className="flex-1 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all font-semibold"
+                    className="flex-1"
                 >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete

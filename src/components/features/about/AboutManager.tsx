@@ -96,7 +96,7 @@ export function AboutManager() {
                     <FileText className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">No about section</h3>
                     <p className="text-gray-500 dark:text-slate-400 mb-6">Write a compelling introduction about yourself.</p>
-                    <Button onClick={() => setIsDialogOpen(true)} variant="outline">
+                    <Button onClick={() => setIsDialogOpen(true)} className="bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
                         <Plus className="mr-2 h-4 w-4" /> Create About
                     </Button>
                 </div>

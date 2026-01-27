@@ -38,7 +38,7 @@ export const AboutCard = ({
             variant="outline"
             size="sm"
             onClick={() => onEdit(about)}
-            className="flex-1"
+            className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300"
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit

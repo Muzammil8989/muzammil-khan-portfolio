@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,6 +33,11 @@ export function ProfileManager() {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
     const [avatarUrl, setAvatarUrl] = useState("");
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const { data: profiles = [], isLoading, refetch } = useProfiles();
     const createProfile = useCreateProfile();
@@ -103,7 +108,7 @@ export function ProfileManager() {
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">Profiles</h2>
                     <p className="text-sm text-gray-500 dark:text-slate-400">Manage your public bio and branding</p>
                 </div>
-                {profiles.length === 0 && (
+                {profiles.length === 0 && isMounted && (
                     <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
                         <DialogTrigger asChild>
                             <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300">
@@ -148,49 +153,53 @@ export function ProfileManager() {
                     <User className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">No profiles found</h3>
                     <p className="text-gray-500 dark:text-slate-400 mb-6">Create your first professional identity.</p>
-                    <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline">
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
                         <Plus className="mr-2 h-4 w-4" /> Create Profile
                     </Button>
                 </div>
             )}
 
             {/* Edit Dialog */}
-            <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
-                <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>Edit Profile</DialogTitle>
-                    </DialogHeader>
-                    <ProfileForm
-                        profile={selectedProfile || undefined}
-                        onSubmit={handleEditSubmit}
-                        isSubmitting={updateProfile.isPending}
-                        onAvatarUpload={setAvatarUrl}
-                        avatarUrl={avatarUrl}
-                    />
-                </DialogContent>
-            </Dialog>
+            {isMounted && (
+                <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
+                    <DialogContent className="sm:max-w-[600px]">
+                        <DialogHeader>
+                            <DialogTitle>Edit Profile</DialogTitle>
+                        </DialogHeader>
+                        <ProfileForm
+                            profile={selectedProfile || undefined}
+                            onSubmit={handleEditSubmit}
+                            isSubmitting={updateProfile.isPending}
+                            onAvatarUpload={setAvatarUrl}
+                            avatarUrl={avatarUrl}
+                        />
+                    </DialogContent>
+                </Dialog>
+            )}
 
             {/* Delete Alert */}
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => { setIsDeleteDialogOpen(open); if (!open) resetForm(); }}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will permanently delete the profile "{selectedProfile?.name}".
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleDelete}
-                            disabled={deleteProfile.isPending}
-                            className="bg-red-600 hover:bg-red-700"
-                        >
-                            {deleteProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {isMounted && (
+                <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => { setIsDeleteDialogOpen(open); if (!open) resetForm(); }}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will permanently delete the profile "{selectedProfile?.name}".
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={handleDelete}
+                                disabled={deleteProfile.isPending}
+                                className="bg-red-600 hover:bg-red-700"
+                            >
+                                {deleteProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
         </div>
     );
 }

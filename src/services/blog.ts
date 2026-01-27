@@ -9,6 +9,7 @@ export interface Blog {
   slug: string;
   excerpt: string;
   content: string;
+  coverImage?: string;
   codeBlocks?: CodeBlock[];
   languages?: string[];
   frameworks?: string[];
