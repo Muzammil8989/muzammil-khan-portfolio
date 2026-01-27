@@ -71,7 +71,7 @@ export function PortfolioCTA() {
               <Link href="/#projects" className="group">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 hover:from-indigo-700 hover:via-purple-700 hover:to-blue-700 text-white border-0 shadow-xl shadow-indigo-500/25 dark:shadow-indigo-500/20 rounded-xl px-8 py-6 text-base font-bold group-hover:scale-105 transition-all duration-300"
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-xl shadow-blue-500/25 dark:shadow-blue-500/20 rounded-xl px-8 py-6 text-base font-bold group-hover:scale-105 transition-all duration-300"
                 >
                   View My Portfolio
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       !SMTP_TO_EMAIL
     ) {
       throw new AppError(
-        "SERVER_ERROR",
+        "INTERNAL_SERVER_ERROR",
         "Email configuration is missing. Please contact the administrator.",
         500
       );

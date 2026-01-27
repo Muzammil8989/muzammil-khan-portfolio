@@ -68,7 +68,7 @@ export function AboutManager() {
                 {!aboutContent && (
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md transition-all duration-300">
+                            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300">
                                 <Plus className="mr-2 h-4 w-4" /> Create About
                             </Button>
                         </DialogTrigger>

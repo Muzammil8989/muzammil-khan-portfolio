@@ -23,7 +23,6 @@ export const ProjectForm = ({
 }: ProjectFormProps) => {
     const [formData, setFormData] = useState<Omit<Project, "_id">>({
         title: "",
-        href: "",
         dates: "",
         active: true,
         description: "",
@@ -41,16 +40,15 @@ export const ProjectForm = ({
         if (project) {
             setFormData({
                 title: project.title || "",
-                href: project.href || "",
                 dates: project.dates || "",
                 active: project.active ?? true,
                 description: project.description || "",
                 technologies: project.technologies || [],
                 links: project.links || [],
                 image: project.image || "",
-                projectUrl: (project as any).projectUrl || "",
-                githubUrl: (project as any).githubUrl || "",
-                caseStudyUrl: (project as any).caseStudyUrl || "",
+                projectUrl: project.projectUrl || "",
+                githubUrl: project.githubUrl || "",
+                caseStudyUrl: project.caseStudyUrl || "",
             });
             setTechInput(project.technologies.join(", "));
         }

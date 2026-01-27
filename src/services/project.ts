@@ -10,7 +10,6 @@ export interface ProjectLink {
 export interface Project {
     _id: string;
     title: string;
-    href: string;
     dates: string;
     active: boolean;
     description: string;

@@ -7,7 +7,6 @@ export const ProjectLinkSchema = z.object({
 
 export const ProjectSchema = z.object({
     title: z.string().min(1, "Title is required"),
-    href: z.string().url().optional().or(z.literal("")),
     dates: z.string().min(1, "Dates are required"),
     active: z.boolean().default(true),
     description: z.string().min(1, "Description is required"),

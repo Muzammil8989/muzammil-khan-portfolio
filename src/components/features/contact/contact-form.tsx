@@ -53,54 +53,59 @@ export function ContactForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Your name"
-                  {...field}
-                  disabled={isSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Your Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="John Doe"
+                    {...field}
+                    disabled={isSubmitting}
+                    className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  {...field}
-                  disabled={isSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Email Address</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="john@example.com"
+                    {...field}
+                    disabled={isSubmitting}
+                    className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
           name="subject"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject</FormLabel>
+              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Subject</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="What is this about?"
+                  placeholder="Project inquiry, collaboration, or just say hi!"
                   {...field}
                   disabled={isSubmitting}
+                  className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
                 />
               </FormControl>
               <FormMessage />
@@ -113,11 +118,11 @@ export function ContactForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Message</FormLabel>
+              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Message</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Your message..."
-                  className="min-h-[150px] resize-none"
+                  placeholder="Tell me about your project, ideas, or how we can collaborate..."
+                  className="min-h-[180px] resize-none bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
                   {...field}
                   disabled={isSubmitting}
                 />
@@ -129,21 +134,25 @@ export function ContactForm() {
 
         <Button
           type="submit"
-          className="w-full"
+          className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-blue-500/30 transition-all duration-300"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Sending...
+              Sending your message...
             </>
           ) : (
             <>
-              <Send className="mr-2 h-4 w-4" />
+              <Send className="mr-2 h-5 w-5" />
               Send Message
             </>
           )}
         </Button>
+
+        <p className="text-xs text-center text-slate-500 dark:text-slate-400">
+          I typically respond within 24-48 hours. Looking forward to connecting!
+        </p>
       </form>
     </Form>
   );

@@ -171,7 +171,6 @@ export const DATA = {
   projects: [
     {
       title: "Chat Collect",
-      href: "https://chatcollect.com",
       dates: "Jan 2024 - Feb 2024",
       active: true,
       description:
@@ -194,12 +193,12 @@ export const DATA = {
         },
       ],
       image: "",
+      projectUrl: "https://chatcollect.com",
       video:
         "https://pub-83c5db439b40468498f97946200806f7.r2.dev/chat-collect.mp4",
     },
     {
       title: "Magic UI",
-      href: "https://magicui.design",
       dates: "June 2023 - Present",
       active: true,
       description:
@@ -227,11 +226,12 @@ export const DATA = {
         },
       ],
       image: "",
+      projectUrl: "https://magicui.design",
+      githubUrl: "https://github.com/magicuidesign/magicui",
       video: "https://cdn.magicui.design/bento-grid.mp4",
     },
     {
       title: "llm.report",
-      href: "https://llm.report",
       dates: "April 2023 - September 2023",
       active: true,
       description:
@@ -260,11 +260,12 @@ export const DATA = {
         },
       ],
       image: "",
+      projectUrl: "https://llm.report",
+      githubUrl: "https://github.com/dillionverma/llm.report",
       video: "https://cdn.llm.report/openai-demo.mp4",
     },
     {
       title: "Automatic Chat",
-      href: "https://automatic.chat",
       dates: "April 2023 - March 2024",
       active: true,
       description:
@@ -288,6 +289,7 @@ export const DATA = {
         },
       ],
       image: "",
+      projectUrl: "https://automatic.chat",
       video:
         "https://pub-83c5db439b40468498f97946200806f7.r2.dev/automatic-chat.mp4",
     },

@@ -138,8 +138,8 @@ export function BlogCard({
           {blog.tags && blog.tags.length > 0 && (
             <div className="flex flex-wrap gap-x-3 gap-y-2">
               {blog.tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide flex items-center gap-1 group-hover:text-indigo-400/80 dark:group-hover:text-blue-400/80 transition-colors">
-                  <span className="text-indigo-500/50 dark:text-blue-500/50 font-black">#</span>
+                <span key={tag} className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide flex items-center gap-1 group-hover:text-blue-600/80 dark:group-hover:text-blue-400/80 transition-colors">
+                  <span className="text-blue-500/50 dark:text-blue-500/50 font-black">#</span>
                   {tag}
                 </span>
               ))}
@@ -149,7 +149,7 @@ export function BlogCard({
           {/* Languages & Frameworks */}
           <div className="flex flex-wrap gap-2">
             {[...(blog.languages || []), ...(blog.frameworks || [])].slice(0, 4).map((item) => (
-              <span key={item} className="px-3 py-1 rounded-lg bg-slate-50 dark:bg-white/5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10 group-hover:border-indigo-100 dark:group-hover:border-blue-500/20 transition-colors">
+              <span key={item} className="px-3 py-1 rounded-lg bg-slate-50 dark:bg-white/5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10 group-hover:border-blue-200 dark:group-hover:border-blue-500/20 transition-colors">
                 {item}
               </span>
             ))}
