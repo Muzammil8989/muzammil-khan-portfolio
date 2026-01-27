@@ -14,13 +14,21 @@ export class EducationService {
 
     static async create(data: EducationInput) {
         const { db } = await connectToDatabase();
-        const result = await db.collection(this.collection).insertOne({
+        const id = new ObjectId();
+        const now = new Date();
+        const newDoc = {
             ...data,
-            _id: new ObjectId(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-        return result;
+            _id: id,
+            createdAt: now,
+            updatedAt: now,
+        };
+        await db.collection(this.collection).insertOne(newDoc);
+        return {
+            ...data,
+            _id: id.toString(),
+            createdAt: now.toISOString(),
+            updatedAt: now.toISOString(),
+        };
     }
 
     static async update(id: string, data: Partial<EducationInput>) {
@@ -43,7 +51,10 @@ export class EducationService {
             throw new AppError("NOT_FOUND", "Education entry not found", 404);
         }
 
-        return result;
+        return {
+            ...result,
+            _id: result._id.toString(),
+        };
     }
 
     static async delete(id: string) {

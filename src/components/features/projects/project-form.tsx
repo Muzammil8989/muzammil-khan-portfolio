@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CloudinaryUploader } from "@/components/ui/cloudinary-uploader";
+import { BlobUploader } from "@/components/ui/blob-uploader";
 import { Project, ProjectLink } from "@/services/project";
 
 interface ProjectFormProps {
@@ -152,7 +152,7 @@ export const ProjectForm = ({
 
             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                 <label className="text-sm font-medium mb-2 block dark:text-slate-200">Project Image</label>
-                <CloudinaryUploader
+                <BlobUploader
                     buttonText={formData.image ? "Change Image" : "Upload Image"}
                     onSuccess={(res: any) => setFormData(p => ({ ...p, image: res.secure_url }))}
                     folder="projects"

@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CloudinaryUploader } from "@/components/ui/cloudinary-uploader";
+import { BlobUploader } from "@/components/ui/blob-uploader";
 import type { WorkExperience } from "@/services/work";
 
 interface WorkExperienceFormProps {
@@ -236,7 +236,7 @@ export const WorkExperienceForm = ({
       {/* Logo Upload */}
       <div>
         <label className="block text-sm font-medium mb-1 dark:text-slate-200">Company Logo</label>
-        <CloudinaryUploader
+        <BlobUploader
           buttonText={formData.logoUrl ? "Change Logo" : "Upload Logo"}
           label=""
           onSuccess={(result: any) => {

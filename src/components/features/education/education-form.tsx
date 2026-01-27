@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CloudinaryUploader } from "@/components/ui/cloudinary-uploader";
+import { BlobUploader } from "@/components/ui/blob-uploader";
 import type { Education } from "@/services/education";
 
 interface EducationFormProps {
@@ -166,7 +166,7 @@ export const EducationForm = ({
       {/* Logo Upload */}
       <div>
         <label className="block text-sm font-medium mb-1 dark:text-slate-200">School Logo</label>
-        <CloudinaryUploader
+        <BlobUploader
           buttonText={formData.logoUrl ? "Change Logo" : "Upload Logo"}
           label=""
           onSuccess={(result: any) => {
