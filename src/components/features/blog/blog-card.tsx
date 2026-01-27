@@ -181,7 +181,7 @@ export function BlogCard({
           </div>
         ) : (
           <Link href={`/blog/${blog.slug}`} className="w-full group/link">
-            <div className="w-full px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-colors duration-200 flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-sm">
+            <div className="w-full px-5 py-2.5 rounded-xl bg-blue-500 dark:bg-blue-600 border border-blue-600 dark:border-blue-500 hover:bg-blue-600 dark:hover:bg-blue-700 hover:border-blue-700 dark:hover:border-blue-600 transition-colors duration-200 flex items-center justify-center gap-2 text-white font-semibold text-sm">
               Read Article
               <ArrowRight className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform duration-200" />
             </div>
