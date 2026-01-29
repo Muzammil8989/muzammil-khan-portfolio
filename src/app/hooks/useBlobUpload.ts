@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useCloudinaryUpload = () => {
+export const useBlobUpload = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);

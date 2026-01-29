@@ -21,13 +21,21 @@ export class ProfileService {
     static async create(id: string, data: ProfileInput) {
         const { db } = await connectToDatabase();
         // In this app, the profile ID usually matches the user ID (based on original route)
-        const result = await db.collection(this.collection).insertOne({
+        const objectId = new ObjectId(id);
+        const now = new Date();
+        const newDoc = {
             ...data,
-            _id: new ObjectId(id),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-        return result;
+            _id: objectId,
+            createdAt: now,
+            updatedAt: now,
+        };
+        await db.collection(this.collection).insertOne(newDoc);
+        return {
+            ...data,
+            _id: objectId.toString(),
+            createdAt: now.toISOString(),
+            updatedAt: now.toISOString(),
+        };
     }
 
     static async update(id: string, data: Partial<ProfileInput>) {
@@ -50,7 +58,10 @@ export class ProfileService {
             throw new AppError("NOT_FOUND", "Profile not found", 404);
         }
 
-        return result;
+        return {
+            ...result,
+            _id: result._id.toString(),
+        };
     }
 
     static async delete(id: string) {

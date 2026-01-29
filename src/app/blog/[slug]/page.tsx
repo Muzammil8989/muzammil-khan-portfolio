@@ -58,20 +58,11 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
         modifiedTime: blog.updatedAt,
         authors: [blog.author],
         tags: blog.tags,
-        images: blog.coverImage ? [
-          {
-            url: blog.coverImage,
-            width: 1200,
-            height: 630,
-            alt: blog.title,
-          }
-        ] : [],
       },
       twitter: {
         card: "summary_large_image",
         title: blog.title,
         description: blog.excerpt || blog.title,
-        images: blog.coverImage ? [blog.coverImage] : [],
       },
       alternates: {
         canonical: blogUrl,
@@ -167,7 +158,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         title={blog.title}
         description={blog.excerpt}
         url={blogUrl}
-        image={blog.coverImage}
         datePublished={blog.publishedAt || blog.createdAt}
         dateModified={blog.updatedAt}
         author={blog.author}
