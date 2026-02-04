@@ -58,9 +58,8 @@ export default function Navbar() {
   }, []);
 
   const handleDownload = () => {
-    // You can place your resume file inside the "public" folder (e.g. /public/resume.pdf)
     const link = document.createElement("a");
-    link.href = "/Muzammil Khan CV.pdf"; // <-- path to your resume in /public
+    link.href = "/Muzammil Khan CV.pdf";
     link.download = "Muhammad_Muzammil_Khan_Resume.pdf";
     document.body.appendChild(link);
     link.click();
