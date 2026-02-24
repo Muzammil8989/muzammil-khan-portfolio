@@ -181,20 +181,19 @@ export class BlogService {
     const collection = db.collection(COLLECTION_NAME);
 
     // If content is being updated, recalculate reading time
-    const updateData: any = { ...data };
+    const { $inc: _, ...rest } = data as any;
+    const updateData: any = { ...rest };
     if (data.content) {
       updateData.readingTime = calculateReadingTime(data.content);
     }
 
-    // Increment version
     updateData.updatedAt = new Date().toISOString();
-    updateData.$inc = { version: 1 };
 
     const result = await collection.findOneAndUpdate(
       { _id: new ObjectId(id) },
       {
         $set: updateData,
-        $inc: { version: 1 }
+        $inc: { version: 1 },
       },
       { returnDocument: "after" }
     );

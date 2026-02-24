@@ -290,7 +290,7 @@ export function BlogManager() {
           {!searchQuery && (
             <Button
               onClick={() => setIsCreateDialogOpen(true)}
-              variant="outline"
+              className="bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300"
             >
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Blog

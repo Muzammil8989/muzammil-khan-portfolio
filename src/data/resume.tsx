@@ -37,7 +37,7 @@ export const DATA = {
       },
       LinkedIn: {
         name: "LinkedIn",
-        url: "https://www.linkedin.com/in/muhammad-muzammil-khan-?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+        url: "https://www.linkedin.com/in/muhammad-muzammil-khan-",
         icon: Icons.linkedin,
 
         navbar: true,

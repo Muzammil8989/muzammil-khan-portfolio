@@ -15,7 +15,7 @@ import Image from "next/image";
 import Navbar from "@/components/layout/navbar";
 import { ContactSection } from "@/components/features/contact/contact-section";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: revalidate every 60 seconds
 
 interface AboutData {
   message: string;
@@ -70,7 +70,7 @@ export default async function Page() {
             <React.Fragment key={profile._id}>
               <div className="relative w-full md:w-auto flex justify-center md:block">
                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-purple-200 dark:from-blue-600 dark:to-purple-600 rounded-full blur-3xl opacity-40 dark:opacity-40"></div>
-                <Avatar className="relative w-40 h-40 md:w-48 md:h-48 md:w-56 md:h-56 border-8 border-white dark:border-white/20 object-cover shadow-2xl">
+                <Avatar className="relative w-40 h-40 md:w-56 md:h-56 border-8 border-white dark:border-white/20 object-cover shadow-2xl">
                   <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
                   <AvatarFallback className="text-4xl font-bold bg-indigo-50 dark:bg-blue-900 text-indigo-600 dark:text-blue-300">
                     {profile.initials}

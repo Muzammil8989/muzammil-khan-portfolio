@@ -13,11 +13,14 @@ import { DATA } from "@/data/resume";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useProfiles } from "@/app/hooks/useProfiles";
 
 export default function Navbar() {
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const { data: profiles = [] } = useProfiles();
+  const resumeUrl = profiles[0]?.resumeUrl || "";
 
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
@@ -58,10 +61,11 @@ export default function Navbar() {
   }, []);
 
   const handleDownload = () => {
-    // You can place your resume file inside the "public" folder (e.g. /public/resume.pdf)
+    const href = resumeUrl || "/Muzammil Khan CV.pdf";
     const link = document.createElement("a");
-    link.href = "/resume.pdf"; // <-- path to your resume in /public
+    link.href = href;
     link.download = "Muhammad_Muzammil_Khan_Resume.pdf";
+    link.target = "_blank";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

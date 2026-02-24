@@ -104,8 +104,8 @@ export function BlogCard({
               onClick={handleLike}
               disabled={hasLiked || likeMutation.isPending}
               className={`flex items-center gap-1 transition-all duration-300 ${hasLiked
-                  ? "text-red-500 font-bold scale-110"
-                  : "hover:text-red-500 hover:scale-105"
+                ? "text-red-500 font-bold scale-110"
+                : "hover:text-red-500 hover:scale-105"
                 }`}
             >
               <Heart className={`w-3.5 h-3.5 ${hasLiked ? "fill-red-500" : ""}`} />
@@ -161,10 +161,9 @@ export function BlogCard({
         {showActions ? (
           <div className="flex items-center gap-3 w-full">
             <Button
-              variant="outline"
               size="sm"
               onClick={() => onEdit?.(blog)}
-              className="flex-1 rounded-xl border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-blue-500/5 transition-all font-bold text-xs h-10"
+              className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-bold text-xs h-10"
             >
               <Edit className="mr-2 h-4 w-4" />
               Edit
@@ -181,11 +180,21 @@ export function BlogCard({
           </div>
         ) : (
           <Link href={`/blog/${blog.slug}`} className="w-full group/link">
-            <div className="w-full px-5 py-2.5 rounded-xl bg-blue-500 dark:bg-blue-600 border border-blue-600 dark:border-blue-500 hover:bg-blue-600 dark:hover:bg-blue-700 hover:border-blue-700 dark:hover:border-blue-600 transition-colors duration-200 flex items-center justify-center gap-2 text-white font-semibold text-sm">
+            <div className="
+    w-full h-12 px-5 rounded-xl
+    bg-gradient-to-r from-blue-600 to-indigo-600
+    hover:from-blue-700 hover:to-indigo-700
+    text-white font-semibold text-sm
+    shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20
+    hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-blue-500/30
+    transition-all duration-300
+    flex items-center justify-center gap-2
+  ">
               Read Article
               <ArrowRight className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform duration-200" />
             </div>
           </Link>
+
         )}
       </CardFooter>
     </Card>

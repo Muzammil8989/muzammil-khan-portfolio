@@ -5,6 +5,7 @@ import { Providers } from "./providers/providers";
 import { DATA } from "@/data/resume";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { OrganizationStructuredData, WebSiteStructuredData } from "@/components/seo/structured-data";
+import { ProfileService } from "@/services/profile-service";
 
 // Font setup with display swap for performance
 const fontSans = Inter({
@@ -21,20 +22,14 @@ const fontDisplay = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-// ✅ Fetch profile data (single object)
+// Fetch profile data directly from DB (no HTTP round-trip)
 async function getProfileData() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) throw new Error("Failed to fetch profile data");
-
-    const data = await res.json();
-
+    const profiles = await ProfileService.getAll();
+    const profile = profiles[0] as any;
     return {
-      name: data?.name || DATA.name,
-      description: data?.description ,
+      name: profile?.name || DATA.name,
+      description: profile?.description as string | undefined,
     };
   } catch (error) {
     console.error("Error fetching profile:", error);
@@ -42,7 +37,7 @@ async function getProfileData() {
   }
 }
 
-// ✅ Dynamic Metadata (title + description)
+// Dynamic Metadata (title + description)
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfileData();
 
@@ -121,10 +116,6 @@ export async function generateMetadata(): Promise<Metadata> {
         "max-image-preview": "large",
         "max-snippet": -1,
       },
-    },
-    verification: {
-      google: "",
-      yandex: "",
     },
     alternates: {
       canonical: DATA.url,

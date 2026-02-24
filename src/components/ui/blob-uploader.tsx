@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useId } from "react";
 import { useBlobUpload } from "@/app/hooks/useBlobUpload";
 
 interface UploadResult {
@@ -35,6 +35,7 @@ export const BlobUploader: React.FC<BlobUploaderProps> = ({
   loadingText = "Uploading...",
 }) => {
   const { upload, loading, error } = useBlobUpload();
+  const uid = useId();
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,10 +70,10 @@ export const BlobUploader: React.FC<BlobUploaderProps> = ({
             onChange={handleFileChange}
             disabled={disabled || loading}
             className="hidden"
-            id="blob-upload"
+            id={uid}
           />
           <label
-            htmlFor="blob-upload"
+            htmlFor={uid}
             className={`px-4 py-2 rounded-md text-sm font-medium cursor-pointer ${
               disabled || loading
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
