@@ -33,6 +33,7 @@ export function ProfileManager() {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
     const [avatarUrl, setAvatarUrl] = useState("");
+    const [resumeUrl, setResumeUrl] = useState("");
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -47,11 +48,12 @@ export function ProfileManager() {
     const resetForm = () => {
         setSelectedProfile(null);
         setAvatarUrl("");
+        setResumeUrl("");
     };
 
     const handleCreateSubmit = (data: Omit<Profile, "_id">) => {
         createProfile.mutate(
-            { ...data, avatarUrl },
+            { ...data, avatarUrl, resumeUrl },
             {
                 onSuccess: () => {
                     setIsCreateDialogOpen(false);
@@ -69,6 +71,7 @@ export function ProfileManager() {
                 ...data,
                 _id: selectedProfile._id,
                 avatarUrl: avatarUrl || data.avatarUrl,
+                resumeUrl: resumeUrl || data.resumeUrl,
             },
             {
                 onSuccess: () => {
@@ -124,6 +127,8 @@ export function ProfileManager() {
                                 isSubmitting={createProfile.isPending}
                                 onAvatarUpload={setAvatarUrl}
                                 avatarUrl={avatarUrl}
+                                onResumeUpload={setResumeUrl}
+                                resumeUrl={resumeUrl}
                             />
                         </DialogContent>
                     </Dialog>
@@ -139,6 +144,7 @@ export function ProfileManager() {
                             onEdit={(p) => {
                                 setSelectedProfile(p);
                                 setAvatarUrl(p.avatarUrl || "");
+                                setResumeUrl(p.resumeUrl || "");
                                 setIsEditDialogOpen(true);
                             }}
                             onDelete={(p) => {
@@ -172,6 +178,8 @@ export function ProfileManager() {
                             isSubmitting={updateProfile.isPending}
                             onAvatarUpload={setAvatarUrl}
                             avatarUrl={avatarUrl}
+                            onResumeUpload={setResumeUrl}
+                            resumeUrl={resumeUrl}
                         />
                     </DialogContent>
                 </Dialog>

@@ -5,8 +5,11 @@ import Navbar from "@/components/layout/navbar";
 import { BlogFilter } from "@/components/features/blog/blog-filter";
 import { Blog } from "@/services/blog";
 import { Metadata } from "next";
+import { DATA } from "@/data/resume";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: revalidate every 60 seconds
+
+const blogUrl = `${DATA.url}blog`;
 
 export const metadata: Metadata = {
   title: "Engineering Blog | Software Development Insights & Tutorials",
@@ -16,7 +19,7 @@ export const metadata: Metadata = {
     title: "Engineering Blog | Software Development Insights",
     description: "Deep dives into modern software architecture, technical leadership, and full-stack development.",
     type: "website",
-    url: "https://muzammilkhan.vercel.app/blog",
+    url: blogUrl,
   },
   twitter: {
     card: "summary_large_image",
@@ -24,7 +27,7 @@ export const metadata: Metadata = {
     description: "Deep dives into modern software architecture, technical leadership, and full-stack development.",
   },
   alternates: {
-    canonical: "https://muzammilkhan.vercel.app/blog",
+    canonical: blogUrl,
   },
 };
 

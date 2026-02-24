@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Profile } from "@/services/profile";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, FileText } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export const ProfileCard = ({
   profile,
@@ -32,8 +33,23 @@ export const ProfileCard = ({
           {profile.name}
         </h3>
       </CardHeader>
-      <CardContent className="text-center text-gray-600 dark:text-slate-300 flex-grow">
+      <CardContent className="text-center text-gray-600 dark:text-slate-300 grow">
         <p className="line-clamp-3">{profile.description}</p>
+        <div className="mt-3 flex justify-center">
+          {profile.resumeUrl ? (
+            <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer">
+              <Badge variant="secondary" className="gap-1 text-xs cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40">
+                <FileText className="h-3 w-3" />
+                Resume uploaded
+              </Badge>
+            </a>
+          ) : (
+            <Badge variant="outline" className="gap-1 text-xs text-muted-foreground">
+              <FileText className="h-3 w-3" />
+              No resume
+            </Badge>
+          )}
+        </div>
       </CardContent>
       <CardFooter className="flex justify-center gap-2 pt-2 pb-4">
         <Button

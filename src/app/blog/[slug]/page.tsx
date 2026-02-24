@@ -25,8 +25,9 @@ import { BlogCard } from "@/components/features/blog/blog-card";
 import { PortfolioCTA } from "@/components/features/blog/portfolio-cta";
 import { Metadata } from "next";
 import { BlogPostingStructuredData, BreadcrumbStructuredData } from "@/components/seo/structured-data";
+import { DATA } from "@/data/resume";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // needed: per-IP like status injected on each request
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     }
 
     const blog = { ...rawBlog, _id: rawBlog._id.toString() } as Blog;
-    const baseUrl = "https://muzammilkhan.vercel.app";
+    const baseUrl = DATA.url.replace(/\/$/, "");
     const blogUrl = `${baseUrl}/blog/${blog.slug}`;
 
     return {
@@ -148,7 +149,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   const contentToRead = `${blog.title}. ${blog.excerpt}. ${extractTextFromMarkdown(blog.content)}`;
 
-  const baseUrl = "https://muzammilkhan.vercel.app";
+  const baseUrl = DATA.url.replace(/\/$/, "");
   const blogUrl = `${baseUrl}/blog/${blog.slug}`;
 
   return (

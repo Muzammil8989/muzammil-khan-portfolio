@@ -7,6 +7,7 @@ export interface Profile {
   description: string;
   avatarUrl: string;
   initials: string;
+  resumeUrl?: string;
 }
 
 export const fetchProfiles = async (): Promise<Profile[]> => {

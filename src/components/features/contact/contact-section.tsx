@@ -2,6 +2,7 @@
 
 import { ContactForm } from "./contact-form";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { DATA } from "@/data/resume";
 
 export function ContactSection() {
   return (
@@ -28,10 +29,10 @@ export function ContactSection() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-0.5">Email</p>
                     <a
-                      href="mailto:muzammilkhan@example.com"
+                      href={`mailto:${DATA.contact.email}`}
                       className="text-sm text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-blue-400 transition-colors truncate block"
                     >
-                      muzammilkhan@example.com
+                      {DATA.contact.email}
                     </a>
                   </div>
                 </div>
@@ -43,10 +44,10 @@ export function ContactSection() {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-0.5">Phone</p>
                     <a
-                      href="tel:+1234567890"
+                      href={`tel:${DATA.contact.tel}`}
                       className="text-sm text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-blue-400 transition-colors"
                     >
-                      +1 (234) 567-890
+                      {DATA.contact.tel}
                     </a>
                   </div>
                 </div>
@@ -69,7 +70,7 @@ export function ContactSection() {
                 <p className="text-xs font-medium text-slate-500 dark:text-slate-500 mb-3">Connect on social</p>
                 <div className="flex gap-2">
                   <a
-                    href="https://github.com"
+                    href={DATA.contact.social.GitHub.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-transparent hover:border-indigo-500 dark:hover:border-blue-500 hover:bg-indigo-50 dark:hover:bg-blue-500/10 transition-all group"
@@ -80,7 +81,7 @@ export function ContactSection() {
                     </svg>
                   </a>
                   <a
-                    href="https://linkedin.com"
+                    href={DATA.contact.social.LinkedIn.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-transparent hover:border-indigo-500 dark:hover:border-blue-500 hover:bg-indigo-50 dark:hover:bg-blue-500/10 transition-all group"

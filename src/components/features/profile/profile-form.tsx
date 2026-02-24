@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BlobUploader } from "@/components/ui/blob-uploader";
 import { Profile } from "@/services/profile";
+import { FileText, X } from "lucide-react";
 
 interface ProfileFormProps {
   profile?: Profile;
@@ -16,6 +17,8 @@ interface ProfileFormProps {
   isSubmitting: boolean;
   onAvatarUpload: (url: string) => void;
   avatarUrl?: string;
+  onResumeUpload: (url: string) => void;
+  resumeUrl?: string;
 }
 
 export const ProfileForm = ({
@@ -24,12 +27,15 @@ export const ProfileForm = ({
   isSubmitting,
   onAvatarUpload,
   avatarUrl = "",
+  onResumeUpload,
+  resumeUrl = "",
 }: ProfileFormProps) => {
   const [formData, setFormData] = useState<Omit<Profile, "_id">>({
     name: "",
     description: "",
     avatarUrl: "",
     initials: "",
+    resumeUrl: "",
   });
 
   useEffect(() => {
@@ -39,6 +45,7 @@ export const ProfileForm = ({
         description: profile.description || "",
         avatarUrl: profile.avatarUrl || "",
         initials: profile.initials || "",
+        resumeUrl: profile.resumeUrl || "",
       });
     }
   }, [profile]);
@@ -48,6 +55,10 @@ export const ProfileForm = ({
       setFormData((prev) => ({ ...prev, avatarUrl }));
     }
   }, [avatarUrl]);
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, resumeUrl }));
+  }, [resumeUrl]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -187,6 +198,54 @@ export const ProfileForm = ({
             </Button>
           </div>
         )}
+      </div>
+
+      {/* Resume PDF Upload */}
+      <div>
+        <label className="block text-sm font-medium mb-1 dark:text-slate-200">
+          Resume PDF
+        </label>
+        <BlobUploader
+          buttonText={formData.resumeUrl ? "Replace PDF" : "Upload PDF"}
+          label=""
+          onSuccess={(result: any) => {
+            onResumeUpload(result.secure_url);
+            toast.success("Resume uploaded successfully");
+          }}
+          onError={(error: any) => {
+            const message = typeof error === "string" ? error : "Upload failed";
+            toast.error(`Upload failed: ${message}`);
+          }}
+          folder="resumes"
+          accept="application/pdf"
+          className="mb-2"
+        />
+        {formData.resumeUrl && (
+          <div className="mt-2 flex items-center gap-3 p-2 rounded-md bg-muted border">
+            <FileText className="h-5 w-5 text-blue-500 shrink-0" />
+            <a
+              href={formData.resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-blue-600 dark:text-blue-400 underline truncate flex-1"
+            >
+              {formData.resumeUrl.split("/").pop() || "resume.pdf"}
+            </a>
+            <button
+              type="button"
+              aria-label="Remove resume"
+              onClick={() => {
+                onResumeUpload("");
+              }}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground mt-1">
+          This PDF will be used for the resume download button in the navbar.
+        </p>
       </div>
 
       {/* Submit */}
