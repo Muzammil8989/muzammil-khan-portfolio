@@ -5,6 +5,9 @@ import { Providers } from "./providers/providers";
 import { DATA } from "@/data/resume";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { OrganizationStructuredData, WebSiteStructuredData } from "@/components/seo/structured-data";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ProfileService } from "@/services/profile-service";
 
 // Font setup with display swap for performance
@@ -162,6 +165,9 @@ export default function RootLayout({
         />
 
         <Providers>{children}</Providers>
+        <Analytics />
+        <SpeedInsights />
+        <GoogleAnalytics gaId="G-N2MK49JZ16" />
       </body>
     </html>
   );
