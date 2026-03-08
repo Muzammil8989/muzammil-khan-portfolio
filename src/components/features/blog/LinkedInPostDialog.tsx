@@ -115,20 +115,23 @@ export function LinkedInPostDialog({ blog, open, onOpenChange }: LinkedInPostDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Linkedin className="h-5 w-5 text-[#0077B5]" />
-            Post to LinkedIn
-          </DialogTitle>
-          <DialogDescription>
-            Share{" "}
-            <span className="font-medium text-foreground">"{blog.title}"</span> on LinkedIn.
-            Readers will be redirected to your portfolio to read the full article.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="w-[95vw] max-w-xl p-0 flex flex-col max-h-[90vh]">
+        <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Linkedin className="h-5 w-5 text-[#0077B5]" />
+              Post to LinkedIn
+            </DialogTitle>
+            <DialogDescription>
+              Share{" "}
+              <span className="font-medium text-foreground">"{blog.title}"</span> on LinkedIn.
+              Readers will be redirected to your portfolio to read the full article.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-5 pt-1">
+        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+        <div className="space-y-5">
           {/* Blog link preview */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
             <ExternalLink className="h-3.5 w-3.5 shrink-0" />
@@ -274,6 +277,7 @@ export function LinkedInPostDialog({ blog, open, onOpenChange }: LinkedInPostDia
               )}
             </Button>
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>
