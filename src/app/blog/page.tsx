@@ -70,7 +70,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   });
 
   return (
-    <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <main className="min-h-screen relative overflow-x-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {/* Background Decorative Elements */}
       <div className="gradient-decorative-bg"></div>
 
@@ -98,9 +98,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         {/* Search and Filter - Client Component */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
           <BlogFilter
-            allTags={allTags}
             initialSearch={search}
-            initialTag={tag}
             initialDifficulty={difficulty}
           />
         </div>

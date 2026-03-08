@@ -118,18 +118,22 @@ export function ProfileManager() {
                                 <Plus className="mr-2 h-4 w-4" /> Create Profile
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>Create New Profile</DialogTitle>
-                            </DialogHeader>
-                            <ProfileForm
-                                onSubmit={handleCreateSubmit}
-                                isSubmitting={createProfile.isPending}
-                                onAvatarUpload={setAvatarUrl}
-                                avatarUrl={avatarUrl}
-                                onResumeUpload={setResumeUrl}
-                                resumeUrl={resumeUrl}
-                            />
+                        <DialogContent className="w-[95vw] max-w-2xl p-0 flex flex-col max-h-[90vh]">
+                            <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+                                <DialogHeader>
+                                    <DialogTitle>Create New Profile</DialogTitle>
+                                </DialogHeader>
+                            </div>
+                            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+                                <ProfileForm
+                                    onSubmit={handleCreateSubmit}
+                                    isSubmitting={createProfile.isPending}
+                                    onAvatarUpload={setAvatarUrl}
+                                    avatarUrl={avatarUrl}
+                                    onResumeUpload={setResumeUrl}
+                                    resumeUrl={resumeUrl}
+                                />
+                            </div>
                         </DialogContent>
                     </Dialog>
                 )}
@@ -168,19 +172,23 @@ export function ProfileManager() {
             {/* Edit Dialog */}
             {isMounted && (
                 <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
-                    <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Edit Profile</DialogTitle>
-                        </DialogHeader>
-                        <ProfileForm
-                            profile={selectedProfile || undefined}
-                            onSubmit={handleEditSubmit}
-                            isSubmitting={updateProfile.isPending}
-                            onAvatarUpload={setAvatarUrl}
-                            avatarUrl={avatarUrl}
-                            onResumeUpload={setResumeUrl}
-                            resumeUrl={resumeUrl}
-                        />
+                    <DialogContent className="w-[95vw] max-w-2xl p-0 flex flex-col max-h-[90vh]">
+                        <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+                            <DialogHeader>
+                                <DialogTitle>Edit Profile</DialogTitle>
+                            </DialogHeader>
+                        </div>
+                        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+                            <ProfileForm
+                                profile={selectedProfile || undefined}
+                                onSubmit={handleEditSubmit}
+                                isSubmitting={updateProfile.isPending}
+                                onAvatarUpload={setAvatarUrl}
+                                avatarUrl={avatarUrl}
+                                onResumeUpload={setResumeUrl}
+                                resumeUrl={resumeUrl}
+                            />
+                        </div>
                     </DialogContent>
                 </Dialog>
             )}
@@ -188,19 +196,19 @@ export function ProfileManager() {
             {/* Delete Alert */}
             {isMounted && (
                 <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => { setIsDeleteDialogOpen(open); if (!open) resetForm(); }}>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="w-[95vw] max-w-md">
                         <AlertDialogHeader>
                             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                             <AlertDialogDescription>
                                 This will permanently delete the profile "{selectedProfile?.name}".
                             </AlertDialogDescription>
                         </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                            <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                             <AlertDialogAction
                                 onClick={handleDelete}
                                 disabled={deleteProfile.isPending}
-                                className="bg-red-600 hover:bg-red-700"
+                                className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                             >
                                 {deleteProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
                             </AlertDialogAction>

@@ -72,14 +72,18 @@ export function AboutManager() {
                                 <Plus className="mr-2 h-4 w-4" /> Create About
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>Create About Section</DialogTitle>
-                            </DialogHeader>
-                            <AboutForm
-                                onSubmit={handleAboutSubmit}
-                                isSubmitting={createAbout.isPending}
-                            />
+                        <DialogContent className="w-[95vw] max-w-2xl p-0 flex flex-col max-h-[90vh]">
+                            <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+                                <DialogHeader>
+                                    <DialogTitle>Create About Section</DialogTitle>
+                                </DialogHeader>
+                            </div>
+                            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+                                <AboutForm
+                                    onSubmit={handleAboutSubmit}
+                                    isSubmitting={createAbout.isPending}
+                                />
+                            </div>
                         </DialogContent>
                     </Dialog>
                 )}
@@ -104,33 +108,37 @@ export function AboutManager() {
 
             {/* Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>Edit About Section</DialogTitle>
-                    </DialogHeader>
-                    <AboutForm
-                        about={aboutContent || undefined}
-                        onSubmit={handleAboutSubmit}
-                        isSubmitting={updateAbout.isPending || createAbout.isPending}
-                    />
+                <DialogContent className="w-[95vw] max-w-2xl p-0 flex flex-col max-h-[90vh]">
+                    <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+                        <DialogHeader>
+                            <DialogTitle>Edit About Section</DialogTitle>
+                        </DialogHeader>
+                    </div>
+                    <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+                        <AboutForm
+                            about={aboutContent || undefined}
+                            onSubmit={handleAboutSubmit}
+                            isSubmitting={updateAbout.isPending || createAbout.isPending}
+                        />
+                    </div>
                 </DialogContent>
             </Dialog>
 
             {/* Delete Alert */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent className="w-[95vw] max-w-md">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This will permanently delete your about section.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
                             disabled={deleteAboutMutation.isPending}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                         >
                             {deleteAboutMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
                         </AlertDialogAction>

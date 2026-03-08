@@ -1,31 +1,34 @@
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Heart, Clock, ArrowRight, Linkedin } from "lucide-react";
+import { Heart, Clock, ArrowUpRight } from "lucide-react";
 import { Blog } from "@/services/blog";
 import { useLikeBlog } from "@/app/hooks/useBlogs";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { getTypeColorClasses, getPublishStatusColorClasses } from "@/lib/blog-colors";
 
 interface BlogCardProps {
   blog: Blog;
-  onEdit?: (blog: Blog) => void;
-  onDelete?: (blog: Blog) => void;
-  onLinkedIn?: (blog: Blog) => void;
   showActions?: boolean;
 }
 
-export function BlogCard({
-  blog,
-  onEdit,
-  onDelete,
-  onLinkedIn,
-  showActions = true,
-}: BlogCardProps) {
+// Accent colors per difficulty
+const difficultyConfig: Record<string, { label: string; from: string; to: string; text: string; dot: string }> = {
+  beginner:     { label: "Beginner",     from: "from-emerald-500", to: "to-teal-400",    text: "text-emerald-600 dark:text-emerald-400",  dot: "bg-emerald-500" },
+  intermediate: { label: "Intermediate", from: "from-violet-500",  to: "to-indigo-400",  text: "text-violet-600 dark:text-violet-400",    dot: "bg-violet-500"  },
+  advanced:     { label: "Advanced",     from: "from-orange-500",  to: "to-rose-400",    text: "text-orange-600 dark:text-orange-400",    dot: "bg-orange-500"  },
+};
+
+const typeColors: Record<string, string> = {
+  "Tutorial":   "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/20",
+  "Article":    "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10",
+  "Case Study": "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20",
+  "Deep Dive":  "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/20",
+  "Quick Tip":  "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300 border-green-200 dark:border-green-500/20",
+  "Guide":      "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/20",
+};
+
+export function BlogCard({ blog, showActions = false }: BlogCardProps) {
   const queryClient = useQueryClient();
   const likeMutation = useLikeBlog();
   const [hasLiked, setHasLiked] = useState(false);
@@ -33,8 +36,8 @@ export function BlogCard({
 
   useEffect(() => {
     if (blog?._id) {
-      const likedBlogs = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
-      setHasLiked(likedBlogs.includes(blog._id));
+      const liked = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
+      setHasLiked(liked.includes(blog._id));
     }
   }, [blog?._id]);
 
@@ -45,185 +48,133 @@ export function BlogCard({
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (!blog?._id || hasLiked) return;
-
-    // Optimistic update
-    setLikesCount(prev => prev + 1);
+    setLikesCount((p) => p + 1);
     setHasLiked(true);
-
     likeMutation.mutate(blog._id, {
       onSuccess: () => {
-        const likedBlogs = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
-        if (!likedBlogs.includes(blog._id)) {
-          likedBlogs.push(blog._id);
-          localStorage.setItem("liked_blogs", JSON.stringify(likedBlogs));
+        const liked = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
+        if (!liked.includes(blog._id)) {
+          liked.push(blog._id);
+          localStorage.setItem("liked_blogs", JSON.stringify(liked));
         }
-        // Invalidate queries to sync with other components
         queryClient.invalidateQueries({ queryKey: ["blogs"] });
       },
       onError: () => {
-        // Rollback
-        setLikesCount(prev => prev - 1);
+        setLikesCount((p) => p - 1);
         setHasLiked(false);
-      }
+      },
     });
   };
 
+  const diff = difficultyConfig[blog.difficulty] ?? difficultyConfig.beginner;
+  const typeClass = typeColors[blog.type] ?? typeColors["Article"];
+  const stack = [...(blog.languages || []), ...(blog.frameworks || [])].slice(0, 4);
 
   return (
-    <Card className="group relative h-full flex flex-col overflow-hidden rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-sm shadow-lg dark:shadow-2xl transition-all duration-300 hover:shadow-xl dark:hover:shadow-[0_20px_50px_0_rgba(0,0,0,0.5)] hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-1">
+    <Link href={`/blog/${blog.slug}`} className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-2xl">
+      <article
+        className="relative h-full flex flex-col rounded-2xl overflow-hidden
+          bg-white dark:bg-[#0d0d2b]
+          border border-slate-200/70 dark:border-white/[0.07]
+          shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]
+          hover:shadow-[0_12px_40px_rgba(79,70,229,0.15)] dark:hover:shadow-[0_16px_48px_rgba(79,70,229,0.2)]
+          hover:-translate-y-2
+          transition-all duration-300 ease-out
+        "
+      >
+        {/* ── Top gradient strip (visible always, bolder on hover) ── */}
+        <div className={`h-[3px] w-full bg-gradient-to-r ${diff.from} ${diff.to} opacity-60 group-hover:opacity-100 transition-opacity duration-300`} />
 
-      <CardHeader className={showActions ? "p-4 pb-0 space-y-3" : "p-7 pb-0 space-y-6"}>
-        <div className="flex items-center justify-between">
-          {showActions ? (
-            <div className="flex gap-2">
-              <Badge className={`${getTypeColorClasses(blog.type)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
-                {blog.type}
-              </Badge>
-              <Badge className={`${getPublishStatusColorClasses(blog.isPublished)} border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm`}>
-                {blog.isPublished ? "Published" : "Draft"}
-              </Badge>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors" style={{
-              backgroundColor: 'var(--surface-overlay)',
-              borderColor: 'var(--border-subtle)',
-              color: 'var(--text-secondary)'
-            }}>
-              <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-brand-primary)' }} />
+        {/* ── Body ─────────────────────────────────────────────── */}
+        <div className="flex flex-col flex-1 p-5 gap-4">
+
+          {/* Row 1 — type badge + meta */}
+          <div className="flex items-center justify-between gap-2">
+            <span className={`inline-flex items-center text-[10px] font-black uppercase tracking-[0.18em] px-2.5 py-[3px] rounded-full border ${typeClass}`}>
               {blog.type}
-            </div>
-          )}
-
-          <div className="flex items-center gap-2.5 text-[11px] text-slate-400 font-medium">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              {blog.readingTime || 5} min
             </span>
-            <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-            <button
-              onClick={handleLike}
-              disabled={hasLiked || likeMutation.isPending}
-              className={`flex items-center gap-1 transition-all duration-300 ${hasLiked
-                ? "text-red-500 font-bold scale-110"
-                : "hover:text-red-500 hover:scale-105"
-                }`}
-            >
-              <Heart className={`w-3.5 h-3.5 ${hasLiked ? "fill-red-500" : ""}`} />
-              {likesCount}
-            </button>
-          </div>
-        </div>
 
-        <div className="space-y-3">
-          {showActions ? (
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight line-clamp-2">
-              {blog.title}
-            </h3>
-          ) : (
-            <Link href={`/blog/${blog.slug}`}>
-              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 tracking-tight leading-tight line-clamp-2">
-                {blog.title}
-              </h3>
-            </Link>
-          )}
-          <p className={showActions ? "text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-light" : "text-[15px] text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed font-light"}>
+            <div className="flex items-center gap-2.5 text-[11px] font-medium text-slate-400 dark:text-slate-500">
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {blog.readingTime || 5} min
+              </span>
+
+              <button
+                onClick={handleLike}
+                disabled={hasLiked || likeMutation.isPending}
+                aria-label="Like this post"
+                className={`flex items-center gap-1 transition-all duration-200 rounded-full ${
+                  hasLiked
+                    ? "text-rose-500"
+                    : "hover:text-rose-400"
+                }`}
+              >
+                <Heart className={`w-3 h-3 transition-all ${hasLiked ? "fill-rose-500 scale-125" : ""}`} />
+                <span className="tabular-nums">{likesCount}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Row 2 — title */}
+          <h3 className="text-base font-bold leading-snug tracking-tight
+            text-slate-900 dark:text-white
+            group-hover:text-indigo-600 dark:group-hover:text-indigo-400
+            transition-colors duration-200 line-clamp-2"
+          >
+            {blog.title}
+          </h3>
+
+          {/* Row 3 — excerpt */}
+          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3 font-light flex-1">
             {blog.excerpt}
           </p>
-        </div>
-      </CardHeader>
 
-      <CardContent className={`${showActions ? "p-4" : "p-7"} flex-grow flex flex-col justify-end`}>
-        <div className={showActions ? "space-y-2" : "space-y-5"}>
-          {/* Tags with more professional look */}
-          {blog.tags && blog.tags.length > 0 && (
-            <div className="flex flex-wrap gap-x-3 gap-y-2">
-              {blog.tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide flex items-center gap-1 group-hover:text-blue-600/80 dark:group-hover:text-blue-400/80 transition-colors">
-                  <span className="text-blue-500/50 dark:text-blue-500/50 font-black">#</span>
-                  {tag}
+          {/* Row 4 — stack chips */}
+          {stack.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {stack.map((item) => (
+                <span
+                  key={item}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide
+                    bg-slate-50 dark:bg-white/[0.04]
+                    text-slate-600 dark:text-slate-400
+                    border border-slate-100 dark:border-white/[0.07]
+                    group-hover:border-indigo-200 dark:group-hover:border-indigo-500/25
+                    transition-colors duration-200"
+                >
+                  {item}
                 </span>
               ))}
             </div>
           )}
 
-          {/* Languages & Frameworks */}
-          <div className="flex flex-wrap gap-2">
-            {[...(blog.languages || []), ...(blog.frameworks || [])].slice(0, 4).map((item) => (
-              <span key={item} className={`${showActions ? "px-2 py-0.5" : "px-3 py-1"} rounded-lg bg-slate-50 dark:bg-white/5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10 group-hover:border-blue-200 dark:group-hover:border-blue-500/20 transition-colors`}>
-                {item}
-              </span>
-            ))}
+          {/* Row 5 — footer */}
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/[0.05] mt-auto">
+            {/* difficulty pill */}
+            <span className={`flex items-center gap-1.5 text-[11px] font-bold ${diff.text}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${diff.dot} animate-pulse`} />
+              {diff.label}
+            </span>
+
+            {/* CTA */}
+            <span className="flex items-center gap-1 text-[12px] font-bold
+              text-indigo-600 dark:text-indigo-400
+              group-hover:text-indigo-700 dark:group-hover:text-indigo-300
+              transition-colors duration-200"
+            >
+              Read article
+              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+            </span>
           </div>
         </div>
-      </CardContent>
 
-      <CardFooter className={`${showActions ? "p-4 pt-0" : "p-7 pt-0"} relative z-10`}>
-        {showActions ? (
-          <div className="flex flex-col gap-2 w-full">
-            {/* Main actions row */}
-            <div className="flex items-center gap-2 w-full">
-              <Button
-                size="sm"
-                onClick={() => onEdit?.(blog)}
-                className="flex-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-bold text-[11px] h-8"
-              >
-                <Edit className="mr-1.5 h-3.5 w-3.5" />
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => onDelete?.(blog)}
-                className="flex-1 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 border-none transition-all font-bold text-[11px] h-8"
-              >
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                Delete
-              </Button>
-            </div>
-
-            {/* LinkedIn button row */}
-            <button
-              onClick={() => onLinkedIn?.(blog)}
-              disabled={!onLinkedIn}
-              className={`w-full flex items-center justify-center gap-2 h-7 rounded-lg text-[11px] font-bold transition-all duration-200 border ${
-                blog.linkedinPost
-                  ? "bg-[#0077B5]/10 border-[#0077B5]/30 text-[#0077B5] hover:bg-[#0077B5]/20"
-                  : onLinkedIn
-                  ? "bg-transparent border-[#0077B5]/30 text-[#0077B5] hover:bg-[#0077B5]/10"
-                  : "bg-transparent border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-600 cursor-not-allowed"
-              }`}
-            >
-              <Linkedin className="h-3.5 w-3.5" />
-              {blog.linkedinPost
-                ? "Edit LinkedIn Post"
-                : onLinkedIn
-                ? "Post to LinkedIn"
-                : blog.isPublished
-                ? "Connect LinkedIn to post"
-                : "Publish first to post"}
-            </button>
-          </div>
-        ) : (
-          <Link href={`/blog/${blog.slug}`} className="w-full group/link">
-            <div className="
-    w-full h-12 px-5 rounded-xl
-    bg-gradient-to-r from-blue-600 to-indigo-600
-    hover:from-blue-700 hover:to-indigo-700
-    text-white font-semibold text-sm
-    shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20
-    hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-blue-500/30
-    transition-all duration-300
-    flex items-center justify-center gap-2
-  ">
-              Read Article
-              <ArrowRight className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform duration-200" />
-            </div>
-          </Link>
-
-        )}
-      </CardFooter>
-    </Card>
+        {/* ── Hover shimmer overlay ─────────────────────────────── */}
+        <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{ background: "linear-gradient(135deg, rgba(79,70,229,0.03) 0%, transparent 60%)" }}
+        />
+      </article>
+    </Link>
   );
 }

@@ -214,7 +214,7 @@ function MetadataSection() {
       {/* Tags */}
       <div className="space-y-2">
         <Label>Tags *</Label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
@@ -225,8 +225,9 @@ function MetadataSection() {
               }
             }}
             placeholder="Add a tag and press Enter"
+            className="flex-1"
           />
-          <Button type="button" onClick={handleAddTag} variant="secondary">
+          <Button type="button" onClick={handleAddTag} variant="secondary" className="sm:w-auto w-full">
             Add
           </Button>
         </div>
@@ -251,7 +252,7 @@ function MetadataSection() {
       {/* Languages */}
       <div className="space-y-2">
         <Label>Programming Languages (optional)</Label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={languageInput}
             onChange={(e) => setLanguageInput(e.target.value)}
@@ -262,11 +263,13 @@ function MetadataSection() {
               }
             }}
             placeholder="e.g., JavaScript, Python"
+            className="flex-1"
           />
           <Button
             type="button"
             onClick={handleAddLanguage}
             variant="secondary"
+            className="sm:w-auto w-full"
           >
             Add
           </Button>
@@ -292,7 +295,7 @@ function MetadataSection() {
       {/* Frameworks */}
       <div className="space-y-2">
         <Label>Frameworks/Libraries (optional)</Label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={frameworkInput}
             onChange={(e) => setFrameworkInput(e.target.value)}
@@ -303,11 +306,13 @@ function MetadataSection() {
               }
             }}
             placeholder="e.g., React, Next.js"
+            className="flex-1"
           />
           <Button
             type="button"
             onClick={handleAddFramework}
             variant="secondary"
+            className="sm:w-auto w-full"
           >
             Add
           </Button>

@@ -109,16 +109,20 @@ export function EducationManager() {
                             <Plus className="mr-2 h-4 w-4" /> Add Education
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>Add Education</DialogTitle>
-                        </DialogHeader>
-                        <EducationForm
-                            onSubmit={handleCreateSubmit}
-                            isSubmitting={createEducation.isPending}
-                            onLogoUpload={setLogoUrl}
-                            logoUrl={logoUrl}
-                        />
+                    <DialogContent className="w-[95vw] max-w-xl p-0 flex flex-col max-h-[90vh]">
+                        <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+                            <DialogHeader>
+                                <DialogTitle>Add Education</DialogTitle>
+                            </DialogHeader>
+                        </div>
+                        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+                            <EducationForm
+                                onSubmit={handleCreateSubmit}
+                                isSubmitting={createEducation.isPending}
+                                onLogoUpload={setLogoUrl}
+                                logoUrl={logoUrl}
+                            />
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
@@ -154,35 +158,39 @@ export function EducationManager() {
 
             {/* Edit Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
-                <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>Edit Education</DialogTitle>
-                    </DialogHeader>
-                    <EducationForm
-                        education={selectedEducation || undefined}
-                        onSubmit={handleEditSubmit}
-                        isSubmitting={updateEducation.isPending}
-                        onLogoUpload={setLogoUrl}
-                        logoUrl={logoUrl}
-                    />
+                <DialogContent className="w-[95vw] max-w-xl p-0 flex flex-col max-h-[90vh]">
+                    <div className="flex-none px-6 pt-6 pb-4 border-b border-border">
+                        <DialogHeader>
+                            <DialogTitle>Edit Education</DialogTitle>
+                        </DialogHeader>
+                    </div>
+                    <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+                        <EducationForm
+                            education={selectedEducation || undefined}
+                            onSubmit={handleEditSubmit}
+                            isSubmitting={updateEducation.isPending}
+                            onLogoUpload={setLogoUrl}
+                            logoUrl={logoUrl}
+                        />
+                    </div>
                 </DialogContent>
             </Dialog>
 
             {/* Delete Alert */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={(open) => { setIsDeleteDialogOpen(open); if (!open) resetForm(); }}>
-                <AlertDialogContent>
+                <AlertDialogContent className="w-[95vw] max-w-md">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This will permanently delete this education entry.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
                             disabled={deleteEducation.isPending}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                         >
                             {deleteEducation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
                         </AlertDialogAction>

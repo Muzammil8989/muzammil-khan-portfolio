@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
     Select,
     SelectContent,
@@ -14,17 +13,16 @@ import {
 import { Search } from "lucide-react";
 
 interface BlogFilterProps {
-    allTags: string[];
     initialDifficulty?: string;
-    initialTag?: string;
     initialSearch?: string;
+    // kept for API compatibility but not used
+    allTags?: string[];
+    initialTag?: string;
 }
 
 export function BlogFilter({
-    allTags,
     initialDifficulty = "all",
-    initialTag = "",
-    initialSearch = ""
+    initialSearch = "",
 }: BlogFilterProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -33,6 +31,8 @@ export function BlogFilter({
 
     const updateFilters = (updates: Record<string, string | null>) => {
         const params = new URLSearchParams(searchParams.toString());
+        // drop tag param since we removed tag filtering
+        params.delete("tag");
 
         Object.entries(updates).forEach(([key, value]) => {
             if (value && value !== "all") {
@@ -49,7 +49,6 @@ export function BlogFilter({
 
     const handleSearchChange = (value: string) => {
         setSearchValue(value);
-        // Debounce search update (optional, but good for UX)
         const timeoutId = setTimeout(() => {
             updateFilters({ search: value });
         }, 500);
@@ -57,57 +56,37 @@ export function BlogFilter({
     };
 
     return (
-        <div className="space-y-4">
-            {/* Search Bar */}
-            <div className="relative max-w-2xl mx-auto">
-                <Search className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 ${isPending ? 'text-indigo-500 animate-pulse' : 'text-muted-foreground'}`} />
+        <div className="flex flex-col sm:flex-row items-center gap-3 max-w-2xl mx-auto w-full">
+            {/* Search */}
+            <div className="relative flex-1 w-full">
+                <Search
+                    className={`absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 ${
+                        isPending ? "text-indigo-500 animate-pulse" : "text-muted-foreground"
+                    }`}
+                />
                 <Input
-                    placeholder="Search blogs by title, tags, or content..."
+                    placeholder="Search articles…"
                     value={searchValue}
                     onChange={(e) => handleSearchChange(e.target.value)}
-                    className="pl-12 h-12 text-base"
+                    className="pl-10 h-11 text-sm"
                 />
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3 justify-center">
-                <Select
-                    value={initialDifficulty}
-                    onValueChange={(value) => updateFilters({ difficulty: value })}
-                >
-                    <SelectTrigger className="w-48">
-                        <SelectValue placeholder="Difficulty" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Levels</SelectItem>
-                        <SelectItem value="beginner">Beginner</SelectItem>
-                        <SelectItem value="intermediate">Intermediate</SelectItem>
-                        <SelectItem value="advanced">Advanced</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                {allTags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                        <Badge
-                            variant={!initialTag ? "default" : "outline"}
-                            className="cursor-pointer"
-                            onClick={() => updateFilters({ tag: null })}
-                        >
-                            All
-                        </Badge>
-                        {allTags.slice(0, 10).map((tag) => (
-                            <Badge
-                                key={tag}
-                                variant={initialTag === tag ? "default" : "outline"}
-                                className="cursor-pointer"
-                                onClick={() => updateFilters({ tag: tag === initialTag ? null : tag })}
-                            >
-                                #{tag}
-                            </Badge>
-                        ))}
-                    </div>
-                )}
-            </div>
+            {/* Difficulty */}
+            <Select
+                value={initialDifficulty}
+                onValueChange={(value) => updateFilters({ difficulty: value })}
+            >
+                <SelectTrigger className="w-full sm:w-40 h-11 shrink-0">
+                    <SelectValue placeholder="All Levels" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
     );
 }
