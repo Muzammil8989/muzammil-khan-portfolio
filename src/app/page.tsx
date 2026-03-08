@@ -15,7 +15,7 @@ import Image from "next/image";
 import Navbar from "@/components/layout/navbar";
 import { ContactSection } from "@/components/features/contact/contact-section";
 
-export const revalidate = 60; // ISR: revalidate every 60 seconds
+export const dynamic = "force-dynamic";
 
 interface AboutData {
   message: string;
