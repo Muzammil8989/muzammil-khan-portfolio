@@ -57,7 +57,7 @@ export default async function Page() {
           name={profile.name}
           description={profile.description}
           url={DATA.url}
-          image={profile.avatarUrl}
+          image={profile.avatarUrl ?? undefined}
           sameAs={sameAs as string[]}
         />
       )}

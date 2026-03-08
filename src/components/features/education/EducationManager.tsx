@@ -109,7 +109,7 @@ export function EducationManager() {
                             <Plus className="mr-2 h-4 w-4" /> Add Education
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Add Education</DialogTitle>
                         </DialogHeader>
@@ -154,7 +154,7 @@ export function EducationManager() {
 
             {/* Edit Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Education</DialogTitle>
                     </DialogHeader>

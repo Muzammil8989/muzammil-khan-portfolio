@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, use } from "react";
+import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 import {
   Select,
   SelectContent,
@@ -20,6 +24,451 @@ import { generateSlug } from "@/lib/blog-utils";
 import { toast } from "sonner";
 import { CodeBlockEditor } from "./code-block-editor";
 
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+
+// ─── Context ──────────────────────────────────────────────────────────────────
+
+interface BlogFormState {
+  formData: BlogInput;
+  tagInput: string;
+  languageInput: string;
+  frameworkInput: string;
+  resolvedTheme: string | undefined;
+}
+
+interface BlogFormActions {
+  setFormData: React.Dispatch<React.SetStateAction<BlogInput>>;
+  setTagInput: React.Dispatch<React.SetStateAction<string>>;
+  setLanguageInput: React.Dispatch<React.SetStateAction<string>>;
+  setFrameworkInput: React.Dispatch<React.SetStateAction<string>>;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+  handleSeoChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+  handleAddTag: () => void;
+  handleRemoveTag: (tag: string) => void;
+  handleAddLanguage: () => void;
+  handleRemoveLanguage: (lang: string) => void;
+  handleAddFramework: () => void;
+  handleRemoveFramework: (framework: string) => void;
+}
+
+const BlogFormCtx = createContext<{
+  state: BlogFormState;
+  actions: BlogFormActions;
+} | null>(null);
+
+function useBlogForm() {
+  const ctx = use(BlogFormCtx);
+  if (!ctx) throw new Error("useBlogForm must be used within BlogForm");
+  return ctx;
+}
+
+// ─── Section sub-components ───────────────────────────────────────────────────
+
+function BasicInfoSection() {
+  const { state, actions } = useBlogForm();
+  const { formData } = state;
+  const { handleChange } = actions;
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Basic Information</h3>
+
+      <div className="space-y-2">
+        <Label htmlFor="title">Title *</Label>
+        <Input
+          id="title"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+          placeholder="How to Build a Modern Web App with Next.js"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="slug">Slug *</Label>
+        <Input
+          id="slug"
+          name="slug"
+          value={formData.slug}
+          onChange={handleChange}
+          required
+          placeholder="how-to-build-modern-web-app-nextjs"
+        />
+        <p className="text-xs text-muted-foreground">
+          URL-friendly version (auto-generated from title)
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="excerpt">Excerpt *</Label>
+        <Textarea
+          id="excerpt"
+          name="excerpt"
+          value={formData.excerpt}
+          onChange={handleChange}
+          required
+          rows={2}
+          placeholder="A brief summary of your blog post (1-2 sentences)"
+          maxLength={300}
+        />
+        <p className="text-xs text-muted-foreground">
+          {formData.excerpt.length}/300 characters
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="author">Author</Label>
+        <Input
+          id="author"
+          name="author"
+          value={formData.author}
+          onChange={handleChange}
+          placeholder="Muhammad Muzammil Khan"
+        />
+      </div>
+    </div>
+  );
+}
+
+function ContentSection() {
+  const { state, actions } = useBlogForm();
+  const { formData, resolvedTheme } = state;
+  const { setFormData } = actions;
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Content</h3>
+
+      <div className="space-y-2">
+        <Label>Blog Content (Markdown) *</Label>
+        <div data-color-mode={resolvedTheme === "dark" ? "dark" : "light"}>
+          <MDEditor
+            value={formData.content}
+            onChange={(val) =>
+              setFormData((prev) => ({ ...prev, content: val ?? "" }))
+            }
+            height={480}
+            preview="live"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Live preview — write Markdown on the left, see it rendered on the
+          right
+        </p>
+      </div>
+
+      <CodeBlockEditor
+        codeBlocks={formData.codeBlocks || []}
+        onChange={(blocks) =>
+          setFormData((prev) => ({ ...prev, codeBlocks: blocks }))
+        }
+      />
+    </div>
+  );
+}
+
+function MetadataSection() {
+  const { state, actions } = useBlogForm();
+  const { formData, tagInput, languageInput, frameworkInput } = state;
+  const {
+    setFormData,
+    setTagInput,
+    setLanguageInput,
+    setFrameworkInput,
+    handleAddTag,
+    handleRemoveTag,
+    handleAddLanguage,
+    handleRemoveLanguage,
+    handleAddFramework,
+    handleRemoveFramework,
+  } = actions;
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Categories &amp; Tags</h3>
+
+      <div className="space-y-2">
+        <Label htmlFor="difficulty">Difficulty Level</Label>
+        <Select
+          value={formData.difficulty}
+          onValueChange={(
+            value: "beginner" | "intermediate" | "advanced",
+          ) => setFormData((prev) => ({ ...prev, difficulty: value }))}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="beginner">Beginner</SelectItem>
+            <SelectItem value="intermediate">Intermediate</SelectItem>
+            <SelectItem value="advanced">Advanced</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Tags */}
+      <div className="space-y-2">
+        <Label>Tags *</Label>
+        <div className="flex gap-2">
+          <Input
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddTag();
+              }
+            }}
+            placeholder="Add a tag and press Enter"
+          />
+          <Button type="button" onClick={handleAddTag} variant="secondary">
+            Add
+          </Button>
+        </div>
+        {formData.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {formData.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="pr-1">
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="ml-1 hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Languages */}
+      <div className="space-y-2">
+        <Label>Programming Languages (optional)</Label>
+        <div className="flex gap-2">
+          <Input
+            value={languageInput}
+            onChange={(e) => setLanguageInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddLanguage();
+              }
+            }}
+            placeholder="e.g., JavaScript, Python"
+          />
+          <Button
+            type="button"
+            onClick={handleAddLanguage}
+            variant="secondary"
+          >
+            Add
+          </Button>
+        </div>
+        {formData.languages && formData.languages.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {formData.languages.map((lang) => (
+              <Badge key={lang} variant="outline" className="pr-1">
+                {lang}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveLanguage(lang)}
+                  className="ml-1 hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Frameworks */}
+      <div className="space-y-2">
+        <Label>Frameworks/Libraries (optional)</Label>
+        <div className="flex gap-2">
+          <Input
+            value={frameworkInput}
+            onChange={(e) => setFrameworkInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddFramework();
+              }
+            }}
+            placeholder="e.g., React, Next.js"
+          />
+          <Button
+            type="button"
+            onClick={handleAddFramework}
+            variant="secondary"
+          >
+            Add
+          </Button>
+        </div>
+        {formData.frameworks && formData.frameworks.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {formData.frameworks.map((framework) => (
+              <Badge key={framework} variant="outline" className="pr-1">
+                {framework}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFramework(framework)}
+                  className="ml-1 hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SEOSection() {
+  const { state, actions } = useBlogForm();
+  const { formData } = state;
+  const { handleSeoChange } = actions;
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">SEO Settings (optional)</h3>
+
+      <div className="space-y-2">
+        <Label htmlFor="metaTitle">Meta Title</Label>
+        <Input
+          id="metaTitle"
+          name="metaTitle"
+          value={formData.seo?.metaTitle || ""}
+          onChange={handleSeoChange}
+          placeholder="Leave empty to use blog title"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="metaDescription">Meta Description</Label>
+        <Textarea
+          id="metaDescription"
+          name="metaDescription"
+          value={formData.seo?.metaDescription || ""}
+          onChange={handleSeoChange}
+          rows={3}
+          placeholder="Leave empty to use excerpt"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="canonicalUrl">Canonical URL</Label>
+        <Input
+          id="canonicalUrl"
+          name="canonicalUrl"
+          type="url"
+          value={formData.seo?.canonicalUrl || ""}
+          onChange={handleSeoChange}
+          placeholder="https://yoursite.com/blog/slug"
+        />
+      </div>
+    </div>
+  );
+}
+
+function PublishSection() {
+  const { state, actions } = useBlogForm();
+  const { formData } = state;
+  const { setFormData } = actions;
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Publishing</h3>
+
+      <div className="space-y-2">
+        <Label htmlFor="type">Blog Type</Label>
+        <Select
+          value={formData.type}
+          onValueChange={(
+            value:
+              | "Article"
+              | "Case Study"
+              | "Tutorial"
+              | "Deep Dive"
+              | "Quick Tip"
+              | "Guide",
+          ) => setFormData((prev) => ({ ...prev, type: value }))}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Article">Article</SelectItem>
+            <SelectItem value="Case Study">Case Study</SelectItem>
+            <SelectItem value="Tutorial">Tutorial</SelectItem>
+            <SelectItem value="Deep Dive">Deep Dive</SelectItem>
+            <SelectItem value="Quick Tip">Quick Tip</SelectItem>
+            <SelectItem value="Guide">Guide</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="isPublished">Publish Status</Label>
+        <Select
+          value={formData.isPublished ? "published" : "draft"}
+          onValueChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              isPublished: value === "published",
+              publishedAt:
+                value === "published" && !prev.publishedAt
+                  ? new Date().toISOString()
+                  : prev.publishedAt,
+            }))
+          }
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {formData.isPublished && (
+        <div className="space-y-2">
+          <Label htmlFor="publishedAt">Published Date</Label>
+          <Input
+            id="publishedAt"
+            name="publishedAt"
+            type="datetime-local"
+            value={
+              formData.publishedAt
+                ? new Date(formData.publishedAt).toISOString().slice(0, 16)
+                : ""
+            }
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                publishedAt: new Date(e.target.value).toISOString(),
+              }))
+            }
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main export ──────────────────────────────────────────────────────────────
+
 interface BlogFormProps {
   blog?: Blog;
   onSubmit: (data: BlogInput) => void;
@@ -27,6 +476,7 @@ interface BlogFormProps {
 }
 
 export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
+  const { resolvedTheme } = useTheme();
   const [formData, setFormData] = useState<BlogInput>({
     title: "",
     slug: "",
@@ -38,11 +488,7 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
     difficulty: "beginner",
     author: "Muhammad Muzammil Khan",
     tags: [],
-    seo: {
-      metaTitle: "",
-      metaDescription: "",
-      canonicalUrl: "",
-    },
+    seo: { metaTitle: "", metaDescription: "", canonicalUrl: "" },
     type: "Article",
     isPublished: false,
     publishedAt: "",
@@ -54,7 +500,6 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
   const [languageInput, setLanguageInput] = useState("");
   const [frameworkInput, setFrameworkInput] = useState("");
 
-  // Populate form when editing
   useEffect(() => {
     if (blog) {
       setFormData({
@@ -82,11 +527,9 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
     }
   }, [blog]);
 
-  // Auto-generate slug from title
   useEffect(() => {
     if (formData.title && !blog) {
-      const autoSlug = generateSlug(formData.title);
-      setFormData((prev) => ({ ...prev, slug: autoSlug }));
+      setFormData((prev) => ({ ...prev, slug: generateSlug(formData.title) }));
     }
   }, [formData.title, blog]);
 
@@ -101,13 +544,7 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      seo: {
-        ...prev.seo,
-        [name]: value,
-      },
-    }));
+    setFormData((prev) => ({ ...prev, seo: { ...prev.seo, [name]: value } }));
   };
 
   const handleAddTag = () => {
@@ -234,11 +671,11 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as any;
-    
-    const blogs = await BlogService.getAll({ 
-      status: status || "published" 
+
+    const blogs = await BlogService.getAll({
+      status: status || "published"
     });
-    
+
     return NextResponse.json({ success: true, data: blogs });
   } catch (error) {
     return NextResponse.json(
@@ -305,27 +742,22 @@ export function CodeBlock({ code, language, filename }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Client-side validation
     if (!formData.title.trim()) {
       toast.error("Title is required");
       return;
     }
-
     if (!formData.slug.trim()) {
       toast.error("Slug is required");
       return;
     }
-
     if (!formData.excerpt.trim()) {
       toast.error("Excerpt is required");
       return;
     }
-
     if (!formData.content.trim()) {
       toast.error("Content is required");
       return;
     }
-
     if (formData.tags.length === 0) {
       toast.error("At least one tag is required");
       return;
@@ -334,379 +766,57 @@ export function CodeBlock({ code, language, filename }) {
     onSubmit(formData);
   };
 
+  const ctx = {
+    state: { formData, tagInput, languageInput, frameworkInput, resolvedTheme },
+    actions: {
+      setFormData,
+      setTagInput,
+      setLanguageInput,
+      setFrameworkInput,
+      handleChange,
+      handleSeoChange,
+      handleAddTag,
+      handleRemoveTag,
+      handleAddLanguage,
+      handleRemoveLanguage,
+      handleAddFramework,
+      handleRemoveFramework,
+    },
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Fill Dummy Data Button - For Testing */}
-      {!blog && (
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleFillDummyData}
-            className="gap-2"
-          >
-            <span className="text-lg">🎲</span>
-            Fill Dummy Data (For Testing)
-          </Button>
-        </div>
-      )}
-
-      {/* Basic Information */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Basic Information</h3>
-
-        <div className="space-y-2">
-          <Label htmlFor="title">Title *</Label>
-          <Input
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            placeholder="How to Build a Modern Web App with Next.js"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="slug">Slug *</Label>
-          <Input
-            id="slug"
-            name="slug"
-            value={formData.slug}
-            onChange={handleChange}
-            required
-            placeholder="how-to-build-modern-web-app-nextjs"
-          />
-          <p className="text-xs text-muted-foreground">
-            URL-friendly version (auto-generated from title)
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="excerpt">Excerpt *</Label>
-          <Textarea
-            id="excerpt"
-            name="excerpt"
-            value={formData.excerpt}
-            onChange={handleChange}
-            required
-            rows={2}
-            placeholder="A brief summary of your blog post (1-2 sentences)"
-            maxLength={300}
-          />
-          <p className="text-xs text-muted-foreground">
-            {formData.excerpt.length}/300 characters
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="author">Author</Label>
-          <Input
-            id="author"
-            name="author"
-            value={formData.author}
-            onChange={handleChange}
-            placeholder="Muhammad Muzammil Khan"
-          />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Content</h3>
-
-        <div className="space-y-2">
-          <Label htmlFor="content">Blog Content (Markdown) *</Label>
-          <Textarea
-            id="content"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            required
-            rows={15}
-            placeholder="Write your blog content in Markdown format..."
-            className="font-mono"
-          />
-          <p className="text-xs text-muted-foreground">
-            Supports Markdown syntax
-          </p>
-        </div>
-
-        {/* Code Blocks */}
-        <CodeBlockEditor
-          codeBlocks={formData.codeBlocks || []}
-          onChange={(blocks) =>
-            setFormData((prev) => ({ ...prev, codeBlocks: blocks }))
-          }
-        />
-      </div>
-
-      {/* Categories & Tags */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Categories & Tags</h3>
-
-        <div className="space-y-2">
-          <Label htmlFor="difficulty">Difficulty Level</Label>
-          <Select
-            value={formData.difficulty}
-            onValueChange={(value: "beginner" | "intermediate" | "advanced") =>
-              setFormData((prev) => ({ ...prev, difficulty: value }))
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="beginner">Beginner</SelectItem>
-              <SelectItem value="intermediate">Intermediate</SelectItem>
-              <SelectItem value="advanced">Advanced</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Tags */}
-        <div className="space-y-2">
-          <Label>Tags *</Label>
-          <div className="flex gap-2">
-            <Input
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAddTag();
-                }
-              }}
-              placeholder="Add a tag and press Enter"
-            />
-            <Button type="button" onClick={handleAddTag} variant="secondary">
-              Add
-            </Button>
-          </div>
-          {formData.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="pr-1">
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(tag)}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Languages */}
-        <div className="space-y-2">
-          <Label>Programming Languages (optional)</Label>
-          <div className="flex gap-2">
-            <Input
-              value={languageInput}
-              onChange={(e) => setLanguageInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAddLanguage();
-                }
-              }}
-              placeholder="e.g., JavaScript, Python"
-            />
+    <BlogFormCtx.Provider value={ctx}>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {!blog && (
+          <div className="flex justify-end">
             <Button
               type="button"
-              onClick={handleAddLanguage}
-              variant="secondary"
+              variant="outline"
+              onClick={handleFillDummyData}
+              className="gap-2"
             >
-              Add
+              <span className="text-lg">🎲</span>
+              Fill Dummy Data (For Testing)
             </Button>
-          </div>
-          {formData.languages && formData.languages.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.languages.map((lang) => (
-                <Badge key={lang} variant="outline" className="pr-1">
-                  {lang}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveLanguage(lang)}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Frameworks */}
-        <div className="space-y-2">
-          <Label>Frameworks/Libraries (optional)</Label>
-          <div className="flex gap-2">
-            <Input
-              value={frameworkInput}
-              onChange={(e) => setFrameworkInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAddFramework();
-                }
-              }}
-              placeholder="e.g., React, Next.js"
-            />
-            <Button
-              type="button"
-              onClick={handleAddFramework}
-              variant="secondary"
-            >
-              Add
-            </Button>
-          </div>
-          {formData.frameworks && formData.frameworks.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.frameworks.map((framework) => (
-                <Badge key={framework} variant="outline" className="pr-1">
-                  {framework}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFramework(framework)}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* SEO Settings */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">SEO Settings (optional)</h3>
-
-        <div className="space-y-2">
-          <Label htmlFor="metaTitle">Meta Title</Label>
-          <Input
-            id="metaTitle"
-            name="metaTitle"
-            value={formData.seo?.metaTitle || ""}
-            onChange={handleSeoChange}
-            placeholder="Leave empty to use blog title"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="metaDescription">Meta Description</Label>
-          <Textarea
-            id="metaDescription"
-            name="metaDescription"
-            value={formData.seo?.metaDescription || ""}
-            onChange={handleSeoChange}
-            rows={3}
-            placeholder="Leave empty to use excerpt"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="canonicalUrl">Canonical URL</Label>
-          <Input
-            id="canonicalUrl"
-            name="canonicalUrl"
-            type="url"
-            value={formData.seo?.canonicalUrl || ""}
-            onChange={handleSeoChange}
-            placeholder="https://yoursite.com/blog/slug"
-          />
-        </div>
-      </div>
-
-      {/* Publishing Options */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Publishing</h3>
-
-        <div className="space-y-2">
-          <Label htmlFor="type">Blog Type</Label>
-          <Select
-            value={formData.type}
-            onValueChange={(value: "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide") =>
-              setFormData((prev) => ({ ...prev, type: value }))
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Article">Article</SelectItem>
-              <SelectItem value="Case Study">Case Study</SelectItem>
-              <SelectItem value="Tutorial">Tutorial</SelectItem>
-              <SelectItem value="Deep Dive">Deep Dive</SelectItem>
-              <SelectItem value="Quick Tip">Quick Tip</SelectItem>
-              <SelectItem value="Guide">Guide</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="isPublished">Publish Status</Label>
-          <Select
-            value={formData.isPublished ? "published" : "draft"}
-            onValueChange={(value) =>
-              setFormData((prev) => ({
-                ...prev,
-                isPublished: value === "published",
-                publishedAt: value === "published" && !prev.publishedAt
-                  ? new Date().toISOString()
-                  : prev.publishedAt
-              }))
-            }
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {formData.isPublished && (
-          <div className="space-y-2">
-            <Label htmlFor="publishedAt">Published Date</Label>
-            <Input
-              id="publishedAt"
-              name="publishedAt"
-              type="datetime-local"
-              value={
-                formData.publishedAt
-                  ? new Date(formData.publishedAt).toISOString().slice(0, 16)
-                  : ""
-              }
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  publishedAt: new Date(e.target.value).toISOString(),
-                }))
-              }
-            />
           </div>
         )}
-      </div>
 
-      {/* Submit Button */}
-      <div className="flex gap-2 pt-4">
-        <Button type="submit" disabled={isSubmitting} className="flex-1">
-          {isSubmitting
-            ? "Processing..."
-            : blog
-              ? "Update Blog"
-              : "Create Blog"}
-        </Button>
-      </div>
-    </form>
+        <BasicInfoSection />
+        <ContentSection />
+        <MetadataSection />
+        <SEOSection />
+        <PublishSection />
+
+        <div className="flex gap-2 pt-4">
+          <Button type="submit" disabled={isSubmitting} className="flex-1">
+            {isSubmitting
+              ? "Processing..."
+              : blog
+                ? "Update Blog"
+                : "Create Blog"}
+          </Button>
+        </div>
+      </form>
+    </BlogFormCtx.Provider>
   );
 }

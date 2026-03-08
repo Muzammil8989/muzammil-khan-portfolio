@@ -118,7 +118,7 @@ export function ProfileManager() {
                                 <Plus className="mr-2 h-4 w-4" /> Create Profile
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
+                        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle>Create New Profile</DialogTitle>
                             </DialogHeader>
@@ -168,7 +168,7 @@ export function ProfileManager() {
             {/* Edit Dialog */}
             {isMounted && (
                 <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
-                    <DialogContent className="sm:max-w-[600px]">
+                    <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Edit Profile</DialogTitle>
                         </DialogHeader>

@@ -1,22 +1,23 @@
 // app/api/test-connection/route.ts
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    await connectToDatabase();
+    // A lightweight ping — count blogs without fetching any data
+    await prisma.$runCommandRaw({ ping: 1 });
     return NextResponse.json({
       status: "success",
-      message: "MongoDB connected successfully",
+      message: "Database connected successfully",
     });
   } catch (error: any) {
     return NextResponse.json(
       {
         status: "error",
-        message: "MongoDB connection failed",
+        message: "Database connection failed",
         error: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

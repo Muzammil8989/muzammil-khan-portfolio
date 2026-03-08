@@ -61,7 +61,10 @@ export default function Navbar() {
   }, []);
 
   const handleDownload = () => {
-    const href = resumeUrl || "/Muzammil Khan CV.pdf";
+    const raw = resumeUrl || "/Muzammil Khan CV.pdf";
+    const href = raw.includes("cloudinary.com")
+      ? raw.replace("/upload/", "/upload/fl_attachment/")
+      : raw;
     const link = document.createElement("a");
     link.href = href;
     link.download = "Muhammad_Muzammil_Khan_Resume.pdf";

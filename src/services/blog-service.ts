@@ -1,10 +1,8 @@
-import { connectToDatabase } from "@/lib/mongodb";
+import { prisma, toMongoDoc } from "@/lib/prisma";
 import { BlogInput } from "@/core/validation/blog";
-import { ObjectId } from "mongodb";
 import { AppError } from "@/core/errors/AppError";
 import { calculateReadingTime, generateSlug } from "@/lib/blog-utils";
-
-const COLLECTION_NAME = "blogs";
+import { Prisma } from "@prisma/client";
 
 // Re-export for backwards compatibility
 export { generateSlug };
@@ -14,115 +12,78 @@ export class BlogService {
    * Get all blogs with optional filtering
    */
   static async getAll(filters?: {
-    type?: "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide";
+    type?: string;
     isPublished?: boolean;
     tag?: string;
     difficulty?: "beginner" | "intermediate" | "advanced";
   }) {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
+    const where: Prisma.BlogWhereInput = {};
 
-    const query: any = {};
+    if (filters?.type) where.type = filters.type;
+    if (filters?.isPublished !== undefined) where.isPublished = filters.isPublished;
+    if (filters?.tag) where.tags = { has: filters.tag };
+    if (filters?.difficulty) where.difficulty = filters.difficulty;
 
-    if (filters?.type) {
-      query.type = filters.type;
-    }
+    const blogs = await prisma.blog.findMany({
+      where,
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    });
 
-    if (filters?.isPublished !== undefined) {
-      query.isPublished = filters.isPublished;
-    }
-
-    if (filters?.tag) {
-      query.tags = { $in: [filters.tag] };
-    }
-
-    if (filters?.difficulty) {
-      query.difficulty = filters.difficulty;
-    }
-
-    const blogs = await collection
-      .find(query)
-      .sort({ publishedAt: -1, createdAt: -1 })
-      .toArray();
-
-    return blogs.map((blog) => ({
-      ...blog,
-      _id: blog._id.toString(),
-    }));
+    return blogs.map(toMongoDoc);
   }
 
   /**
-   * Get blog by slug
+   * Get blog by slug (published only)
    */
   static async getBySlug(slug: string) {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    const blog = await collection.findOne({ slug });
+    const blog = await prisma.blog.findUnique({
+      where: { slug, isPublished: true },
+    });
 
     if (!blog) {
       throw new AppError("NOT_FOUND", "Blog post not found", 404);
     }
 
-    return {
-      ...blog,
-      _id: blog._id.toString(),
-    };
+    return toMongoDoc(blog);
   }
 
   /**
    * Get blog by ID
    */
   static async getById(id: string) {
-    if (!ObjectId.isValid(id)) {
-      throw new AppError(
-        "BAD_REQUEST",
-        "Invalid blog ID format",
-        400
-      );
-    }
-
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    const blog = await collection.findOne({ _id: new ObjectId(id) });
+    const blog = await prisma.blog.findUnique({ where: { id } }).catch((e: any) => {
+      if (e?.code === "P2023") {
+        throw new AppError("BAD_REQUEST", "Invalid blog ID format", 400);
+      }
+      throw e;
+    });
 
     if (!blog) {
-      throw new AppError(
-        "NOT_FOUND",
-        "Blog post not found",
-        404
-      );
+      throw new AppError("NOT_FOUND", "Blog post not found", 404);
     }
 
-    return {
-      ...blog,
-      _id: blog._id.toString(),
-    };
+    return toMongoDoc(blog);
   }
 
   /**
-   * Search blogs by title or content
+   * Search blogs by title, content, or tags (regex, case-insensitive via findRaw)
    */
   static async search(query: string) {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    const blogs = await collection
-      .find({
+    const raw = await prisma.blog.findRaw({
+      filter: {
         $or: [
           { title: { $regex: query, $options: "i" } },
           { content: { $regex: query, $options: "i" } },
-          { tags: { $in: [new RegExp(query, "i")] } },
+          { tags: { $elemMatch: { $regex: query, $options: "i" } } },
         ],
         isPublished: true,
-      })
-      .sort({ publishedAt: -1 })
-      .toArray();
+      },
+      options: { sort: { publishedAt: -1 } },
+    });
 
-    return blogs.map((blog) => ({
-      ...blog,
-      _id: blog._id.toString(),
+    return (raw as unknown as any[]).map((doc) => ({
+      ...doc,
+      _id: (doc._id as any)?.$oid ?? doc._id,
     }));
   }
 
@@ -130,112 +91,74 @@ export class BlogService {
    * Create new blog post
    */
   static async create(data: BlogInput) {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    // Calculate reading time
-    const readingTime = calculateReadingTime(data.content);
-
-    // Check if slug already exists
-    const existingBlog = await collection.findOne({ slug: data.slug });
-    if (existingBlog) {
-      throw new AppError(
-        "BAD_REQUEST",
-        "A blog with this slug already exists",
-        400
-      );
+    const existing = await prisma.blog.findUnique({ where: { slug: data.slug } });
+    if (existing) {
+      throw new AppError("BAD_REQUEST", "A blog with this slug already exists", 400);
     }
 
     const now = new Date().toISOString();
+    const readingTime = calculateReadingTime(data.content);
 
-    const blogData = {
-      ...data,
-      readingTime,
-      createdAt: now,
-      updatedAt: now,
-      likes: 0,
-      version: 1,
-    };
+    const blog = await prisma.blog.create({
+      data: {
+        ...data,
+        readingTime,
+        createdAt: now,
+        updatedAt: now,
+        likes: 0,
+        version: 1,
+        likedBy: [],
+      },
+    });
 
-    const result = await collection.insertOne(blogData);
-
-    return {
-      _id: result.insertedId.toString(),
-      ...blogData,
-    };
+    return toMongoDoc(blog);
   }
 
   /**
    * Update existing blog post
    */
   static async update(id: string, data: Partial<BlogInput>) {
-    if (!ObjectId.isValid(id)) {
-      throw new AppError(
-        "BAD_REQUEST",
-        "Invalid blog ID format",
-        400
-      );
-    }
+    const updateData: Record<string, unknown> = { ...data };
 
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    // If content is being updated, recalculate reading time
-    const { $inc: _, ...rest } = data as any;
-    const updateData: any = { ...rest };
     if (data.content) {
       updateData.readingTime = calculateReadingTime(data.content);
     }
-
     updateData.updatedAt = new Date().toISOString();
 
-    const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      {
-        $set: updateData,
-        $inc: { version: 1 },
-      },
-      { returnDocument: "after" }
-    );
+    const blog = await prisma.blog
+      .update({
+        where: { id },
+        data: {
+          ...(updateData as Prisma.BlogUpdateInput),
+          version: { increment: 1 },
+        },
+      })
+      .catch((e: any) => {
+        if (e?.code === "P2025") {
+          throw new AppError("NOT_FOUND", "Blog post not found", 404);
+        }
+        if (e?.code === "P2023") {
+          throw new AppError("BAD_REQUEST", "Invalid blog ID format", 400);
+        }
+        throw e;
+      });
 
-    if (!result) {
-      throw new AppError(
-        "NOT_FOUND",
-        "Blog post not found",
-        404
-      );
-    }
-
-    return {
-      ...result,
-      _id: result._id.toString(),
-    };
+    return toMongoDoc(blog);
   }
 
   /**
    * Delete blog post
    */
   static async delete(id: string) {
-    if (!ObjectId.isValid(id)) {
-      throw new AppError(
-        "BAD_REQUEST",
-        "Invalid blog ID format",
-        400
-      );
-    }
-
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    const result = await collection.deleteOne({ _id: new ObjectId(id) });
-
-    if (result.deletedCount === 0) {
-      throw new AppError(
-        "NOT_FOUND",
-        "Blog post not found",
-        404
-      );
-    }
+    await prisma.blog.delete({ where: { id } }).catch((e: any) => {
+      if (e?.code === "P2025") {
+        throw new AppError("NOT_FOUND", "Blog post not found", 404);
+      }
+      if (e?.code === "P2023") {
+        throw new AppError("BAD_REQUEST", "Invalid blog ID format", 400);
+      }
+      throw e;
+    });
 
     return { success: true };
   }
@@ -244,112 +167,87 @@ export class BlogService {
    * Publish a draft blog
    */
   static async publish(id: string) {
-    if (!ObjectId.isValid(id)) {
-      throw new AppError(
-        "BAD_REQUEST",
-        "Invalid blog ID format",
-        400
-      );
-    }
-
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      {
-        $set: {
+    const blog = await prisma.blog
+      .update({
+        where: { id },
+        data: {
           isPublished: true,
           publishedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          version: { increment: 1 },
         },
-        $inc: { version: 1 }
-      },
-      { returnDocument: "after" }
-    );
+      })
+      .catch((e: any) => {
+        if (e?.code === "P2025") {
+          throw new AppError("NOT_FOUND", "Blog post not found", 404);
+        }
+        if (e?.code === "P2023") {
+          throw new AppError("BAD_REQUEST", "Invalid blog ID format", 400);
+        }
+        throw e;
+      });
 
-    if (!result) {
-      throw new AppError(
-        "NOT_FOUND",
-        "Blog post not found",
-        404
-      );
-    }
-
-    return {
-      ...result,
-      _id: result._id.toString(),
-    };
+    return toMongoDoc(blog);
   }
 
   /**
-   * Increment likes count with user tracking (IP-based)
+   * Increment likes with IP-based deduplication
    */
   static async incrementLikes(id: string, userIdentifier: string) {
-    if (!ObjectId.isValid(id)) {
-      throw new AppError("BAD_REQUEST", "Invalid blog ID format", 400);
-    }
+    const alreadyLiked = await prisma.blog
+      .findFirst({ where: { id, likedBy: { has: userIdentifier } } })
+      .catch((e: any) => {
+        if (e?.code === "P2023") {
+          throw new AppError("BAD_REQUEST", "Invalid blog ID format", 400);
+        }
+        throw e;
+      });
 
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
-    // Check if user has already liked this blog
-    const blog = await collection.findOne({
-      _id: new ObjectId(id),
-      likedBy: { $in: [userIdentifier] },
-    });
-
-    if (blog) {
+    if (alreadyLiked) {
       throw new AppError("BAD_REQUEST", "You have already liked this blog", 400);
     }
 
-    // Add identifier and increment likes
-    const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      {
-        $inc: { likes: 1 },
-        $addToSet: { likedBy: userIdentifier },
-      },
-      { returnDocument: "after" }
-    );
+    const blog = await prisma.blog
+      .update({
+        where: { id },
+        data: {
+          likes: { increment: 1 },
+          likedBy: { push: userIdentifier },
+        },
+      })
+      .catch((e: any) => {
+        if (e?.code === "P2025") {
+          throw new AppError("NOT_FOUND", "Blog post not found", 404);
+        }
+        throw e;
+      });
 
-    if (!result) {
-      throw new AppError("NOT_FOUND", "Blog post not found", 404);
-    }
-
-    return {
-      ...result,
-      _id: result._id.toString(),
-    };
+    return toMongoDoc(blog);
   }
 
   /**
-   * Get all unique tags
+   * Get all unique tags from published blogs
    */
-  static async getAllTags() {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
+  static async getAllTags(): Promise<string[]> {
+    const result = await prisma.$runCommandRaw({
+      distinct: "blogs",
+      key: "tags",
+      query: { isPublished: true },
+    });
 
-    const tags = await collection.distinct("tags", { isPublished: true });
-    return tags;
+    return ((result as any).values ?? []) as string[];
   }
 
   /**
-   * Get featured blogs (most viewed or liked)
+   * Get featured blogs (most liked)
    */
-  static async getFeatured(limit: number = 3) {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
+  static async getFeatured(limit = 3) {
+    const blogs = await prisma.blog.findMany({
+      where: { isPublished: true },
+      orderBy: [{ likes: "desc" }, { createdAt: "desc" }],
+      take: limit,
+    });
 
-    const blogs = await collection
-      .find({ isPublished: true })
-      .sort({ likes: -1, createdAt: -1 })
-      .limit(limit)
-      .toArray();
-
-    return blogs.map((blog) => ({
-      ...blog,
-      _id: blog._id.toString(),
-    }));
+    return blogs.map(toMongoDoc);
   }
 }

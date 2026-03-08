@@ -1,76 +1,49 @@
 // src/services/work-service.ts
-import { connectToDatabase } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { prisma, toMongoDoc } from "@/lib/prisma";
 import { AppError } from "@/core/errors/AppError";
 import { WorkExperienceInput } from "@/core/validation/work";
 
 export class WorkService {
-    private static collection = "work_experiences";
+  static async getAll() {
+    const docs = await prisma.workExperience.findMany({
+      orderBy: { start: "desc" },
+    });
+    return docs.map(toMongoDoc);
+  }
 
-    static async getAll() {
-        const { db } = await connectToDatabase();
-        return db.collection(this.collection).find().sort({ start: -1 }).toArray();
-    }
+  static async create(data: WorkExperienceInput) {
+    const result = await prisma.workExperience.create({ data });
+    return toMongoDoc(result);
+  }
 
-    static async create(data: WorkExperienceInput) {
-        const { db } = await connectToDatabase();
-        const id = new ObjectId();
-        const now = new Date();
-        const newDoc = {
-            ...data,
-            _id: id,
-            createdAt: now,
-            updatedAt: now,
-        };
-        await db.collection(this.collection).insertOne(newDoc);
-        return {
-            ...data,
-            _id: id.toString(),
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString(),
-        };
-    }
+  static async update(id: string, data: Partial<WorkExperienceInput>) {
+    const { id: _discarded, ...rest } = data as any;
 
-    static async update(id: string, data: Partial<WorkExperienceInput>) {
-        if (!ObjectId.isValid(id)) {
-            throw new AppError("BAD_REQUEST", "Invalid ID format", 400);
+    const result = await prisma.workExperience
+      .update({ where: { id }, data: rest })
+      .catch((e: any) => {
+        if (e?.code === "P2025") {
+          throw new AppError("NOT_FOUND", "Work experience not found", 404);
         }
-
-        const { db } = await connectToDatabase();
-        const { id: _, ...updateData } = data;
-
-        const result = await db.collection(this.collection).findOneAndUpdate(
-            { _id: new ObjectId(id) },
-            {
-                $set: { ...updateData, updatedAt: new Date() }
-            },
-            { returnDocument: "after" }
-        );
-
-        if (!result) {
-            throw new AppError("NOT_FOUND", "Work experience not found", 404);
+        if (e?.code === "P2023") {
+          throw new AppError("BAD_REQUEST", "Invalid ID format", 400);
         }
+        throw e;
+      });
 
-        return {
-            ...result,
-            _id: result._id.toString(),
-        };
-    }
+    return toMongoDoc(result);
+  }
 
-    static async delete(id: string) {
-        if (!ObjectId.isValid(id)) {
-            throw new AppError("BAD_REQUEST", "Invalid ID format", 400);
-        }
-
-        const { db } = await connectToDatabase();
-        const result = await db.collection(this.collection).deleteOne({
-            _id: new ObjectId(id),
-        });
-
-        if (result.deletedCount === 0) {
-            throw new AppError("NOT_FOUND", "Work experience not found", 404);
-        }
-
-        return { success: true };
-    }
+  static async delete(id: string) {
+    await prisma.workExperience.delete({ where: { id } }).catch((e: any) => {
+      if (e?.code === "P2025") {
+        throw new AppError("NOT_FOUND", "Work experience not found", 404);
+      }
+      if (e?.code === "P2023") {
+        throw new AppError("BAD_REQUEST", "Invalid ID format", 400);
+      }
+      throw e;
+    });
+    return { success: true };
+  }
 }

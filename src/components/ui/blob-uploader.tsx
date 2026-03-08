@@ -3,6 +3,46 @@
 import React, { useCallback, useId } from "react";
 import { useBlobUpload } from "@/app/hooks/useBlobUpload";
 
+// ── Upload limits (matching Cloudinary plan) ──────────────────────────────────
+const LIMITS = {
+  image:  { bytes: 10  * 1024 * 1024, label: "10 MB",  maxMp: 25_000_000, maxMpLabel: "25 MP" },
+  video:  { bytes: 100 * 1024 * 1024, label: "100 MB" },
+  raw:    { bytes: 10  * 1024 * 1024, label: "10 MB"  },
+} as const;
+
+async function validateFile(file: File): Promise<string | null> {
+  const { type, size } = file;
+
+  if (type.startsWith("image/")) {
+    if (size > LIMITS.image.bytes)
+      return `Image too large. Max size is ${LIMITS.image.label}.`;
+
+    // Check megapixels
+    const mp: number = await new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img.width * img.height); };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(0); };
+      img.src = url;
+    });
+    if (mp > LIMITS.image.maxMp)
+      return `Image resolution too high. Max is ${LIMITS.image.maxMpLabel} (${(mp / 1_000_000).toFixed(1)} MP detected).`;
+
+    return null;
+  }
+
+  if (type.startsWith("video/")) {
+    if (size > LIMITS.video.bytes)
+      return `Video too large. Max size is ${LIMITS.video.label}.`;
+    return null;
+  }
+
+  // PDF / raw
+  if (size > LIMITS.raw.bytes)
+    return `File too large. Max size is ${LIMITS.raw.label}.`;
+  return null;
+}
+
 interface UploadResult {
   secure_url: string;
   public_id: string;
@@ -34,13 +74,24 @@ export const BlobUploader: React.FC<BlobUploaderProps> = ({
   buttonText = "Upload",
   loadingText = "Uploading...",
 }) => {
-  const { upload, loading, error } = useBlobUpload();
+  const { upload, loading, error: uploadError } = useBlobUpload();
   const uid = useId();
+  const [validationError, setValidationError] = React.useState<string | null>(null);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
+
+      setValidationError(null);
+
+      const err = await validateFile(file);
+      if (err) {
+        setValidationError(err);
+        if (onError) onError(err);
+        e.target.value = "";
+        return;
+      }
 
       try {
         const response = await upload(file, folder);
@@ -48,16 +99,15 @@ export const BlobUploader: React.FC<BlobUploaderProps> = ({
           onSuccess(response);
         }
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Upload failed";
+        const errorMessage = err instanceof Error ? err.message : "Upload failed";
         console.error("Upload error:", errorMessage);
-        if (onError) {
-          onError(errorMessage);
-        }
+        if (onError) onError(errorMessage);
       }
     },
     [upload, folder, onSuccess, onError]
   );
+
+  const displayError = validationError || (typeof uploadError === "string" ? uploadError : uploadError ? "Upload failed" : null);
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -88,10 +138,8 @@ export const BlobUploader: React.FC<BlobUploaderProps> = ({
         </div>
       </label>
 
-      {error && (
-        <p className="text-sm text-red-500">
-          {typeof error === "string" ? error : "Upload failed"}
-        </p>
+      {displayError && (
+        <p className="text-sm text-red-500">{displayError}</p>
       )}
     </div>
   );

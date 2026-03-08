@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+// ── Composite Types (embedded documents — not separate collections) ────────────
+
+type CodeBlock {
+  language         String
+  code             String
+  filename         String?
+  highlightedLines Int[]
+}
+
+type BlogSeo {
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+}
+
+type LinkedinPostMeta {
+  postId     String
+  postUrl    String
+  postedAt   String
+  imageCount Int
+}
+
+type ProjectLink {
+  type String
+  href String
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
+enum Difficulty {
+  beginner
+  intermediate
+  advanced
+}
+
+// ── Models ────────────────────────────────────────────────────────────────────
+
+model Blog {
+  id           String             @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  slug         String             @unique
+  excerpt      String
+  content      String
+  codeBlocks   CodeBlock[]
+  languages    String[]
+  frameworks   String[]
+  difficulty   Difficulty
+  author       String             @default("Muhammad Muzammil Khan")
+  tags         String[]
+  seo          BlogSeo?
+  // "Article" | "Case Study" | "Tutorial" | "Deep Dive" | "Quick Tip" | "Guide"
+  // Stored as plain string to preserve multi-word values in existing data
+  type         String
+  isPublished  Boolean            @default(false)
+  publishedAt  String?
+  likes        Int                @default(0)
+  likedBy      String[]
+  readingTime  Int?
+  version      Int                @default(1)
+  // Stored as ISO strings in existing data — kept as String for compatibility
+  createdAt    String
+  updatedAt    String
+  linkedinPost LinkedinPostMeta?
+
+  @@map("blogs")
+}
+
+model Profile {
+  id          String    @id @map("_id") // plain string — set explicitly from user ID (token.sub)
+  name        String
+  description String
+  avatarUrl   String?
+  initials    String?
+  resumeUrl   String?
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  @@map("profiles")
+}
+
+model WorkExperience {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  company     String
+  href        String?
+  badges      String[]
+  location    String
+  title       String
+  logoUrl     String?
+  start       String
+  end         String?
+  description String
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  @@map("work_experiences")
+}
+
+model Education {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  school    String
+  href      String?
+  degree    String
+  logoUrl   String?
+  start     String
+  end       String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@map("educations")
+}
+
+model Project {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  dates        String
+  active       Boolean       @default(true)
+  description  String
+  technologies String[]
+  links        ProjectLink[]
+  image        String?
+  projectUrl   String?
+  githubUrl    String?
+  caseStudyUrl String?
+  createdAt    DateTime?     @default(now())
+  updatedAt    DateTime?     @updatedAt
+
+  @@map("projects")
+}
+
+model Skill {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  category  String    @default("General")
+  icon      String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@map("skills")
+}
+
+model About {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  message   String
+  updatedAt DateTime? @updatedAt
+
+  @@map("about")
+}
+
+model Metadata {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  key       String    @unique
+  value     Json
+  updatedAt DateTime? @updatedAt
+
+  @@map("metadata")
+}
+
+model OtpCode {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  hashedOtp String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("cl_otps")
+}
+
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  email    String? @unique
+  name     String?
+  username String?
+  password String? // bcrypt hash (admin only)
+
+  @@map("cl_users")
+}
+
+model LinkedinToken {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @unique
+  accessToken  String
+  personId     String
+  name         String
+  profileImage String?
+  expiresAt    DateTime
+  connectedAt  DateTime @default(now())
+
+  @@map("linkedin_tokens")
+}

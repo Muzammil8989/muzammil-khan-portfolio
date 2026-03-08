@@ -109,7 +109,7 @@ export function WorkManager() {
                             <Plus className="mr-2 h-4 w-4" /> Add Experience
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Create Work Experience</DialogTitle>
                         </DialogHeader>
@@ -154,7 +154,7 @@ export function WorkManager() {
 
             {/* Edit Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={(open) => { setIsEditDialogOpen(open); if (!open) resetForm(); }}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Experience</DialogTitle>
                     </DialogHeader>

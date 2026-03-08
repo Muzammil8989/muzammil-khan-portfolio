@@ -72,7 +72,7 @@ export function AboutManager() {
                                 <Plus className="mr-2 h-4 w-4" /> Create About
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
+                        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle>Create About Section</DialogTitle>
                             </DialogHeader>
@@ -104,7 +104,7 @@ export function AboutManager() {
 
             {/* Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[600px]">
+                <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit About Section</DialogTitle>
                     </DialogHeader>
