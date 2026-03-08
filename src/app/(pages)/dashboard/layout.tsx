@@ -1,7 +1,5 @@
-"use client";
+import { DashboardShell } from "./dashboard-client";
 
-import { ReactNode } from "react";
-
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <DashboardShell>{children}</DashboardShell>;
 }

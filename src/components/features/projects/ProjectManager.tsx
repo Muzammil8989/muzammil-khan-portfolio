@@ -94,7 +94,7 @@ export function ProjectManager() {
                             <Plus className="mr-2 h-4 w-4" /> Create Project
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Add New Project</DialogTitle>
                         </DialogHeader>
@@ -136,7 +136,7 @@ export function ProjectManager() {
 
             {/* Edit Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="w-[95vw] max-w-[95vw] max-h-[95vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Project</DialogTitle>
                     </DialogHeader>

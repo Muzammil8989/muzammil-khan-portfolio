@@ -27,6 +27,12 @@ export interface Blog {
   version: number;
   createdAt: string;
   updatedAt: string;
+  linkedinPost?: {
+    postId: string;
+    postUrl: string;
+    postedAt: string;
+    imageCount: number;
+  };
 }
 
 /**

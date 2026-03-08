@@ -15,6 +15,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "File is required" }, { status: 400 });
     }
 
+    // ── Size limits ───────────────────────────────────────────────────────────
+    const MB = 1024 * 1024;
+    if (file.type.startsWith("image/") && file.size > 10 * MB) {
+      return NextResponse.json({ error: "Image exceeds 10 MB limit." }, { status: 413 });
+    }
+    if (file.type.startsWith("video/") && file.size > 100 * MB) {
+      return NextResponse.json({ error: "Video exceeds 100 MB limit." }, { status: 413 });
+    }
+    if (!file.type.startsWith("image/") && !file.type.startsWith("video/") && file.size > 10 * MB) {
+      return NextResponse.json({ error: "File exceeds 10 MB limit." }, { status: 413 });
+    }
+
     const timestamp = Math.round(Date.now() / 1000);
 
     // Sign the request: params must be alphabetical, no api_key/file/signature

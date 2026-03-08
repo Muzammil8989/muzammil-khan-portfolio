@@ -1,26 +1,12 @@
-import { AuthOptions, DefaultSession } from "next-auth";
+import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectToDatabase } from "@/lib/mongodb";
-import { compare } from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { verifyOtp, MAX_OTP_ATTEMPTS } from "@/lib/otp";
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      username: string;
-    } & DefaultSession["user"];
-  }
-
-  interface User {
-    id: string;
-    username: string;
-  }
-}
-
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
+const otpSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().length(6).regex(/^\d{6}$/),
 });
 
 export const authOptions: AuthOptions = {
@@ -28,29 +14,77 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "email" },
+        otp: { label: "OTP", type: "text" },
       },
       async authorize(credentials) {
-        const validated = loginSchema.safeParse(credentials);
-        if (!validated.success) {
+        const parsed = otpSchema.safeParse(credentials);
+        if (!parsed.success) {
           throw new Error("Invalid input");
         }
 
-        const { db } = await connectToDatabase();
-        const user = await db.collection("cl_users").findOne({
-          username: validated.data.username.trim(),
+        const { email, otp } = parsed.data;
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // 1. Find the pending OTP record
+        const otpRecord = await prisma.otpCode.findUnique({
+          where: { email: normalizedEmail },
         });
 
-        if (!user || !(await compare(validated.data.password.trim(), user.password))) {
-          throw new Error("Invalid credentials");
+        if (!otpRecord) {
+          throw new Error("No verification code found. Please request a new one.");
+        }
+
+        // 2. Check expiry
+        if (new Date(otpRecord.expiresAt) < new Date()) {
+          await prisma.otpCode.delete({ where: { email: normalizedEmail } });
+          throw new Error("Verification code has expired. Please request a new one.");
+        }
+
+        // 3. Check max attempts
+        if (otpRecord.attempts >= MAX_OTP_ATTEMPTS) {
+          await prisma.otpCode.delete({ where: { email: normalizedEmail } });
+          throw new Error("Too many failed attempts. Please request a new code.");
+        }
+
+        // 4. Verify OTP (timing-safe)
+        if (!verifyOtp(otp, otpRecord.hashedOtp)) {
+          // Increment failed attempts
+          await prisma.otpCode.update({
+            where: { email: normalizedEmail },
+            data: { attempts: { increment: 1 } },
+          });
+
+          const remaining = MAX_OTP_ATTEMPTS - (otpRecord.attempts + 1);
+          throw new Error(
+            remaining > 0
+              ? `Invalid code. ${remaining} attempt${remaining === 1 ? "" : "s"} remaining.`
+              : "Too many failed attempts. Please request a new code.",
+          );
+        }
+
+        // 5. OTP valid — delete it (single use)
+        await prisma.otpCode.delete({ where: { email: normalizedEmail } });
+
+        // 6. Fetch and return the user
+        // Support lookup by email OR username (legacy accounts may not have email field)
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: normalizedEmail },
+              { username: normalizedEmail },
+            ],
+          },
+        });
+
+        if (!user) {
+          throw new Error("User not found.");
         }
 
         return {
-          id: user._id.toString(),
+          id: user.id,
           name: user.name || user.username,
-          username: user.username,
-          email: user.email,
+          email: user.email ?? normalizedEmail,
         };
       },
     }),
@@ -62,22 +96,19 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.username = token.username as string;
       }
       return session;
     },
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
-

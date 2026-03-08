@@ -1,37 +1,37 @@
 // src/services/about-service.ts
-import { connectToDatabase } from "@/lib/mongodb";
+import { prisma, toMongoDoc } from "@/lib/prisma";
 import { AppError } from "@/core/errors/AppError";
 import { AboutInput } from "@/core/validation/about";
 
 export class AboutService {
-    private static collection = "about";
+  static async get() {
+    const doc = await prisma.about.findFirst();
+    return doc ? toMongoDoc(doc) : null;
+  }
 
-    static async get() {
-        const { db } = await connectToDatabase();
-        return db.collection(this.collection).findOne({});
+  static async upsert(data: AboutInput) {
+    const existing = await prisma.about.findFirst();
+
+    if (existing) {
+      const result = await prisma.about.update({
+        where: { id: existing.id },
+        data: { message: data.message },
+      });
+      return toMongoDoc(result);
     }
 
-    static async upsert(data: AboutInput) {
-        const { db } = await connectToDatabase();
-        const result = await db.collection(this.collection).findOneAndUpdate(
-            {},
-            {
-                $set: {
-                    message: data.message,
-                    updatedAt: new Date()
-                }
-            },
-            { upsert: true, returnDocument: "after" }
-        );
-        return result;
-    }
+    const result = await prisma.about.create({
+      data: { message: data.message },
+    });
+    return toMongoDoc(result);
+  }
 
-    static async delete() {
-        const { db } = await connectToDatabase();
-        const result = await db.collection(this.collection).deleteOne({});
-        if (result.deletedCount === 0) {
-            throw new AppError("NOT_FOUND", "About section not found", 404);
-        }
-        return { success: true };
+  static async delete() {
+    const existing = await prisma.about.findFirst();
+    if (!existing) {
+      throw new AppError("NOT_FOUND", "About section not found", 404);
     }
+    await prisma.about.delete({ where: { id: existing.id } });
+    return { success: true };
+  }
 }

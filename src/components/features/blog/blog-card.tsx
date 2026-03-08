@@ -4,17 +4,18 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Heart, Clock, ArrowRight } from "lucide-react";
+import { Edit, Trash2, Heart, Clock, ArrowRight, Linkedin } from "lucide-react";
 import { Blog } from "@/services/blog";
 import { useLikeBlog } from "@/app/hooks/useBlogs";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import { getTypeColorClasses, getDifficultyColorClasses, getPublishStatusColorClasses } from "@/lib/blog-colors";
+import { getTypeColorClasses, getPublishStatusColorClasses } from "@/lib/blog-colors";
 
 interface BlogCardProps {
   blog: Blog;
   onEdit?: (blog: Blog) => void;
   onDelete?: (blog: Blog) => void;
+  onLinkedIn?: (blog: Blog) => void;
   showActions?: boolean;
 }
 
@@ -22,6 +23,7 @@ export function BlogCard({
   blog,
   onEdit,
   onDelete,
+  onLinkedIn,
   showActions = true,
 }: BlogCardProps) {
   const queryClient = useQueryClient();
@@ -72,7 +74,7 @@ export function BlogCard({
   return (
     <Card className="group relative h-full flex flex-col overflow-hidden rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 backdrop-blur-sm shadow-lg dark:shadow-2xl transition-all duration-300 hover:shadow-xl dark:hover:shadow-[0_20px_50px_0_rgba(0,0,0,0.5)] hover:border-slate-300 dark:hover:border-slate-700 hover:-translate-y-1">
 
-      <CardHeader className="p-7 pb-0 space-y-6">
+      <CardHeader className={showActions ? "p-4 pb-0 space-y-3" : "p-7 pb-0 space-y-6"}>
         <div className="flex items-center justify-between">
           {showActions ? (
             <div className="flex gap-2">
@@ -116,7 +118,7 @@ export function BlogCard({
 
         <div className="space-y-3">
           {showActions ? (
-            <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight leading-tight">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight line-clamp-2">
               {blog.title}
             </h3>
           ) : (
@@ -126,14 +128,14 @@ export function BlogCard({
               </h3>
             </Link>
           )}
-          <p className="text-[15px] text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed font-light">
+          <p className={showActions ? "text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-light" : "text-[15px] text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed font-light"}>
             {blog.excerpt}
           </p>
         </div>
       </CardHeader>
 
-      <CardContent className="p-7 flex-grow flex flex-col justify-end">
-        <div className="space-y-5">
+      <CardContent className={`${showActions ? "p-4" : "p-7"} flex-grow flex flex-col justify-end`}>
+        <div className={showActions ? "space-y-2" : "space-y-5"}>
           {/* Tags with more professional look */}
           {blog.tags && blog.tags.length > 0 && (
             <div className="flex flex-wrap gap-x-3 gap-y-2">
@@ -149,7 +151,7 @@ export function BlogCard({
           {/* Languages & Frameworks */}
           <div className="flex flex-wrap gap-2">
             {[...(blog.languages || []), ...(blog.frameworks || [])].slice(0, 4).map((item) => (
-              <span key={item} className="px-3 py-1 rounded-lg bg-slate-50 dark:bg-white/5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10 group-hover:border-blue-200 dark:group-hover:border-blue-500/20 transition-colors">
+              <span key={item} className={`${showActions ? "px-2 py-0.5" : "px-3 py-1"} rounded-lg bg-slate-50 dark:bg-white/5 text-[10px] font-semibold text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10 group-hover:border-blue-200 dark:group-hover:border-blue-500/20 transition-colors`}>
                 {item}
               </span>
             ))}
@@ -157,26 +159,51 @@ export function BlogCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-7 pt-0 relative z-10">
+      <CardFooter className={`${showActions ? "p-4 pt-0" : "p-7 pt-0"} relative z-10`}>
         {showActions ? (
-          <div className="flex items-center gap-3 w-full">
-            <Button
-              size="sm"
-              onClick={() => onEdit?.(blog)}
-              className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-bold text-xs h-10"
+          <div className="flex flex-col gap-2 w-full">
+            {/* Main actions row */}
+            <div className="flex items-center gap-2 w-full">
+              <Button
+                size="sm"
+                onClick={() => onEdit?.(blog)}
+                className="flex-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-bold text-[11px] h-8"
+              >
+                <Edit className="mr-1.5 h-3.5 w-3.5" />
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => onDelete?.(blog)}
+                className="flex-1 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 border-none transition-all font-bold text-[11px] h-8"
+              >
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                Delete
+              </Button>
+            </div>
+
+            {/* LinkedIn button row */}
+            <button
+              onClick={() => onLinkedIn?.(blog)}
+              disabled={!onLinkedIn}
+              className={`w-full flex items-center justify-center gap-2 h-7 rounded-lg text-[11px] font-bold transition-all duration-200 border ${
+                blog.linkedinPost
+                  ? "bg-[#0077B5]/10 border-[#0077B5]/30 text-[#0077B5] hover:bg-[#0077B5]/20"
+                  : onLinkedIn
+                  ? "bg-transparent border-[#0077B5]/30 text-[#0077B5] hover:bg-[#0077B5]/10"
+                  : "bg-transparent border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+              }`}
             >
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => onDelete?.(blog)}
-              className="flex-1 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 border-none transition-all font-bold text-xs h-10"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </Button>
+              <Linkedin className="h-3.5 w-3.5" />
+              {blog.linkedinPost
+                ? "Edit LinkedIn Post"
+                : onLinkedIn
+                ? "Post to LinkedIn"
+                : blog.isPublished
+                ? "Connect LinkedIn to post"
+                : "Publish first to post"}
+            </button>
           </div>
         ) : (
           <Link href={`/blog/${blog.slug}`} className="w-full group/link">

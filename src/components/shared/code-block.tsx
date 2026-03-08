@@ -1,9 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import dynamic from "next/dynamic";
 import { vscDarkPlus, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Button } from "@/components/ui/button";
+
+const SyntaxHighlighter = dynamic(
+  () => import("react-syntax-highlighter").then((m) => ({ default: m.Prism })),
+  {
+    ssr: false,
+    loading: () => (
+      <pre className="p-6 text-sm font-mono text-foreground/60 overflow-x-auto whitespace-pre">
+        Loading…
+      </pre>
+    ),
+  }
+);
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";

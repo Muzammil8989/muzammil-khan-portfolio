@@ -37,7 +37,11 @@ export const ProfileCard = ({
         <p className="line-clamp-3">{profile.description}</p>
         <div className="mt-3 flex justify-center">
           {profile.resumeUrl ? (
-            <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer">
+            <a
+              href={profile.resumeUrl.includes("cloudinary.com") ? profile.resumeUrl.replace("/upload/", "/upload/fl_attachment/") : profile.resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Badge variant="secondary" className="gap-1 text-xs cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40">
                 <FileText className="h-3 w-3" />
                 Resume uploaded

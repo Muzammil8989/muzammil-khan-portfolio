@@ -224,7 +224,7 @@ export const ProfileForm = ({
           <div className="mt-2 flex items-center gap-3 p-2 rounded-md bg-muted border">
             <FileText className="h-5 w-5 text-blue-500 shrink-0" />
             <a
-              href={formData.resumeUrl}
+              href={formData.resumeUrl.includes("cloudinary.com") ? formData.resumeUrl.replace("/upload/", "/upload/fl_attachment/") : formData.resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-blue-600 dark:text-blue-400 underline truncate flex-1"
