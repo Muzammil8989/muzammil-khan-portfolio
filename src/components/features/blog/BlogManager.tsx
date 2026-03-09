@@ -11,16 +11,23 @@ import { BlogManagerContent } from "./blog-manager-empty";
 import { BlogManagerDialogs } from "./blog-manager-dialogs";
 
 // ─── Main export ──────────────────────────────────────────────────────────────
-// Suspense wraps provider so useSearchParams is safe in Next.js App Router
 export function BlogManager() {
   return (
     <Suspense fallback={<BlogManagerSkeleton />}>
       <BlogManagerProvider>
-        <div className="flex flex-col flex-1 min-h-0 gap-6">
+        <div className="flex flex-col gap-6">
           <BlogManagerHeader />
           <BlogManagerStats />
-          <BlogManagerLinkedIn />
-          <BlogManagerFilters />
+
+          {/* LinkedIn + Search/Filters — one combined toolbar */}
+          <div className="rounded-xl border border-border bg-card/60 backdrop-blur-sm px-4 py-3 shadow-sm">
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              <BlogManagerLinkedIn />
+              <div className="w-px h-8 bg-border hidden sm:block shrink-0" />
+              <BlogManagerFilters />
+            </div>
+          </div>
+
           <BlogManagerContent />
           <BlogManagerDialogs />
         </div>

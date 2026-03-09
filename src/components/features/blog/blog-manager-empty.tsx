@@ -51,7 +51,7 @@ export function BlogManagerContent() {
 
   if (filteredBlogs.length === 0) return <BlogManagerEmpty />;
   return (
-    <div className="flex-1 min-h-0 overflow-hidden">
+    <div className="w-full">
       <BlogManagerTable />
     </div>
   );
