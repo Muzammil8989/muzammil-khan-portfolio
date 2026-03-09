@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { ContactSchema } from "@/core/validation/contact";
 import { apiWrapper } from "@/lib/api-utils";
 import { AppError } from "@/core/errors/AppError";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 /**
  * Basic HTML escaping to prevent user input from breaking your email HTML.
@@ -23,6 +24,13 @@ function safeTrim(s?: string) {
 
 export async function POST(req: NextRequest) {
   return apiWrapper(async () => {
+    // Rate limit: 5 submissions per 10 minutes per IP
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : "anonymous";
+    if (!checkRateLimit(`contact:${ip}`, 5, 10 * 60 * 1000)) {
+      throw new AppError("TOO_MANY_REQUESTS", "Too many requests. Please try again later.", 429);
+    }
+
     const body = await req.json();
     const validated = ContactSchema.parse(body);
 

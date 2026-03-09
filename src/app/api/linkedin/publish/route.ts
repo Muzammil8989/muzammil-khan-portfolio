@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error("LinkedIn publish error:", err);
     return NextResponse.json(
-      { success: false, error: err.message || "Failed to publish to LinkedIn" },
+      { success: false, error: "Failed to publish to LinkedIn" },
       { status: 500 },
     );
   }

@@ -5,7 +5,8 @@ export type ErrorCode =
     | "BAD_REQUEST"
     | "NOT_FOUND"
     | "INTERNAL_SERVER_ERROR"
-    | "VALIDATION_ERROR";
+    | "VALIDATION_ERROR"
+    | "TOO_MANY_REQUESTS";
 
 export class AppError extends Error {
     constructor(

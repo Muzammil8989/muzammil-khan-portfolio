@@ -13,6 +13,7 @@ import { DATA } from "@/data/resume";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import { ContactSection } from "@/components/features/contact/contact-section";
 
 export const dynamic = "force-dynamic";
@@ -322,12 +323,7 @@ export default async function Page() {
       {/* Navigation Dock */}
       <Navbar />
 
-      {/* Footer */}
-      <footer className="text-center py-20 border-t border-slate-100 dark:border-white/10 dark:bg-black/10">
-        <p className="text-slate-400 dark:text-slate-400 font-light text-sm">
-          © {new Date().getFullYear()} {profile?.name?.replace(' Khan', '') || 'Muhammad Muzammil'}
-        </p>
-      </footer>
+      <Footer />
     </main>
   );
 }

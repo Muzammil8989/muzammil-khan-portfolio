@@ -1,3 +1,4 @@
+import Footer from "@/components/layout/footer";
 import { BlogService } from "@/services/blog-service";
 import { ProfileService } from "@/services/profile-service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -400,19 +401,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
       <Navbar />
 
-      <footer className="text-center py-24 border-t border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/30">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="h-12 w-12 rounded-2xl bg-[#FFB902]/20 border border-[#FFB902]/30 flex items-center justify-center text-[#FFB902] mx-auto mb-6">
-            <BookOpen className="h-6 w-6" />
-          </div>
-          <p className="text-slate-400 dark:text-slate-500 font-medium text-sm tracking-widest uppercase">
-            End of Transmission
-          </p>
-          <p className="text-xs text-slate-300 dark:text-slate-600 mt-4 italic">
-            Thoughtfully crafted by Muhammad Muzammil
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

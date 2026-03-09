@@ -38,10 +38,13 @@ export async function GET(request: NextRequest) {
       return transformBlog(blog);
     }
 
-    // Search blogs
+    // Search blogs (max query length + capped results)
     if (search) {
+      if (search.length > 100) {
+        throw new AppError("BAD_REQUEST", "Search query too long", 400);
+      }
       const blogs = await BlogService.search(search);
-      return blogs.map(transformBlog);
+      return blogs.slice(0, 50).map(transformBlog);
     }
 
     // Get all blogs with filters
@@ -111,6 +114,10 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
+
+    // Strip null enum values (old DB docs may have null; partial update should skip them)
+    if (body.difficulty == null) delete body.difficulty;
+    if (body.type == null) delete body.type;
 
     // Validate partial data
     const validatedData = BlogSchema.partial().parse(body);
