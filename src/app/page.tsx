@@ -15,6 +15,7 @@ import Image from "next/image";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { ContactSection } from "@/components/features/contact/contact-section";
+import { SkillBadges } from "@/components/features/skills/SkillBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -172,32 +173,7 @@ export default async function Page() {
             </h2>
           </div>
           <div className="md:col-span-2">
-            <div className="flex flex-wrap gap-3">
-              {skillsData.map((skill: string) => {
-                const colorMap: Record<string, string> = {
-                  'React.js': 'bg-blue-500',
-                  'React': 'bg-blue-500',
-                  'Next.js': 'bg-black',
-                  'Node.js': 'bg-green-500',
-                  'JavaScript': 'bg-yellow-400',
-                  'TypeScript': 'bg-blue-400',
-                  'Tailwind CSS': 'bg-indigo-500',
-                  'Docker': 'bg-orange-500',
-                  'Prisma': 'bg-purple-500',
-                };
-                const dotColor = colorMap[skill] || 'bg-slate-500';
-
-                return (
-                  <span
-                    key={skill}
-                    className="px-5 py-2.5 rounded-2xl bg-white dark:bg-transparent border border-slate-100 dark:border-white/10 shadow-sm text-slate-600 dark:text-white font-medium flex items-center gap-2 hover:shadow-md dark:hover:scale-105 transition-all glass-card"
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${dotColor} dark:shadow-[0_0_10px_currentColor]`}></span>
-                    {skill}
-                  </span>
-                );
-              })}
-            </div>
+            <SkillBadges skills={skillsData} />
           </div>
         </section>
       </div>
