@@ -47,7 +47,7 @@ export const EducationCard = ({
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-lg md:text-xl font-semibold text-center text-blue-600 hover:underline"
+            className="text-lg md:text-xl font-semibold text-center hover:underline" style={{ color: "#FFB902" }}
           >
             {school}
           </a>

@@ -39,7 +39,7 @@ export const WorkExperienceCard = ({
             href={work.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-lg md:text-xl font-semibold text-center text-blue-600 hover:underline"
+            className="text-lg md:text-xl font-semibold text-center hover:underline" style={{ color: "#FFB902" }}
           >
             {work.company}
           </a>
@@ -71,7 +71,7 @@ export const WorkExperienceCard = ({
           variant="outline"
           size="sm"
           onClick={() => onEdit(work)}
-          className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300"
+          className="flex-1 font-bold transition-opacity hover:opacity-85" style={{ background: "#FFB902", color: "#04061a" }}
         >
           <Edit className="mr-2 h-4 w-4" />
           Edit

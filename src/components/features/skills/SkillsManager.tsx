@@ -52,7 +52,7 @@ export function SkillsManager() {
             <div className="bg-white/50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm space-y-4">
                 <div>
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
-                        <Sparkles className="size-5 text-blue-500" />
+                        <Sparkles className="size-5" style={{ color: "#FFB902" }} />
                         Tech Stack & Skills
                     </h2>
                     <p className="text-sm text-gray-500 dark:text-slate-400">Manage the technologies you use. Press Enter to add a skill.</p>
@@ -66,7 +66,7 @@ export function SkillsManager() {
                         placeholder="Add a skill (e.g. Docker, Rust, GSAP)"
                         className="flex-1"
                     />
-                    <Button onClick={addSkill} className="bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
+                    <Button onClick={addSkill} className="font-bold transition-opacity hover:opacity-85 shadow-md" style={{ background: "#FFB902", color: "#04061a" }}>
                         <Plus className="size-4" />
                     </Button>
                 </div>
@@ -93,7 +93,7 @@ export function SkillsManager() {
                 <Button
                     onClick={handleSave}
                     disabled={updateSkills.isPending || JSON.stringify(skills) === JSON.stringify(initialSkills)}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 min-w-[140px]"
+                    className="font-bold transition-opacity hover:opacity-85 shadow-md min-w-[140px]" style={{ background: "#FFB902", color: "#04061a" }}
                 >
                     {updateSkills.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : <Save className="size-4 mr-2" />}
                     Save Changes

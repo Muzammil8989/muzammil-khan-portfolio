@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ContactSchema, type ContactInput } from "@/core/validation/contact";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -50,6 +49,10 @@ export function ContactForm() {
     }
   };
 
+  const inputClass =
+    "transition-all duration-200 bg-transparent border text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus-visible:ring-1 focus-visible:ring-[#FFB902] focus-visible:border-[#FFB902]";
+  const inputStyle = { borderColor: "rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -59,13 +62,14 @@ export function ContactForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Your Name</FormLabel>
+                <FormLabel className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>Your Name</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="John Doe"
                     {...field}
                     disabled={isSubmitting}
-                    className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
+                    className={inputClass}
+                    style={inputStyle}
                   />
                 </FormControl>
                 <FormMessage />
@@ -78,14 +82,15 @@ export function ContactForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Email Address</FormLabel>
+                <FormLabel className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>Email Address</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
                     placeholder="john@example.com"
                     {...field}
                     disabled={isSubmitting}
-                    className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
+                    className={inputClass}
+                    style={inputStyle}
                   />
                 </FormControl>
                 <FormMessage />
@@ -99,13 +104,14 @@ export function ContactForm() {
           name="subject"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Subject</FormLabel>
+              <FormLabel className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>Subject</FormLabel>
               <FormControl>
                 <Input
                   placeholder="Project inquiry, collaboration, or just say hi!"
                   {...field}
                   disabled={isSubmitting}
-                  className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
+                  className={inputClass}
+                  style={inputStyle}
                 />
               </FormControl>
               <FormMessage />
@@ -118,11 +124,12 @@ export function ContactForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Message</FormLabel>
+              <FormLabel className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>Message</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Tell me about your project, ideas, or how we can collaborate..."
-                  className="min-h-[180px] resize-none bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-blue-500 focus:ring-indigo-500/20 dark:focus:ring-blue-500/20 transition-all"
+                  className={`min-h-[180px] resize-none ${inputClass}`}
+                  style={inputStyle}
                   {...field}
                   disabled={isSubmitting}
                 />
@@ -132,25 +139,26 @@ export function ContactForm() {
           )}
         />
 
-        <Button
+        <button
           type="submit"
-          className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-blue-500/30 dark:shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-blue-500/30 transition-all duration-300"
           disabled={isSubmitting}
+          className="w-full h-12 rounded-[12px] text-[14px] font-black flex items-center justify-center gap-2 transition-opacity duration-200 hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ background: "#FFB902", color: "#04061a" }}
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
               Sending your message...
             </>
           ) : (
             <>
-              <Send className="mr-2 h-5 w-5" />
+              <Send className="h-4 w-4" />
               Send Message
             </>
           )}
-        </Button>
+        </button>
 
-        <p className="text-xs text-center text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-center" style={{ color: "var(--text-tertiary)" }}>
           I typically respond within 24-48 hours. Looking forward to connecting!
         </p>
       </form>

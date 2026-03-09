@@ -42,7 +42,7 @@ export const ProfileCard = ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Badge variant="secondary" className="gap-1 text-xs cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40">
+              <Badge variant="secondary" className="gap-1 text-xs cursor-pointer hover:bg-[rgba(255,185,2,0.12)]">
                 <FileText className="h-3 w-3" />
                 Resume uploaded
               </Badge>
@@ -59,7 +59,8 @@ export const ProfileCard = ({
         <Button
           size="sm"
           onClick={() => onEdit(profile)}
-          className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300"
+          className="flex-1 font-bold transition-opacity hover:opacity-85"
+          style={{ background: "#FFB902", color: "#04061a" }}
         >
           <Edit className="mr-2 h-4 w-4" />
           Edit

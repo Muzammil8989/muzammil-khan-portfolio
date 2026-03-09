@@ -111,7 +111,7 @@ export default async function Page() {
               delay={200}
               className="text-slate-600 dark:text-slate-200 leading-relaxed text-lg font-light"
               emphasizeKeywords={highlightList}
-              emphasizeClassName="font-semibold text-slate-900 dark:text-blue-400 underline decoration-indigo-600 dark:decoration-blue-400 decoration-2 underline-offset-4"
+              emphasizeClassName="font-semibold text-[#FFB902] decoration-[#FFB902] underline decoration-2 underline-offset-4"
             />
           </div>
         </section>

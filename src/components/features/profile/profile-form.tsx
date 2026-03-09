@@ -222,12 +222,12 @@ export const ProfileForm = ({
         />
         {formData.resumeUrl && (
           <div className="mt-2 flex items-center gap-3 p-2 rounded-md bg-muted border">
-            <FileText className="h-5 w-5 text-blue-500 shrink-0" />
+            <FileText className="h-5 w-5 shrink-0" style={{ color: "#FFB902" }} />
             <a
               href={formData.resumeUrl.includes("cloudinary.com") ? formData.resumeUrl.replace("/upload/", "/upload/fl_attachment/") : formData.resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-blue-600 dark:text-blue-400 underline truncate flex-1"
+              className="text-sm underline truncate flex-1" style={{ color: "#FFB902" }}
             >
               {formData.resumeUrl.split("/").pop() || "resume.pdf"}
             </a>
@@ -249,7 +249,7 @@ export const ProfileForm = ({
       </div>
 
       {/* Submit */}
-      <Button type="submit" disabled={isSubmitting} className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
+      <Button type="submit" disabled={isSubmitting} className="flex-1 font-bold transition-opacity hover:opacity-85" style={{ background: "#FFB902", color: "#04061a" }}>
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

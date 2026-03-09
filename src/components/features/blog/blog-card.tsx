@@ -162,35 +162,37 @@ export function BlogCard({ blog, cardNumber }: BlogCardProps) {
         )}
 
         {/* Footer: level bars + read button */}
-        <div className="flex items-center justify-between mt-auto">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-[3px]">
-              {[1, 2, 3].map((n) => (
-                <div
-                  key={n}
-                  className="w-[18px] h-1 rounded-sm transition-colors duration-200"
-                  style={{ background: n <= bars ? "#FFB902" : "rgba(255,255,255,0.1)" }}
-                />
-              ))}
+        <div className="mt-auto pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-[3px]">
+                {[1, 2, 3].map((n) => (
+                  <div
+                    key={n}
+                    className="w-[18px] h-1 rounded-sm transition-colors duration-200"
+                    style={{ background: n <= bars ? "#FFB902" : "rgba(255,255,255,0.1)" }}
+                  />
+                ))}
+              </div>
+              <span className="text-[11px] font-semibold capitalize" style={{ color: "var(--text-secondary)" }}>
+                {blog.difficulty}
+              </span>
             </div>
-            <span className="text-[11px] font-semibold capitalize" style={{ color: "var(--text-secondary)" }}>
-              {blog.difficulty}
+
+            <span
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] text-[12px] font-bold
+                transition-all duration-200
+                group-hover:bg-[#FFB902] group-hover:text-[#04061a] group-hover:border-[#FFB902]"
+              style={{
+                background: "rgba(255,185,2,0.1)",
+                border: "1px solid rgba(255,185,2,0.25)",
+                color: "#FFB902",
+              }}
+            >
+              Read
+              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
             </span>
           </div>
-
-          <span
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] text-[12px] font-bold
-              transition-all duration-200
-              group-hover:bg-[#FFB902] group-hover:text-[#04061a] group-hover:border-[#FFB902]"
-            style={{
-              background: "rgba(255,185,2,0.1)",
-              border: "1px solid rgba(255,185,2,0.25)",
-              color: "#FFB902",
-            }}
-          >
-            Read
-            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
-          </span>
         </div>
       </article>
     </Link>

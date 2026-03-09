@@ -4,7 +4,6 @@ import { useMemo, useCallback, useRef, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
@@ -276,7 +275,7 @@ export function BlogManagerProvider({ children }: { children: React.ReactNode })
                   {blog.readingTime || 5} min
                 </span>
                 {blog.tags?.slice(0, 2).map((tag) => (
-                  <span key={tag} className="text-blue-500/60 hidden sm:inline">
+                  <span key={tag} className="hidden sm:inline" style={{ color: "rgba(255,185,2,0.6)" }}>
                     #{tag}
                   </span>
                 ))}
@@ -498,7 +497,7 @@ export function BlogManagerProvider({ children }: { children: React.ReactNode })
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 text-muted-foreground hover:text-blue-500"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-[#FFB902]"
                     onClick={() => handleEditRow(blog)}
                   >
                     <Edit className="h-3.5 w-3.5" />

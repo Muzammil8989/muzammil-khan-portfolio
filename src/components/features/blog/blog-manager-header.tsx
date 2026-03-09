@@ -25,8 +25,8 @@ export function BlogManagerHeader() {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div className="flex items-center gap-3">
-        <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-md shadow-indigo-500/20 shrink-0">
-          <BookOpen className="w-5 h-5 text-white" />
+        <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl shrink-0" style={{ background: "#FFB902" }}>
+          <BookOpen className="w-5 h-5" style={{ color: "#04061a" }} />
         </div>
         <div>
           <h2 className="text-2xl font-black tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
@@ -42,7 +42,10 @@ export function BlogManagerHeader() {
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogTrigger asChild>
-          <Button className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all w-full sm:w-auto font-semibold">
+          <Button
+            className="gap-2 w-full sm:w-auto font-bold transition-opacity hover:opacity-85"
+            style={{ background: "#FFB902", color: "#04061a" }}
+          >
             <Plus className="h-4 w-4" />
             New Post
           </Button>

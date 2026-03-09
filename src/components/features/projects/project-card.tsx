@@ -38,7 +38,7 @@ export const ProjectCard = ({
             </div>
 
             <CardHeader className="p-5 pb-2">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors uppercase tracking-tight">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:opacity-80 transition-opacity uppercase tracking-tight">
                     {project.title}
                 </h3>
                 <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
@@ -66,7 +66,7 @@ export const ProjectCard = ({
                 <Button
                     size="sm"
                     onClick={() => onEdit(project)}
-                    className="flex-1 bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300 font-semibold"
+                    className="flex-1 font-bold transition-opacity hover:opacity-85 shadow-md" style={{ background: "#FFB902", color: "#04061a" }}
                 >
                     <Edit className="mr-2 h-4 w-4" />
                     Edit
