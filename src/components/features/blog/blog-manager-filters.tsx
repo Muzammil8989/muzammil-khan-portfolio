@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Filter, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,10 +21,10 @@ export function BlogManagerFilters() {
   const hasFilters = searchQuery || typeFilter !== "all" || publishFilter !== "all";
 
   return (
-    <div className="rounded-xl border border-border bg-card/60 backdrop-blur-sm px-4 py-3.5 shadow-sm">
-      <div className="flex flex-col sm:flex-row gap-2.5">
+    <div className="flex flex-col gap-2 flex-1 min-w-0">
+      <div className="flex flex-col sm:flex-row gap-2">
         {/* Search */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             placeholder="Search by title, tags, content…"
@@ -42,11 +42,10 @@ export function BlogManagerFilters() {
           )}
         </div>
 
-        {/* Filters row */}
-        <div className="flex gap-2">
+        {/* Dropdowns */}
+        <div className="flex gap-2 shrink-0">
           <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
-            <SelectTrigger className="w-full sm:w-36 h-9 bg-background border-border/60 text-sm">
-              <Filter className="h-3 w-3 mr-1.5 text-muted-foreground shrink-0" />
+            <SelectTrigger className="w-32 h-9 bg-background border-border/60 text-sm">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -61,7 +60,7 @@ export function BlogManagerFilters() {
           </Select>
 
           <Select value={publishFilter} onValueChange={(v: any) => setPublishFilter(v)}>
-            <SelectTrigger className="w-full sm:w-32 h-9 bg-background border-border/60 text-sm">
+            <SelectTrigger className="w-28 h-9 bg-background border-border/60 text-sm">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -90,7 +89,7 @@ export function BlogManagerFilters() {
       </div>
 
       {hasFilters && (
-        <p className="text-[11px] text-muted-foreground mt-2.5 font-medium">
+        <p className="text-[11px] text-muted-foreground font-medium">
           Showing{" "}
           <span className="text-foreground font-semibold">{filteredBlogs.length}</span> of{" "}
           <span className="text-foreground font-semibold">{blogsArray.length}</span> posts

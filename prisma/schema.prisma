@@ -75,7 +75,7 @@ model Blog {
 }
 
 model Profile {
-  id          String    @id @map("_id") // plain string — set explicitly from user ID (token.sub)
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
   avatarUrl   String?

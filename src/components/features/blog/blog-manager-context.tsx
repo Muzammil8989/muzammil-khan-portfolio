@@ -2,7 +2,6 @@
 
 import { createContext, use } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import type { SortingState, Table } from "@tanstack/react-table";
 import type { Blog } from "@/services/blog";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -22,12 +21,10 @@ export interface BlogManagerState {
   blogsArray: Blog[];
   stats: StatItem[];
   linkedInStatus: { connected: boolean; name?: string } | undefined;
-  table: Table<Blog>;
   viewMode: ViewMode;
   searchQuery: string;
   typeFilter: "all" | Blog["type"];
   publishFilter: "all" | "published" | "draft";
-  sorting: SortingState;
   selectedBlog: Blog | null;
   linkedInBlog: Blog | null;
   unlinkBlog: Blog | null;
@@ -47,7 +44,6 @@ export interface BlogManagerActions {
   setSearchQuery: Dispatch<SetStateAction<string>>;
   setTypeFilter: (t: "all" | Blog["type"]) => void;
   setPublishFilter: (p: "all" | "published" | "draft") => void;
-  setSorting: Dispatch<SetStateAction<SortingState>>;
   setSelectedBlog: (b: Blog | null) => void;
   setLinkedInBlog: (b: Blog | null) => void;
   setUnlinkBlog: (b: Blog | null) => void;

@@ -3,30 +3,11 @@
 import { useMemo, useCallback, useRef, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
-  createColumnHelper,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type SortingState,
-} from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   Heart,
-  Clock,
   CheckCircle2,
   Circle,
   FileText,
   Linkedin,
-  Unlink,
-  Edit,
-  Trash2,
-  Eye,
-  Zap,
 } from "lucide-react";
 import { Blog } from "@/services/blog";
 import {
@@ -42,14 +23,8 @@ import {
   useLinkedInDisconnect,
   useLinkedInDeletePost,
 } from "@/app/hooks/useLinkedIn";
-import { getTypeColorClasses } from "@/lib/blog-colors";
-import Link from "next/link";
 import { BlogManagerCtx, type ViewMode, type StatItem } from "./blog-manager-context";
 import { BlogManagerSkeleton } from "./blog-manager-skeleton";
-import { SortHeader } from "./blog-manager-table";
-
-// ─── Module-level column helper ───────────────────────────────────────────────
-const columnHelper = createColumnHelper<Blog>();
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 export function BlogManagerProvider({ children }: { children: React.ReactNode }) {
@@ -78,7 +53,6 @@ export function BlogManagerProvider({ children }: { children: React.ReactNode })
 
   // ── Local state ────────────────────────────────
   const [searchQuery, setSearchQuery] = useState("");
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [linkedInBlog, setLinkedInBlog] = useState<Blog | null>(null);
   const [unlinkBlog, setUnlinkBlog] = useState<Blog | null>(null);
@@ -236,312 +210,6 @@ export function BlogManagerProvider({ children }: { children: React.ReactNode })
     );
   }, [unlinkBlog, deleteLinkedInPost]);
 
-  // ── Table columns ──────────────────────────────
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("title", {
-        header: ({ column }) => (
-          <SortHeader
-            label="Post"
-            isSorted={column.getIsSorted()}
-            toggle={column.getToggleSortingHandler()}
-          />
-        ),
-        cell: ({ row }) => {
-          const blog = row.original;
-          const liPost = blog.linkedinPost;
-          return (
-            <div className="min-w-0 max-w-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-foreground truncate leading-tight">
-                  {blog.title}
-                </span>
-                {liPost && (
-                  <a
-                    href={liPost.postUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="View on LinkedIn"
-                    className="shrink-0 text-[#0077B5] hover:text-[#005f8e] transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Linkedin className="h-3.5 w-3.5" />
-                  </a>
-                )}
-              </div>
-              <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {blog.readingTime || 5} min
-                </span>
-                {blog.tags?.slice(0, 2).map((tag) => (
-                  <span key={tag} className="hidden sm:inline" style={{ color: "rgba(255,185,2,0.6)" }}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          );
-        },
-        enableSorting: true,
-      }),
-
-      columnHelper.accessor("type", {
-        header: ({ column }) => (
-          <SortHeader
-            label="Type"
-            isSorted={column.getIsSorted()}
-            toggle={column.getToggleSortingHandler()}
-          />
-        ),
-        cell: ({ getValue }) => (
-          <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide whitespace-nowrap ${getTypeColorClasses(getValue())}`}
-          >
-            {getValue()}
-          </span>
-        ),
-        enableSorting: true,
-      }),
-
-      columnHelper.accessor("difficulty", {
-        header: ({ column }) => (
-          <SortHeader
-            label="Level"
-            isSorted={column.getIsSorted()}
-            toggle={column.getToggleSortingHandler()}
-          />
-        ),
-        cell: ({ getValue }) => {
-          const d = getValue();
-          const style =
-            d === "beginner"
-              ? "bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400"
-              : d === "intermediate"
-              ? "bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-400"
-              : "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400";
-          return (
-            <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide whitespace-nowrap ${style}`}
-            >
-              {d}
-            </span>
-          );
-        },
-        enableSorting: true,
-      }),
-
-      columnHelper.accessor("isPublished", {
-        header: ({ column }) => (
-          <SortHeader
-            label="Status"
-            isSorted={column.getIsSorted()}
-            toggle={column.getToggleSortingHandler()}
-          />
-        ),
-        cell: ({ getValue }) => {
-          const live = getValue();
-          return (
-            <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide whitespace-nowrap ${
-                live
-                  ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
-                  : "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400"
-              }`}
-            >
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  live ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
-                }`}
-              />
-              {live ? "Live" : "Draft"}
-            </span>
-          );
-        },
-        enableSorting: true,
-        sortingFn: (a, b) =>
-          Number(a.original.isPublished) - Number(b.original.isPublished),
-      }),
-
-      columnHelper.accessor("likes", {
-        header: ({ column }) => (
-          <SortHeader
-            label="Likes"
-            isSorted={column.getIsSorted()}
-            toggle={column.getToggleSortingHandler()}
-          />
-        ),
-        cell: ({ getValue }) => (
-          <span className="flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums">
-            <Heart className="h-3.5 w-3.5 text-rose-400 shrink-0" />
-            {getValue() || 0}
-          </span>
-        ),
-        enableSorting: true,
-      }),
-
-      columnHelper.accessor("publishedAt", {
-        header: ({ column }) => (
-          <SortHeader
-            label="Date"
-            isSorted={column.getIsSorted()}
-            toggle={column.getToggleSortingHandler()}
-          />
-        ),
-        cell: ({ getValue, row }) => {
-          const date = getValue() || row.original.createdAt;
-          return (
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-              {date
-                ? new Date(date).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })
-                : "—"}
-            </span>
-          );
-        },
-        enableSorting: true,
-        sortingFn: (a, b) => {
-          const da = new Date(a.original.publishedAt || a.original.createdAt).getTime();
-          const db = new Date(b.original.publishedAt || b.original.createdAt).getTime();
-          return da - db;
-        },
-      }),
-
-      columnHelper.display({
-        id: "actions",
-        header: () => (
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Actions
-          </span>
-        ),
-        cell: ({ row }) => {
-          const blog = row.original;
-          const liPost = blog.linkedinPost;
-          return (
-            <div className="flex items-center gap-0.5">
-              {blog.isPublished && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link href={`/blog/${blog.slug}`} target="_blank">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">View live post</TooltipContent>
-                </Tooltip>
-              )}
-              {!blog.isPublished && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-emerald-500"
-                      onClick={() => handlePublishRow(blog._id)}
-                    >
-                      <Zap className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Publish</TooltipContent>
-                </Tooltip>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`h-8 w-8 p-0 transition-colors ${
-                      !liPost
-                        ? "text-muted-foreground hover:text-[#0077B5]"
-                        : "text-[#0077B5] hover:text-[#005f8e]"
-                    }`}
-                    disabled={!blog.isPublished}
-                    onClick={() => handleLinkedInRow(blog)}
-                  >
-                    <Linkedin className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  {!blog.isPublished
-                    ? "Publish post first"
-                    : liPost
-                    ? "Re-post to LinkedIn"
-                    : "Post to LinkedIn"}
-                </TooltipContent>
-              </Tooltip>
-              {liPost && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-[#0077B5] hover:text-red-500"
-                      onClick={() => handleUnlinkLinkedIn(blog)}
-                    >
-                      <Unlink className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">Delete LinkedIn post</TooltipContent>
-                </Tooltip>
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-muted-foreground hover:text-[#FFB902]"
-                    onClick={() => handleEditRow(blog)}
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Edit post</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
-                    onClick={() => handleDeleteRow(blog)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">Delete post</TooltipContent>
-              </Tooltip>
-            </div>
-          );
-        },
-      }),
-    ],
-    [
-      handlePublishRow,
-      handleLinkedInRow,
-      handleEditRow,
-      handleDeleteRow,
-      handleUnlinkLinkedIn,
-      linkedInStatus?.connected,
-    ]
-  );
-
-  const table = useReactTable({
-    data: filteredBlogs,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
-
   if (isLoading) return <BlogManagerSkeleton />;
 
   return (
@@ -552,12 +220,10 @@ export function BlogManagerProvider({ children }: { children: React.ReactNode })
           blogsArray,
           stats,
           linkedInStatus,
-          table,
           viewMode,
           searchQuery,
           typeFilter,
           publishFilter,
-          sorting,
           selectedBlog,
           linkedInBlog,
           unlinkBlog,
@@ -576,7 +242,6 @@ export function BlogManagerProvider({ children }: { children: React.ReactNode })
           setSearchQuery,
           setTypeFilter,
           setPublishFilter,
-          setSorting,
           setSelectedBlog,
           setLinkedInBlog,
           setUnlinkBlog,

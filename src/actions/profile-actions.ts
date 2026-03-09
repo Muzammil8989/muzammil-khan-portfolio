@@ -8,9 +8,8 @@ import { z } from "zod";
 
 /** Update Profile Action */
 export async function updateProfileAction(data: any) {
-    return protectedAction(data, ProfileSchema.partial(), async (validatedData) => {
-        const { _id, ...rest } = data;
-        const result = await ProfileService.update(_id, rest);
+    return protectedAction(data, ProfileSchema.partial(), async (validatedData, session) => {
+        const result = await ProfileService.update(session.user.id, validatedData as any);
         revalidatePath("/");
         revalidatePath("/dashboard");
         return result;
@@ -30,8 +29,8 @@ export async function createProfileAction(data: any) {
 
 /** Delete Profile Action */
 export async function deleteProfileAction(id: string) {
-    return protectedAction({ id }, z.object({ id: z.string() }), async ({ id: profileId }) => {
-        const result = await ProfileService.delete(profileId);
+    return protectedAction({ id }, z.object({ id: z.string() }), async (_data, session) => {
+        const result = await ProfileService.delete(session.user.id);
         revalidatePath("/");
         revalidatePath("/dashboard");
         return result;
