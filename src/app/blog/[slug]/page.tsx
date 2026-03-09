@@ -121,10 +121,25 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       likedBy: undefined, // Don't leak other IPs
     } as Blog;
 
-    // Fetch related blogs based on tags
+    // Fetch related blogs based on tags, fallback to recent posts
     const allBlogs = await BlogService.getAll({ isPublished: true });
-    relatedBlogs = allBlogs
-      .filter((b: any) => b.slug !== slug && b.tags.some((t: string) => blog.tags.includes(t)))
+    const otherBlogs = allBlogs.filter((b: any) => b.slug !== slug);
+
+    // Deduplicate by slug in case DB has duplicate entries
+    const seen = new Set<string>();
+    const uniqueOtherBlogs = otherBlogs.filter((b: any) => {
+      if (seen.has(b.slug)) return false;
+      seen.add(b.slug);
+      return true;
+    });
+
+    // Try tag-matched first, fallback to most recent
+    const tagMatched = uniqueOtherBlogs.filter((b: any) =>
+      blog.tags?.length > 0 && b.tags?.some((t: string) => blog.tags.includes(t))
+    );
+    const candidates = tagMatched.length > 0 ? tagMatched : uniqueOtherBlogs;
+
+    relatedBlogs = candidates
       .slice(0, 3)
       .map((b: any) => ({ ...b, _id: b._id.toString() } as Blog));
 
@@ -182,7 +197,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
       <div className="relative z-10">
         {/* Navigation / Breadcrumbs */}
-        <nav className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-8 flex items-center justify-between">
+        <nav className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-8 flex items-center justify-between">
           <Link href="/blog">
             <Button
               variant="ghost"
@@ -204,7 +219,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         </nav>
 
         {/* Article Container */}
-        <article className="w-full max-w-4xl mx-auto px-4 sm:px-6 pb-20 break-words">
+        <article className="w-full max-w-5xl mx-auto px-4 sm:px-6 pb-20 break-words">
           <header className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-8">
@@ -342,15 +357,15 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                 <Share2 className="h-24 w-24 -rotate-12" />
               </div>
               <h3 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
-                <BookOpen className="h-5 w-5" style={{ color: 'var(--color-brand-primary)' }} />
+                <BookOpen className="h-5 w-5" style={{ color: '#FFB902' }} />
                 Stack Context
               </h3>
               <div className="flex flex-wrap gap-3">
                 {blog.languages?.map((lang: string) => (
                   <Badge key={lang} className="shadow-sm px-4 py-1.5 rounded-xl hover:scale-105 transition-transform border" style={{
                     backgroundColor: 'var(--surface-elevated)',
-                    color: 'var(--color-brand-primary)',
-                    borderColor: 'var(--border-default)'
+                    color: '#FFB902',
+                    borderColor: 'rgba(255,185,2,0.3)'
                   }}>
                     {lang}
                   </Badge>
@@ -358,8 +373,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                 {blog.frameworks?.map((framework: string) => (
                   <Badge key={framework} className="shadow-sm px-4 py-1.5 rounded-xl hover:scale-105 transition-transform border" style={{
                     backgroundColor: 'var(--surface-elevated)',
-                    color: 'var(--color-brand-secondary)',
-                    borderColor: 'var(--border-default)'
+                    color: '#FFB902',
+                    borderColor: 'rgba(255,185,2,0.3)'
                   }}>
                     {framework}
                   </Badge>
@@ -373,14 +388,14 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
           {/* Related Posts */}
           {relatedBlogs.length > 0 && (
-            <div className="mt-24 pt-16 border-t border-slate-100 dark:border-white/5">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-10 flex items-center gap-3 tracking-tight">
+            <div className="mt-24 pt-16 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+              <h3 className="text-2xl font-bold mb-10 flex items-center gap-3 tracking-tight" style={{ color: "var(--text-primary)" }}>
                 Continue Reading
-                <div className="h-px flex-1 bg-gradient-to-r from-slate-200 dark:from-white/10 to-transparent" />
+                <div className="h-px flex-1" style={{ background: "linear-gradient(90deg, rgba(255,185,2,0.3), transparent)" }} />
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {relatedBlogs.map((rBlog) => (
-                  <div key={rBlog._id} className="scale-95 hover:scale-100 transition-transform duration-300">
+                  <div key={rBlog._id} className="h-full">
                     <BlogCard blog={rBlog} showActions={false} />
                   </div>
                 ))}

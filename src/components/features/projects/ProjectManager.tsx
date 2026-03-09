@@ -90,7 +90,7 @@ export function ProjectManager() {
                 </div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300">
+                        <Button className="font-bold transition-opacity hover:opacity-85 shadow-md" style={{ background: "#FFB902", color: "#04061a" }}>
                             <Plus className="mr-2 h-4 w-4" /> Create Project
                         </Button>
                     </DialogTrigger>
@@ -132,7 +132,7 @@ export function ProjectManager() {
                     <Layout className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">No projects yet</h3>
                     <p className="text-gray-500 dark:text-slate-400 mb-6">Start building your portfolio by adding a project.</p>
-                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-all duration-300">
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="font-bold transition-opacity hover:opacity-85 shadow-md" style={{ background: "#FFB902", color: "#04061a" }}>
                         <Plus className="mr-2 h-4 w-4" /> Add First Project
                     </Button>
                 </div>

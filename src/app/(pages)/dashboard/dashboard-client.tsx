@@ -89,8 +89,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       >
         {/* Brand */}
         <div className="flex items-center gap-2.5 h-14 px-3 border-b border-slate-200 dark:border-slate-800 shrink-0 overflow-hidden">
-          <div className="p-1.5 bg-blue-600 rounded-lg text-white shrink-0">
-            <LayoutDashboard className="h-4 w-4" />
+          <div className="p-1.5 rounded-lg shrink-0" style={{ background: "#FFB902" }}>
+            <LayoutDashboard className="h-4 w-4" style={{ color: "#04061a" }} />
           </div>
           <div
             className={cn(
@@ -120,16 +120,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                   "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-150",
                   collapsed ? "justify-center" : "justify-start",
                   isActive
-                    ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                    ? "text-[#04061a] dark:text-[#04061a]"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                 )}
+                style={isActive ? { background: "#FFB902" } : undefined}
               >
                 <Icon
                   className={cn(
                     "shrink-0 transition-all",
                     collapsed ? "h-[18px] w-[18px]" : "h-4 w-4",
-                    isActive && "text-blue-600 dark:text-blue-400"
                   )}
+                  style={isActive ? { color: "#04061a" } : undefined}
                 />
                 <span
                   className={cn(
@@ -219,7 +220,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 "bg-white dark:bg-slate-900",
                 "text-slate-400 hover:text-slate-700 dark:hover:text-slate-200",
                 "shadow-sm hover:shadow transition-colors duration-150",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB902]"
               )}
             >
               {collapsed ? (
@@ -246,11 +247,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <button
             onClick={() => setMobileOpen(true)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            className="md:hidden flex items-center justify-center h-8 w-8 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="md:hidden flex items-center justify-center h-8 w-8 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB902]"
           >
             {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
-          <ActiveIcon className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
+          <ActiveIcon className="h-4 w-4 shrink-0" style={{ color: "#FFB902" }} />
           <div className="min-w-0">
             <h1 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
               {activeItem.label}

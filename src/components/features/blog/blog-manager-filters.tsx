@@ -30,7 +30,7 @@ export function BlogManagerFilters() {
             placeholder="Search by title, tags, content…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 bg-background border-border/60 text-sm focus-visible:ring-1 focus-visible:ring-indigo-500"
+            className="pl-9 h-9 bg-background border-border/60 text-sm focus-visible:ring-1 focus-visible:ring-[#FFB902]"
           />
           {searchQuery && (
             <button
@@ -95,7 +95,7 @@ export function BlogManagerFilters() {
           <span className="text-foreground font-semibold">{filteredBlogs.length}</span> of{" "}
           <span className="text-foreground font-semibold">{blogsArray.length}</span> posts
           {searchQuery && (
-            <span className="text-indigo-500"> matching &ldquo;{searchQuery}&rdquo;</span>
+            <span style={{ color: "#FFB902" }}> matching &ldquo;{searchQuery}&rdquo;</span>
           )}
         </p>
       )}

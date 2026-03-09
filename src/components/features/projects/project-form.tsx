@@ -177,7 +177,7 @@ export const ProjectForm = ({
                 )}
             </div>
 
-            <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600">
+            <Button type="submit" disabled={isSubmitting} className="w-full h-12 text-lg font-bold transition-opacity hover:opacity-85" style={{ background: "#FFB902", color: "#04061a" }}>
                 {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : project ? "Update Project" : "Create Project"}
             </Button>
         </form>
