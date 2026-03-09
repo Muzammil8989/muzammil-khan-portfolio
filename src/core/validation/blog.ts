@@ -10,9 +10,9 @@ export const CodeBlockSchema = z.object({
 
 // SEO Schema
 export const SeoSchema = z.object({
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
-  canonicalUrl: z.union([z.string().url(), z.literal("")]).optional(),
+  metaTitle: z.string().nullish(),
+  metaDescription: z.string().nullish(),
+  canonicalUrl: z.string().nullish(),
 });
 
 // Blog Schema
@@ -28,7 +28,7 @@ export const BlogSchema = z.object({
   difficulty: z.enum(["beginner", "intermediate", "advanced"]).default("beginner"),
   author: z.string().default("Muhammad Muzammil Khan"),
   tags: z.array(z.string()).min(1, "At least one tag is required"),
-  seo: SeoSchema.optional(),
+  seo: SeoSchema.nullish(),
   type: z.enum(["Article", "Case Study", "Tutorial", "Deep Dive", "Quick Tip", "Guide"]).default("Article"),
   isPublished: z.boolean().default(false),
   publishedAt: z.string().optional(),

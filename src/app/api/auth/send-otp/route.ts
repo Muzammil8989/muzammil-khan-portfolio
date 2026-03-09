@@ -42,18 +42,22 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("[send-otp] lookup:", {
-      input: normalizedInput,
-      found: !!user,
-      hasPassword: !!user?.password,
-      hasEmail: !!user?.email,
-      username: user?.username,
-    });
+    if (process.env.NODE_ENV === "development") {
+      console.log("[send-otp] lookup:", {
+        input: normalizedInput,
+        found: !!user,
+        hasPassword: !!user?.password,
+        hasEmail: !!user?.email,
+        username: user?.username,
+      });
+    }
 
     const passwordValid = await compare(password, user?.password ?? DUMMY_HASH);
 
     if (!user || !passwordValid) {
-      console.log("[send-otp] auth failed:", { userFound: !!user, passwordValid });
+      if (process.env.NODE_ENV === "development") {
+        console.log("[send-otp] auth failed:", { userFound: !!user, passwordValid });
+      }
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 

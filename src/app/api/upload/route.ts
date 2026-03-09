@@ -1,18 +1,44 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { getToken } from "next-auth/jwt";
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;
 const API_KEY = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!;
 const API_SECRET = process.env.CLOUDINARY_API_SECRET!;
 
-export async function POST(request: Request) {
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg", "image/png", "image/gif", "image/webp", "image/avif", "image/svg+xml",
+  "video/mp4", "video/webm", "video/ogg",
+  "application/pdf",
+]);
+
+const FOLDER_REGEX = /^[a-zA-Z0-9/_-]{1,100}$/;
+
+export async function POST(request: NextRequest) {
+  // Auth check - only authenticated users can upload
+  const token = await getToken({ req: request });
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const folder = (formData.get("folder") as string) || "uploads";
+    const rawFolder = (formData.get("folder") as string) || "uploads";
 
     if (!file) {
       return NextResponse.json({ error: "File is required" }, { status: 400 });
+    }
+
+    // Validate and sanitize folder name
+    const folder = rawFolder.replace(/\\/g, "/");
+    if (!FOLDER_REGEX.test(folder)) {
+      return NextResponse.json({ error: "Invalid folder name" }, { status: 400 });
+    }
+
+    // Validate MIME type against whitelist
+    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+      return NextResponse.json({ error: "File type not allowed" }, { status: 415 });
     }
 
     // ── Size limits ───────────────────────────────────────────────────────────
@@ -62,8 +88,7 @@ export async function POST(request: Request) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Upload error:", error);
-    const message = error instanceof Error ? error.message : "Upload failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
 

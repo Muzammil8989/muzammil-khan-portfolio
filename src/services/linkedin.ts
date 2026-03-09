@@ -1,4 +1,40 @@
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
+
+// ── Token encryption (AES-256-GCM) ────────────────────────────────────────────
+// Key is derived from NEXTAUTH_SECRET so no extra env var is needed.
+// Encrypted format: "enc:<iv_hex>:<ciphertext_hex>:<tag_hex>"
+// Plain values (pre-encryption) are handled transparently for backward compat.
+
+function getEncryptionKey(): Buffer {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) throw new Error("NEXTAUTH_SECRET must be configured");
+  return crypto.createHash("sha256").update(`linkedin-token:${secret}`).digest();
+}
+
+function encryptToken(plaintext: string): string {
+  const key = getEncryptionKey();
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return `enc:${iv.toString("hex")}:${encrypted.toString("hex")}:${tag.toString("hex")}`;
+}
+
+function decryptToken(value: string): string {
+  if (!value.startsWith("enc:")) return value; // backward compat
+  const parts = value.split(":");
+  if (parts.length !== 4) throw new Error("Invalid encrypted token format");
+  const [, ivHex, encHex, tagHex] = parts;
+  const key = getEncryptionKey();
+  const decipher = crypto.createDecipheriv("aes-256-gcm", key, Buffer.from(ivHex, "hex"));
+  decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+  return Buffer.concat([
+    decipher.update(Buffer.from(encHex, "hex")),
+    decipher.final(),
+  ]).toString("utf8");
+}
+// ──────────────────────────────────────────────────────────────────────────────
 
 const LINKEDIN_API = "https://api.linkedin.com/v2";
 const LINKEDIN_UPLOAD_API = "https://api.linkedin.com/v2/assets?action=registerUpload";
@@ -26,7 +62,7 @@ export async function saveLinkedInToken(token: LinkedInToken): Promise<void> {
     where: { userId: token.userId },
     create: {
       userId: token.userId,
-      accessToken: token.accessToken,
+      accessToken: encryptToken(token.accessToken),
       personId: token.personId,
       name: token.name,
       profileImage: token.profileImage,
@@ -34,7 +70,7 @@ export async function saveLinkedInToken(token: LinkedInToken): Promise<void> {
       connectedAt: token.connectedAt,
     },
     update: {
-      accessToken: token.accessToken,
+      accessToken: encryptToken(token.accessToken),
       personId: token.personId,
       name: token.name,
       profileImage: token.profileImage,
@@ -50,7 +86,10 @@ export async function saveLinkedInToken(token: LinkedInToken): Promise<void> {
 export async function getLinkedInToken(userId: string): Promise<LinkedInToken | null> {
   const token = await prisma.linkedinToken.findUnique({ where: { userId } });
   if (!token) return null;
-  return token as unknown as LinkedInToken;
+  return {
+    ...(token as unknown as LinkedInToken),
+    accessToken: decryptToken(token.accessToken),
+  };
 }
 
 /**

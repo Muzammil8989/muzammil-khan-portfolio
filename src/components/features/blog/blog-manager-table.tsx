@@ -49,10 +49,10 @@ export function BlogManagerTable() {
   const rows = table.getRowModel().rows;
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+    <div className="h-full flex flex-col rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
               <TableRow
                 key={hg.id}

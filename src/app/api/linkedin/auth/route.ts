@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import crypto from "crypto";
 
 /**
  * GET /api/linkedin/auth
@@ -23,8 +24,15 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // State encodes the userId so we can link the token after callback
-  const state = Buffer.from(JSON.stringify({ userId: token.id })).toString("base64url");
+  // Build CSRF-protected state: userId + nonce + HMAC signature
+  const nonce = crypto.randomBytes(16).toString("hex");
+  const statePayload = { userId: token.id, nonce };
+  const stateJson = JSON.stringify(statePayload);
+  const sig = crypto
+    .createHmac("sha256", process.env.NEXTAUTH_SECRET!)
+    .update(stateJson)
+    .digest("hex");
+  const state = Buffer.from(JSON.stringify({ ...statePayload, sig })).toString("base64url");
 
   const params = new URLSearchParams({
     response_type: "code",

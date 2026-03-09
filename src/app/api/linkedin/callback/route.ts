@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import {
   exchangeCodeForToken,
   getLinkedInProfile,
@@ -30,8 +31,24 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Decode state to get userId
-    const { userId } = JSON.parse(Buffer.from(state, "base64url").toString());
+    // Decode and CSRF-verify state
+    const decoded = JSON.parse(Buffer.from(state, "base64url").toString());
+    const { userId, nonce, sig } = decoded;
+
+    if (!userId || !nonce || !sig) {
+      throw new Error("Invalid state parameter");
+    }
+
+    const expectedSig = crypto
+      .createHmac("sha256", process.env.NEXTAUTH_SECRET!)
+      .update(JSON.stringify({ userId, nonce }))
+      .digest("hex");
+
+    const sigBuf = Buffer.from(sig, "hex");
+    const expectedBuf = Buffer.from(expectedSig, "hex");
+    if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+      throw new Error("State signature mismatch - possible CSRF attack");
+    }
 
     // Exchange code for access token
     const tokenData = await exchangeCodeForToken(code);

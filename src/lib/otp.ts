@@ -10,9 +10,10 @@ export function generateOtp(): string {
   return crypto.randomInt(100000, 999999).toString();
 }
 
-/** HMAC-SHA256 hash of OTP using NEXTAUTH_SECRET as pepper */
+/** HMAC-SHA256 hash of OTP using OTP_SECRET as pepper */
 export function hashOtp(otp: string): string {
-  const secret = process.env.NEXTAUTH_SECRET ?? "fallback-otp-secret";
+  const secret = process.env.OTP_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (!secret) throw new Error("OTP_SECRET or NEXTAUTH_SECRET must be configured");
   return crypto.createHmac("sha256", secret).update(otp).digest("hex");
 }
 

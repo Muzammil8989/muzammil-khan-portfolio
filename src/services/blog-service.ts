@@ -69,16 +69,19 @@ export class BlogService {
    * Search blogs by title, content, or tags (regex, case-insensitive via findRaw)
    */
   static async search(query: string) {
+    // Escape regex special characters to prevent ReDoS attacks
+    const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     const raw = await prisma.blog.findRaw({
       filter: {
         $or: [
-          { title: { $regex: query, $options: "i" } },
-          { content: { $regex: query, $options: "i" } },
-          { tags: { $elemMatch: { $regex: query, $options: "i" } } },
+          { title: { $regex: safeQuery, $options: "i" } },
+          { content: { $regex: safeQuery, $options: "i" } },
+          { tags: { $elemMatch: { $regex: safeQuery, $options: "i" } } },
         ],
         isPublished: true,
       },
-      options: { sort: { publishedAt: -1 } },
+      options: { sort: { publishedAt: -1 }, limit: 50 },
     });
 
     return (raw as unknown as any[]).map((doc) => ({
