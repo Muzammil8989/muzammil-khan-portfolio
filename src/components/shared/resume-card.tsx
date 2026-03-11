@@ -196,12 +196,12 @@ export const ResumeCard = React.memo(({
             <AnimatePresence initial={false}>
               {isExpanded && description && (
                 <motion.div
-                  key={`desc-wrap-${isExpanded}`}
+                  key="desc-wrap"
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden text-sm sm:text-base text-foreground/85 leading-relaxed mt-2 sm:mt-3"
+                  className="overflow-hidden mt-2 sm:mt-3"
                 >
                   <motion.div
                     initial={{ opacity: 0, y: 12 }}
@@ -210,7 +210,7 @@ export const ResumeCard = React.memo(({
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="border-l-4 border-primary/60 pl-3 sm:pl-5 pr-2 sm:pr-4 py-2 sm:py-3 bg-muted/30 rounded-r-md"
                   >
-                    <p className="text-sm sm:text-base text-foreground/90 leading-relaxed text-justify">{description}</p>
+                    <p className="text-sm sm:text-base text-foreground/90 leading-normal text-justify [text-justify:inter-character] break-words">{description}</p>
                   </motion.div>
                 </motion.div>
               )}
