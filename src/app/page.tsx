@@ -124,9 +124,9 @@ export default async function Page() {
               Work Experience
             </h2>
           </div>
-          <div className="md:col-span-2 space-y-8">
+          <div className="md:col-span-2 space-y-4 sm:space-y-6">
             {workData.map((work: any, index: number) => (
-              <div key={work._id} className="relative pl-8 border-l border-slate-200 dark:border-white/20 py-2">
+              <div key={work._id} className="relative pl-4 sm:pl-8 border-l border-slate-200 dark:border-white/20 py-1 sm:py-2">
                 <div className={`absolute ${index === 0 ? 'w-3 h-3 bg-indigo-500 dark:bg-blue-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] dark:shadow-[0_0_10px_rgba(96,165,250,0.5)]' : 'w-3 h-3 bg-slate-300 dark:bg-slate-600'} rounded-full -left-[6.5px] top-4`}></div>
                 <ResumeCard
                   logoUrl={work.logoUrl}

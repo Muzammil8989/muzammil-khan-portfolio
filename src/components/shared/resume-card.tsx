@@ -69,18 +69,18 @@ export const ResumeCard = React.memo(({
         layout
         transition={{ type: "spring", stiffness: 300, damping: 28 }}
         className={cn(
-          "p-4 sm:p-5 md:p-6",
+          "p-2 sm:p-4 md:p-5",
           "transition-all duration-300"
         )}
       >
-        <div className="flex items-start gap-3 sm:gap-4">
+        <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
           {/* Logo */}
-          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0 ring-2 ring-border shadow-md">
+          <div className="relative w-10 h-10 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-muted flex-shrink-0 ring-2 ring-border shadow-md">
             <Image
               src={logoUrl}
               alt={altText}
               fill
-              sizes="(max-width: 640px) 56px, 64px"
+              sizes="(max-width: 640px) 40px, 56px"
               className="object-cover"
             />
           </div>
@@ -174,7 +174,7 @@ export const ResumeCard = React.memo(({
               </div>
 
               {/* Subtitle + period row */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 sm:mt-3 gap-1.5 sm:gap-2 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-1 sm:mt-2 gap-1 sm:gap-2 min-w-0">
                 {subtitle && (
                   <div className="text-sm sm:text-base text-muted-foreground font-medium line-clamp-2 min-w-0">
                     <BlurText
@@ -201,14 +201,14 @@ export const ResumeCard = React.memo(({
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden text-sm sm:text-base text-foreground/85 leading-relaxed mt-3 sm:mt-4"
+                  className="overflow-hidden text-sm sm:text-base text-foreground/85 leading-relaxed mt-2 sm:mt-3"
                 >
                   <motion.div
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="border-l-4 border-primary/60 pl-4 sm:pl-6 pr-3 sm:pr-4 py-3 sm:py-4 bg-muted/30 rounded-r-md"
+                    className="border-l-4 border-primary/60 pl-3 sm:pl-5 pr-2 sm:pr-4 py-2 sm:py-3 bg-muted/30 rounded-r-md"
                   >
                     <p className="text-sm sm:text-base text-foreground/90 leading-relaxed text-justify">{description}</p>
                   </motion.div>
