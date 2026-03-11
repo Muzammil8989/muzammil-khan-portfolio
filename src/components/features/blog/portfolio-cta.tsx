@@ -47,7 +47,7 @@ export function PortfolioCTA() {
             <div className="grid grid-cols-3 gap-3">
               {[
                 { icon: Code2, value: "10+", label: "Projects" },
-                { icon: Trophy, value: "2+", label: "Years Exp" },
+                { icon: Trophy, value: "1.5+", label: "Years Exp" },
                 { icon: Briefcase, value: "3+", label: "Tech Stack" },
               ].map(({ icon: Icon, value, label }) => (
                 <div
@@ -122,7 +122,7 @@ export function PortfolioCTA() {
 
         {/* Bottom quote */}
         <div className="mt-8 pt-6 border-t" style={{ borderColor: "rgba(255,185,2,0.1)" }}>
-          <p className="text-center text-xs italic" style={{ color: "#3a4060" }}>
+          <p className="text-center text-xs italic">
             "Don't just read about it — see it in action. My portfolio showcases real solutions to real problems."
           </p>
         </div>
