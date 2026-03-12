@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Navbar from "@/components/layout/navbar";
 import { BlogActions } from "@/components/features/blog/blog-actions";
 import { notFound } from "next/navigation";
@@ -293,21 +294,61 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               '--tw-prose-headings': 'var(--color-brand-accent)',
             } as any}>
             <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
               components={{
                 h1: ({ children }) => <h1 className="text-3xl sm:text-4xl mt-12 mb-6" style={{ color: 'var(--color-brand-accent)' }}>{children}</h1>,
                 h2: ({ children }) => <h2 className="text-2xl sm:text-3xl mt-10 mb-5 pb-2 border-b" style={{ color: 'var(--color-brand-accent)', borderColor: 'var(--border-subtle)' }}>{children}</h2>,
                 h3: ({ children }) => <h3 className="text-xl sm:text-2xl mt-8 mb-4" style={{ color: 'var(--color-brand-accent)' }}>{children}</h3>,
-                code({ inline, className, children, ...props }: any) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
-                    <div className="not-prose my-8">
-                      <CodeBlock
-                        code={String(children).replace(/\n$/, "")}
-                        language={match[1]}
-                        {...props}
-                      />
-                    </div>
-                  ) : (
+                table: ({ children }) => (
+                  <div className="overflow-x-auto my-6">
+                    <table className="w-full border-collapse text-sm">{children}</table>
+                  </div>
+                ),
+                thead: ({ children }) => (
+                  <thead style={{ backgroundColor: 'var(--surface-elevated)' }}>{children}</thead>
+                ),
+                th: ({ children }) => (
+                  <th className="px-4 py-3 text-left font-bold text-xs uppercase tracking-wider border" style={{ borderColor: 'var(--border-default)', color: 'var(--color-brand-accent)' }}>
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-4 py-3 border" style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                    {children}
+                  </td>
+                ),
+                tr: ({ children }) => (
+                  <tr className="transition-colors hover:bg-white/5">{children}</tr>
+                ),
+                pre: ({ children }) => {
+                  // Block code — handle here so it never ends up inside a <p>
+                  const child = Array.isArray(children) ? children[0] : children;
+                  const className = (child as any)?.props?.className || "";
+                  const match = /language-(\w+)/.exec(className);
+                  const code = String((child as any)?.props?.children || "").replace(/\n$/, "");
+                  if (match) {
+                    return (
+                      <div className="not-prose my-8">
+                        <CodeBlock code={code} language={match[1]} />
+                      </div>
+                    );
+                  }
+                  return (
+                    <pre
+                      className="not-prose my-6 overflow-x-auto rounded-xl px-5 py-4 text-sm font-mono leading-relaxed"
+                      style={{
+                        backgroundColor: 'var(--surface-elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-subtle)',
+                      }}
+                    >
+                      {code}
+                    </pre>
+                  );
+                },
+                code({ className, children, ...props }: any) {
+                  // Inline code only (block code is handled by pre above)
+                  return (
                     <code
                       className="px-1.5 py-0.5 rounded text-sm font-mono font-medium"
                       style={{
@@ -320,7 +361,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                     </code>
                   );
                 },
-                pre: ({ children }) => <>{children}</>,
               }}
             >
               {blog.content}
