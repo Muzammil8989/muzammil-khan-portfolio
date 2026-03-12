@@ -311,4 +311,13 @@
   .animate-fadeInUp {
     animation: fadeInUp 0.6s ease-out;
   }
+
+  /* TTS read-aloud highlight */
+  .tts-highlight {
+    background-color: rgba(255, 185, 2, 0.12);
+    border-left: 3px solid #FFB902;
+    padding-left: 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
 }
