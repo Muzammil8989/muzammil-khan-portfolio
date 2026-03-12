@@ -59,7 +59,7 @@ export function BlogManagerHeader() {
               </DialogDescription>
             </DialogHeader>
           </div>
-          <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
+          <div className="flex-1 overflow-y-auto min-h-0 px-6 pt-5 pb-24">
             <BlogForm
               onSubmit={handleCreateSubmit}
               isSubmitting={createBlog.isPending}

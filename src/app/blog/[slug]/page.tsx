@@ -17,6 +17,43 @@ import {
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+// Wraps arrow/symbol chars that browsers render as emoji inside
+// <span style="font-variant-emoji:text"> so they appear as plain text glyphs.
+// Real emoji (🎉 😀 etc.) are NOT in the split pattern so they stay as-is.
+const ARROW_SPLIT = /([\u2194-\u2199\u21A9\u21AA\u21D0-\u21D5])/g;
+const isArrow = (s: string) => /^[\u2194-\u2199\u21A9\u21AA\u21D0-\u21D5]$/.test(s);
+
+const rehypeTextArrows = () => (tree: any) => {
+  // Process ALL text nodes (including inside code/pre) — arrows should render
+  // as text glyphs everywhere, not just in paragraphs.
+  const walk = (node: any, parent: any, idx: number) => {
+    if (node.type === 'text') {
+      const parts = node.value.split(ARROW_SPLIT);
+      if (parts.length > 1 && parent?.children) {
+        const nodes = parts
+          .filter((p: string) => p !== '')
+          .map((p: string) =>
+            isArrow(p)
+              ? { type: 'element', tagName: 'span', properties: { style: 'font-variant-emoji:text' }, children: [{ type: 'text', value: p }] }
+              : { type: 'text', value: p }
+          );
+        parent.children.splice(idx, 1, ...nodes);
+        return;
+      }
+    }
+    if (node.children) {
+      for (let i = node.children.length - 1; i >= 0; i--) {
+        walk(node.children[i], node, i);
+      }
+    }
+  };
+  if (tree.children) {
+    for (let i = tree.children.length - 1; i >= 0; i--) {
+      walk(tree.children[i], tree, i);
+    }
+  }
+};
 import Navbar from "@/components/layout/navbar";
 import { BlogActions } from "@/components/features/blog/blog-actions";
 import { notFound } from "next/navigation";
@@ -198,7 +235,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
       <div className="relative z-10">
         {/* Navigation / Breadcrumbs */}
-        <nav className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-24 pb-8 flex items-center justify-between">
+        <nav className="w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-10 lg:px-8 pt-16 pb-6 flex items-center justify-between">
           <Link href="/blog">
             <Button
               variant="ghost"
@@ -220,8 +257,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         </nav>
 
         {/* Article Container */}
-        <article className="w-full max-w-5xl mx-auto px-4 sm:px-6 pb-20 break-words">
-          <header className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <article className="w-full max-w-5xl mx-auto px-4 sm:px-6 md:px-10 lg:px-8 pb-20 break-words">
+          <header className="mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-8">
               {blog.tags?.map((tag: string) => (
@@ -244,10 +281,13 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               {blog.title}
             </h1>
 
-            <p className="text-lg sm:text-xl font-light leading-relaxed mb-10 border-l-4 pl-6 italic" style={{
+            <p className="text-lg sm:text-xl font-light leading-relaxed mb-10 border-l-4 pl-6 italic text-justify" style={{
               color: 'var(--text-secondary)',
-              borderColor: 'var(--color-brand-primary)'
-            }}>
+              borderColor: 'var(--color-brand-primary)',
+              hyphens: 'auto',
+              WebkitHyphens: 'auto',
+              overflowWrap: 'break-word',
+            } as any}>
               {blog.excerpt}
             </p>
 
@@ -287,7 +327,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             prose-headings:font-[family-name:var(--font-display)] prose-headings:font-bold prose-headings:tracking-tight
             prose-a:no-underline hover:prose-a:underline
             prose-blockquote:rounded-r-xl
-            prose-img:rounded-2xl prose-img:shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200"
+            prose-img:rounded-2xl prose-img:shadow-2xl
+            prose-p:text-justify prose-p:break-words
+            prose-li:text-justify prose-li:break-words
+            animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200
+            [&_p]:[hyphens:auto] [&_p]:[-webkit-hyphens:auto] [&_p]:[overflow-wrap:break-word]
+            [&_li]:[hyphens:auto] [&_li]:[-webkit-hyphens:auto]"
             style={{
               '--tw-prose-links': 'var(--color-brand-primary)',
               '--tw-prose-quote-borders': 'var(--color-brand-primary)',
@@ -295,6 +340,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             } as any}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeTextArrows]}
               components={{
                 h1: ({ children }) => <h1 className="text-3xl sm:text-4xl mt-12 mb-6" style={{ color: 'var(--color-brand-accent)' }}>{children}</h1>,
                 h2: ({ children }) => <h2 className="text-2xl sm:text-3xl mt-10 mb-5 pb-2 border-b" style={{ color: 'var(--color-brand-accent)', borderColor: 'var(--border-subtle)' }}>{children}</h2>,
@@ -325,14 +371,22 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                   const child = Array.isArray(children) ? children[0] : children;
                   const className = (child as any)?.props?.className || "";
                   const match = /language-(\w+)/.exec(className);
-                  const code = String((child as any)?.props?.children || "").replace(/\n$/, "");
                   if (match) {
+                    // Recursively extract raw text (children may contain span elements from rehype plugins)
+                    const extractText = (n: any): string => {
+                      if (typeof n === 'string') return n;
+                      if (Array.isArray(n)) return n.map(extractText).join('');
+                      if (n?.props?.children !== undefined) return extractText(n.props.children);
+                      return '';
+                    };
+                    const code = extractText((child as any)?.props?.children ?? "").replace(/\n$/, "");
                     return (
                       <div className="not-prose my-8">
                         <CodeBlock code={code} language={match[1]} />
                       </div>
                     );
                   }
+                  // Plain pre block: render children directly so span-wrapped arrows display correctly
                   return (
                     <pre
                       className="not-prose my-6 overflow-x-auto rounded-xl px-5 py-4 text-sm font-mono leading-relaxed"
@@ -342,7 +396,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                         border: '1px solid var(--border-subtle)',
                       }}
                     >
-                      {code}
+                      {children}
                     </pre>
                   );
                 },
