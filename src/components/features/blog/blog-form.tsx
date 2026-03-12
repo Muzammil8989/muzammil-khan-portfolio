@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { Blog } from "@/services/blog";
 import { BlogInput } from "@/core/validation/blog";
+import { DATA } from "@/data/resume";
 import { generateSlug } from "@/lib/blog-utils";
 import { toast } from "sonner";
 import { CodeBlockEditor } from "./code-block-editor";
@@ -195,7 +196,7 @@ function MetadataSection() {
       <div className="space-y-2">
         <Label htmlFor="difficulty">Difficulty Level</Label>
         <Select
-          value={formData.difficulty}
+          value={formData.difficulty || "beginner"}
           onValueChange={(
             value: "beginner" | "intermediate" | "advanced",
           ) => setFormData((prev) => ({ ...prev, difficulty: value }))}
@@ -375,7 +376,7 @@ function SEOSection() {
         <Input
           id="canonicalUrl"
           name="canonicalUrl"
-          type="url"
+          type="text"
           value={formData.seo?.canonicalUrl || ""}
           onChange={handleSeoChange}
           placeholder="https://yoursite.com/blog/slug"
@@ -397,7 +398,7 @@ function PublishSection() {
       <div className="space-y-2">
         <Label htmlFor="type">Blog Type</Label>
         <Select
-          value={formData.type}
+          value={formData.type || "Article"}
           onValueChange={(
             value:
               | "Article"
@@ -521,7 +522,7 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
         seo: {
           metaTitle: blog.seo?.metaTitle ?? "",
           metaDescription: blog.seo?.metaDescription ?? "",
-          canonicalUrl: blog.seo?.canonicalUrl ?? "",
+          canonicalUrl: blog.seo?.canonicalUrl || `${DATA.url.replace(/\/$/, "")}/blog/${blog.slug}`,
         },
         type: blog.type ?? "Article",
         isPublished: blog.isPublished,
@@ -534,7 +535,17 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
 
   useEffect(() => {
     if (formData.title && !blog) {
-      setFormData((prev) => ({ ...prev, slug: generateSlug(formData.title) }));
+      const slug = generateSlug(formData.title);
+      setFormData((prev) => ({
+        ...prev,
+        slug,
+        seo: {
+          ...prev.seo,
+          metaTitle: prev.seo?.metaTitle ?? "",
+          metaDescription: prev.seo?.metaDescription ?? "",
+          canonicalUrl: `${DATA.url.replace(/\/$/, "")}/blog/${slug}`,
+        },
+      }));
     }
   }, [formData.title, blog]);
 
@@ -549,7 +560,15 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, seo: { ...prev.seo, [name]: value } }));
+    setFormData((prev) => ({
+      ...prev,
+      seo: {
+        metaTitle: prev.seo?.metaTitle ?? "",
+        metaDescription: prev.seo?.metaDescription ?? "",
+        canonicalUrl: prev.seo?.canonicalUrl ?? "",
+        [name]: value,
+      },
+    }));
   };
 
   const handleAddTag = () => {
