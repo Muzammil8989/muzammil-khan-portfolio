@@ -122,22 +122,6 @@ interface BlogDetailPageProps {
   }>;
 }
 
-const extractTextFromMarkdown = (markdown: string): string => {
-  return markdown
-    .replace(/#+\s/g, "")
-    .replace(/\*\*/g, "")
-    .replace(/\*/g, "")
-    .replace(/`{1,3}[^`]*`{1,3}/g, "")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
-    .replace(/>\s/g, "")
-    .replace(/^-\s/gm, "")
-    // Strip Unicode arrows/symbols that TTS reads aloud as "right arrow" etc.
-    .replace(/[\u2190-\u21FF\u2794-\u27BF\u2B00-\u2BFF]/g, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-};
-
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
 
@@ -203,8 +187,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     console.error("Error fetching blog:", error);
     notFound();
   }
-
-  const contentToRead = `${blog.title}. ${blog.excerpt}. ${extractTextFromMarkdown(blog.content)}`;
 
   const baseUrl = DATA.url.replace(/\/$/, "");
   const blogUrl = `${baseUrl}/blog/${blog.slug}`;
@@ -321,7 +303,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <BlogActions blog={blog} contentToRead={contentToRead} />
+                <BlogActions blog={blog} />
               </div>
             </div>
           </header>
