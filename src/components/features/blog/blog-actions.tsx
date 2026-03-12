@@ -47,6 +47,8 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
 
     const isManuallyStopped = useRef(false);
     const chromeBugTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const chunksRef = useRef<string[]>([]);
+    const chunkIndexRef = useRef(0);
 
     // Pre-load voices
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -130,6 +132,63 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
         );
     }, [voices]);
 
+    // Split text into chunks that stay under the browser's utterance limit.
+    // We split on sentence boundaries (. ! ?) to keep speech natural.
+    const splitIntoChunks = useCallback((text: string, maxLen = 3000): string[] => {
+        if (text.length <= maxLen) return [text];
+        const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
+        const result: string[] = [];
+        let current = "";
+        for (const sentence of sentences) {
+            if (current.length + sentence.length > maxLen && current.length > 0) {
+                result.push(current.trim());
+                current = "";
+            }
+            current += sentence;
+        }
+        if (current.trim()) result.push(current.trim());
+        return result;
+    }, []);
+
+    const speakChunk = useCallback((index: number) => {
+        if (isManuallyStopped.current) return;
+        const chunks = chunksRef.current;
+        if (index >= chunks.length) {
+            setIsPlaying(false);
+            setIsPaused(false);
+            toast.success("Audio finished");
+            return;
+        }
+
+        chunkIndexRef.current = index;
+        const utt = new SpeechSynthesisUtterance(chunks[index]);
+        utt.rate = 0.88;
+        utt.pitch = 0.95;
+        utt.volume = 1.0;
+        utt.lang = "en-US";
+
+        const voice = pickVoice();
+        if (voice) utt.voice = voice;
+
+        if (index === 0) {
+            utt.onstart = () => toast.success("Audio started");
+        }
+        utt.onend = () => {
+            if (!isManuallyStopped.current) {
+                speakChunk(index + 1);
+            }
+        };
+        utt.onerror = (event) => {
+            if (!isManuallyStopped.current && event.error !== "canceled" && event.error !== "interrupted") {
+                toast.error(`Audio error: ${event.error}`);
+            }
+            setIsPlaying(false);
+            setIsPaused(false);
+        };
+
+        window.speechSynthesis.speak(utt);
+    }, [pickVoice]);
+
     const handleAudioToggle = () => {
         if (!isSupported || !window.speechSynthesis) return;
 
@@ -152,39 +211,19 @@ export function BlogActions({ blog, contentToRead }: BlogActionsProps) {
             window.speechSynthesis.cancel();
         }
 
-        const utt = new SpeechSynthesisUtterance(contentToRead);
-        utt.rate = 0.88;
-        utt.pitch = 0.95;
-        utt.volume = 1.0;
-        utt.lang = "en-US";
+        chunksRef.current = splitIntoChunks(contentToRead);
+        chunkIndexRef.current = 0;
 
-        const voice = pickVoice();
-        if (voice) utt.voice = voice;
-
-        utt.onstart = () => toast.success("Audio started");
-        utt.onend = () => {
-            setIsPlaying(false);
-            setIsPaused(false);
-
-            if (!isManuallyStopped.current) toast.success("Audio finished");
-        };
-        utt.onerror = (event) => {
-            if (!isManuallyStopped.current && event.error !== "canceled" && event.error !== "interrupted") {
-                toast.error(`Audio error: ${event.error}`);
-            }
-            setIsPlaying(false);
-            setIsPaused(false);
-
-        };
-
-        window.speechSynthesis.speak(utt);
         setIsPlaying(true);
         setIsPaused(false);
+        speakChunk(0);
     };
 
     const handleStop = () => {
         if (window.speechSynthesis) {
             isManuallyStopped.current = true;
+            chunksRef.current = [];
+            chunkIndexRef.current = 0;
             window.speechSynthesis.cancel();
             setIsPlaying(false);
             setIsPaused(false);
