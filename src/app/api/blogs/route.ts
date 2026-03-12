@@ -115,9 +115,11 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    // Strip null enum values (old DB docs may have null; partial update should skip them)
-    if (body.difficulty == null) delete body.difficulty;
-    if (body.type == null) delete body.type;
+    // Strip invalid enum values — null, undefined, or unrecognised strings from old DB docs
+    const VALID_DIFFICULTIES = ["beginner", "intermediate", "advanced"];
+    const VALID_TYPES = ["Article", "Case Study", "Tutorial", "Deep Dive", "Quick Tip", "Guide"];
+    if (!VALID_DIFFICULTIES.includes(body.difficulty)) delete body.difficulty;
+    if (!VALID_TYPES.includes(body.type)) delete body.type;
 
     // Validate partial data
     const validatedData = BlogSchema.partial().parse(body);
