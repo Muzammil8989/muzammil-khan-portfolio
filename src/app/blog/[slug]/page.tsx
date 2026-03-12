@@ -132,6 +132,9 @@ const extractTextFromMarkdown = (markdown: string): string => {
     .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
     .replace(/>\s/g, "")
     .replace(/^-\s/gm, "")
+    // Strip Unicode arrows/symbols that TTS reads aloud as "right arrow" etc.
+    .replace(/[\u2190-\u21FF\u2794-\u27BF\u2B00-\u2BFF]/g, "")
+    .replace(/\s{2,}/g, " ")
     .trim();
 };
 
@@ -323,7 +326,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             </div>
           </header>
 
-          <div className="prose prose-slate dark:prose-invert prose-lg max-w-none
+          <div id="blog-prose-content" className="prose prose-slate dark:prose-invert prose-lg max-w-none
             prose-headings:font-[family-name:var(--font-display)] prose-headings:font-bold prose-headings:tracking-tight
             prose-a:no-underline hover:prose-a:underline
             prose-blockquote:rounded-r-xl
