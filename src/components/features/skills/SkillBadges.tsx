@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 
+// 4 brand-aligned colors matching the 60-30-10 palette
 const palette = [
-  'bg-blue-500', 'bg-green-500', 'bg-yellow-400', 'bg-indigo-500',
-  'bg-orange-500', 'bg-purple-500', 'bg-pink-500', 'bg-cyan-500',
-  'bg-teal-500', 'bg-rose-500', 'bg-emerald-500', 'bg-violet-500',
-  'bg-amber-500', 'bg-red-500', 'bg-sky-500', 'bg-lime-500',
+  'bg-blue-400',    // brand blue  (#60a5fa dark / #3b82f6 light)
+  'bg-indigo-500',  // brand indigo (#4f46e5)
+  'bg-violet-400',  // decorative muted purple
+  'bg-amber-400',   // brand gold  (~#FFB902)
 ];
 
 export function SkillBadges({ skills }: { skills: string[] }) {

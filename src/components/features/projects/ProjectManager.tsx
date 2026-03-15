@@ -73,7 +73,7 @@ export function ProjectManager() {
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {[...Array(3)].map((_, i) => (
                     <Skeleton key={i} className="h-80 rounded-2xl" />
                 ))}
@@ -111,7 +111,7 @@ export function ProjectManager() {
             </div>
 
             {projects.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {projects.map((project) => (
                         <ProjectCard
                             key={project._id}

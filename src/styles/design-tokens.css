@@ -1,47 +1,63 @@
 /**
  * Design Tokens - Centralized Color System
  * Portfolio Color Theme with Consistent Light/Dark Mode
+ *
+ * 60-30-10 Color Rule:
+ *   60% Dominant  — White (#ffffff light) / Deep Navy (#00001a dark)
+ *   30% Secondary — Indigo-tinted surfaces (#f0f4ff light) / Glass cards (dark)
+ *   10% Accent    — Indigo CTA (#4f46e5 light) + Gold brand pop (#FFB902 both)
+ *                   Blue interactive (#60a5fa dark)
+ *   ⚠  Purple (#8b5cf6) → decorative background gradients ONLY, not UI accents
  */
 
 :root {
   /* ============================================
      BASE COLORS - LIGHT MODE
+     60% White | 30% Indigo-tinted | 10% Indigo+Gold
      ============================================ */
 
-  /* Background Colors */
+  /* 60% Background */
   --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
+  --bg-secondary: #f5f7ff;               /* very light indigo tint */
+  --bg-tertiary: #eef2ff;                /* Indigo-50 */
 
-  /* Text Colors */
+  /* Text Colors (part of 30%) */
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --text-tertiary: #94a3b8;
   --text-inverse: #ffffff;
 
   /* Brand Colors */
-  --color-brand-primary: #4f46e5;        /* Indigo-600 */
-  --color-brand-secondary: #8b5cf6;      /* Violet-500 */
-  --color-brand-accent: #FFB902;         /* Gold */
+  --color-brand-primary: #4f46e5;        /* Indigo-600 — 10% CTA */
+  --color-brand-secondary: #6366f1;      /* Indigo-500 — supporting interactive */
+  --color-brand-accent: #FFB902;         /* Gold — 10% brand pop */
+  --color-brand-decorative: #8b5cf6;     /* Violet — background gradients ONLY */
 
-  /* Interactive Colors */
+  /* Interactive Colors (10%) */
   --color-interactive-primary: #4f46e5;
   --color-interactive-hover: #4338ca;    /* Indigo-700 */
   --color-interactive-active: #3730a3;   /* Indigo-800 */
 
-  /* Surface Colors (Cards, Containers) */
-  --surface-base: rgba(255, 255, 255, 0.8);
+  /* 30% Surface Colors — indigo-tinted, clearly separated from white */
+  --surface-base: #f0f4ff;
   --surface-elevated: #ffffff;
-  --surface-overlay: rgba(255, 255, 255, 0.6);
+  --surface-overlay: #f0f4ff;
 
-  /* Border Colors */
-  --border-subtle: #e2e8f0;              /* Slate-200 */
-  --border-default: #cbd5e1;             /* Slate-300 */
+  /* Border Colors — blue-tinted for cohesion */
+  --border-subtle: #dde3f5;
+  --border-default: #c7d2f0;
   --border-emphasis: #94a3b8;            /* Slate-400 */
 
+  /* Gold Accent Transparency Scale (centralizes rgba variants) */
+  --color-brand-accent-subtle: rgba(255, 185, 2, 0.06);
+  --color-brand-accent-soft: rgba(255, 185, 2, 0.10);
+  --color-brand-accent-medium: rgba(255, 185, 2, 0.15);
+  --color-brand-accent-border: rgba(255, 185, 2, 0.25);
+  --color-brand-accent-strong: rgba(255, 185, 2, 0.40);
+
   /* Decorative Gradients */
-  --gradient-bg-1: rgba(79, 70, 229, 0.05);    /* Indigo soft */
-  --gradient-bg-2: rgba(59, 130, 246, 0.05);   /* Blue soft */
+  --gradient-bg-1: rgba(79, 70, 229, 0.06);    /* Indigo soft */
+  --gradient-bg-2: rgba(59, 130, 246, 0.06);   /* Blue soft */
 
   /* Semantic Colors */
   --color-success: #10b981;              /* Emerald-500 */
@@ -61,42 +77,52 @@
 .dark {
   /* ============================================
      BASE COLORS - DARK MODE
+     60% Deep Navy | 30% Glass cards + Slate text | 10% Blue interactive + Gold brand
+     ⚠  Purple → decorative background gradients ONLY
      ============================================ */
 
-  /* Background Colors */
-  --bg-primary: #00001a;                 /* Deep Navy */
-  --bg-secondary: rgba(15, 23, 42, 0.8); /* Slate-900 with opacity */
-  --bg-tertiary: rgba(30, 41, 59, 0.6);  /* Slate-800 with opacity */
+  /* 60% Background */
+  --bg-primary: #00001a;                        /* Deep Navy */
+  --bg-secondary: rgba(10, 15, 50, 0.85);       /* navy-blue tinted (was slate-900) */
+  --bg-tertiary: rgba(20, 30, 70, 0.60);        /* lighter navy layer */
 
-  /* Text Colors */
+  /* Text Colors (part of 30%) */
   --text-primary: #f1f5f9;               /* Slate-100 */
   --text-secondary: #cbd5e1;             /* Slate-300 */
   --text-tertiary: #94a3b8;              /* Slate-400 */
   --text-inverse: #0f172a;               /* Slate-900 */
 
   /* Brand Colors */
-  --color-brand-primary: #60a5fa;        /* Blue-400 */
-  --color-brand-secondary: #a78bfa;      /* Violet-400 */
-  --color-brand-accent: #FFB902;         /* Gold */
+  --color-brand-primary: #60a5fa;        /* Blue-400 — interactive */
+  --color-brand-secondary: #93c5fd;      /* Blue-300 — supporting interactive */
+  --color-brand-accent: #FFB902;         /* Gold — THE brand pop */
+  --color-brand-decorative: #a78bfa;     /* Violet — background gradients ONLY */
 
-  /* Interactive Colors */
+  /* Interactive Colors (10% — Blue family) */
   --color-interactive-primary: #60a5fa;  /* Blue-400 */
   --color-interactive-hover: #3b82f6;    /* Blue-500 */
   --color-interactive-active: #2563eb;   /* Blue-600 */
 
-  /* Surface Colors (Cards, Containers) */
-  --surface-base: rgba(15, 23, 42, 0.8);       /* Slate-900 semi-transparent */
-  --surface-elevated: rgba(30, 41, 59, 0.9);   /* Slate-800 semi-transparent */
-  --surface-overlay: rgba(255, 255, 255, 0.05); /* White overlay for glass */
+  /* 30% Surface Colors — more visible glass (0.07 matches globals.css) */
+  --surface-base: rgba(10, 15, 50, 0.85);
+  --surface-elevated: rgba(20, 30, 70, 0.90);
+  --surface-overlay: rgba(255, 255, 255, 0.07);
 
   /* Border Colors */
-  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.10);
   --border-default: rgba(255, 255, 255, 0.15);
   --border-emphasis: rgba(255, 255, 255, 0.25);
 
-  /* Decorative Gradients */
-  --gradient-bg-1: rgba(59, 130, 246, 0.1);   /* Blue soft */
-  --gradient-bg-2: rgba(99, 102, 241, 0.1);   /* Indigo soft */
+  /* Gold Accent Transparency Scale (shared with light mode) */
+  --color-brand-accent-subtle: rgba(255, 185, 2, 0.06);
+  --color-brand-accent-soft: rgba(255, 185, 2, 0.10);
+  --color-brand-accent-medium: rgba(255, 185, 2, 0.15);
+  --color-brand-accent-border: rgba(255, 185, 2, 0.25);
+  --color-brand-accent-strong: rgba(255, 185, 2, 0.40);
+
+  /* Decorative Gradients (blue family, no purple in primary slots) */
+  --gradient-bg-1: rgba(37, 99, 235, 0.12);    /* Blue-700 soft */
+  --gradient-bg-2: rgba(96, 165, 250, 0.07);   /* Blue-400 soft */
 
   /* Semantic Colors */
   --color-success: #34d399;              /* Emerald-400 */

@@ -33,25 +33,29 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* LIGHT MODE */
+/* LIGHT MODE — 60/30/10 Rule */
+/* 60% Dominant: #ffffff white canvas                          */
+/* 30% Secondary: #f0f4ff indigo-tinted surfaces (cards)      */
+/* 10% Accent: #4f46e5 indigo CTA + #FFB902 gold brand pop    */
 :root {
   --background: #ffffff;
   --foreground: #1e293b;
 
-  --card: rgba(255, 255, 255, 0.6);
+  /* 30% Secondary — indigo-tinted, clearly distinct from white */
+  --card: #f0f4ff;
   --card-foreground: #1e293b;
 
-  --border: #e2e8f0;
+  --border: #dde3f5;
 
-  --input: #f1f5f9;
+  --input: #f0f4ff;
 
-  /* Indigo primary color */
+  /* 10% Accent — Indigo as primary CTA */
   --primary: #4f46e5;
   --primary-foreground: #ffffff;
 
   --ring: #4f46e5;
 
-  --secondary: #f1f5f9;
+  --secondary: #eef2ff;
   --secondary-foreground: #334155;
 
   --accent: #eef2ff;
@@ -62,7 +66,7 @@
 
   --destructive: #ef4444;
 
-  --sidebar: #f8fafc;
+  --sidebar: #f5f7ff;
   --sidebar-foreground: #334155;
 
   --sidebar-primary: #4f46e5;
@@ -71,11 +75,11 @@
   --sidebar-accent: #eef2ff;
   --sidebar-accent-foreground: #334155;
 
-  --sidebar-border: #e2e8f0;
+  --sidebar-border: #dde3f5;
   --sidebar-ring: #4f46e5;
 
-  /* Organic gradient colors */
-  --soft-lavender: #f3f0ff;
+  /* Body gradient colors — aligned with indigo-tinted secondary */
+  --soft-lavender: #f0f4ff;
   --soft-blue: #eef2ff;
 
   --popover: #ffffff;
@@ -83,42 +87,40 @@
 }
 
 
-/* DARK MODE */
+/* DARK MODE — 60/30/10 Rule */
+/* 60% Dominant: #00001a deep navy canvas                         */
+/* 30% Secondary: rgba(255,255,255,0.07) glass cards + slate text */
+/* 10% Accent: #FFB902 gold brand pop + #60a5fa blue interactive  */
+/* Purple #8b5cf6 → decorative background gradients ONLY          */
 .dark {
-  /* Deep blue background */
+  /* 60% Dominant — Deep navy */
   --background: #00001a;
   --foreground: #e2e8f0;
 
-  /* Glass cards */
-  --card: rgba(255, 255, 255, 0.05);
+  /* 30% Secondary — More visible glass cards (0.07 vs old 0.05) */
+  --card: rgba(255, 255, 255, 0.07);
   --card-foreground: #f1f5f9;
 
-  /* Borders with slight glow */
   --border: rgba(255, 255, 255, 0.12);
 
-  /* Inputs */
   --input: rgba(255, 255, 255, 0.08);
 
-  /* Electric blue primary */
+  /* 10% Accent — Blue for interactive elements */
   --primary: #60a5fa;
   --primary-foreground: #ffffff;
 
-  /* Rings for focus outlines */
   --ring: #60a5fa;
 
-  /* Secondary */
   --secondary: rgba(255, 255, 255, 0.1);
   --secondary-foreground: #e2e8f0;
 
-  /* Accent purple */
-  --accent: #8b5cf6;
-  --accent-foreground: #ffffff;
+  /* Gold-tinted hover states — replaces purple accent */
+  --accent: rgba(255, 185, 2, 0.12);
+  --accent-foreground: #fef3c7;
 
-  /* Muted */
   --muted: rgba(255, 255, 255, 0.05);
   --muted-foreground: #94a3b8;
 
-  /* Destructive */
   --destructive: #ef4444;
 
   /* Sidebar */
@@ -128,13 +130,13 @@
   --sidebar-primary: #60a5fa;
   --sidebar-primary-foreground: #ffffff;
 
-  --sidebar-accent: #8b5cf6;
-  --sidebar-accent-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 185, 2, 0.12);
+  --sidebar-accent-foreground: #fef3c7;
 
   --sidebar-border: rgba(255, 255, 255, 0.12);
   --sidebar-ring: #60a5fa;
 
-  /* Gradient colors */
+  /* Decorative-only gradient colors (not used as UI accents) */
   --electric-purple: #c084fc;
   --soft-blue: #60a5fa;
   --royal-blue: #2563eb;
@@ -179,21 +181,21 @@
   body {
     @apply bg-white text-slate-800 antialiased;
     background:
-      radial-gradient(circle at 0% 0%, var(--soft-lavender) 0%, transparent 40%),
-      radial-gradient(circle at 100% 100%, var(--soft-blue) 0%, transparent 40%),
+      radial-gradient(circle at 0% 0%, var(--soft-lavender) 0%, transparent 45%),
+      radial-gradient(circle at 100% 100%, var(--soft-blue) 0%, transparent 45%),
       radial-gradient(circle at 50% 50%, #ffffff 0%, #ffffff 100%);
     background-attachment: fixed;
     font-family: 'Inter', var(--font-sans), system-ui, -apple-system, sans-serif;
   }
 
-  /* Dark mode misty background */
+  /* Dark mode misty background — all blue family, purple is decorative only */
   .dark body {
     @apply text-slate-200;
     background-color: #00001a;
     background-image:
-      radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
+      radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.18) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(96, 165, 250, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.06) 0%, transparent 60%);
     background-attachment: fixed;
   }
 

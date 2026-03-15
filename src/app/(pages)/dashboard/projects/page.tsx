@@ -13,10 +13,8 @@ export default async function ProjectsPage() {
   });
 
   return (
-    <div className="h-full overflow-y-auto">
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <ProjectManager />
-      </HydrationBoundary>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProjectManager />
+    </HydrationBoundary>
   );
 }
