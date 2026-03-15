@@ -60,7 +60,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#00001a]">
 
       {/* Mobile backdrop */}
       {mobileOpen && (
@@ -76,8 +76,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <aside
         className={cn(
           "flex flex-col shrink-0",
-          "bg-white dark:bg-slate-900",
-          "border-r border-slate-200 dark:border-slate-800",
+          "bg-white dark:bg-[#0a0f1e]",
+          "border-r border-slate-200 dark:border-white/10",
           // Mobile: fixed overlay, hidden by default
           "fixed inset-y-0 left-0 z-50 w-[220px]",
           "transition-transform duration-300 ease-in-out",
@@ -88,7 +88,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         )}
       >
         {/* Brand */}
-        <div className="flex items-center gap-2.5 h-14 px-3 border-b border-slate-200 dark:border-slate-800 shrink-0 overflow-hidden">
+        <div className="flex items-center gap-2.5 h-14 px-3 border-b border-slate-200 dark:border-white/10 shrink-0 overflow-hidden">
           <div className="p-1.5 rounded-lg shrink-0" style={{ background: "#FFB902" }}>
             <LayoutDashboard className="h-4 w-4" style={{ color: "#04061a" }} />
           </div>
@@ -161,7 +161,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Bottom: Theme + Sign Out */}
         <div
           className={cn(
-            "flex items-center border-t border-slate-200 dark:border-slate-800 p-2 gap-1 shrink-0 overflow-hidden",
+            "flex items-center border-t border-slate-200 dark:border-white/10 p-2 gap-1 shrink-0 overflow-hidden",
             collapsed ? "flex-col" : "flex-row"
           )}
         >
@@ -242,7 +242,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Page header */}
-        <header className="flex items-center h-14 px-4 md:px-6 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 gap-3">
+        <header className="flex items-center h-14 px-4 md:px-6 bg-white dark:bg-[#0a0f1e] border-b border-slate-200 dark:border-white/10 shrink-0 gap-3">
           {/* Hamburger – mobile only */}
           <button
             onClick={() => setMobileOpen(true)}

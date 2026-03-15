@@ -19,7 +19,7 @@ export const ProjectCard = ({
     return (
         <Card className="hover:shadow-xl transition-all duration-300 h-full flex flex-col group border-slate-200 dark:border-slate-700 overflow-hidden">
             {/* Visual Preview */}
-            <div className="relative h-48 w-full bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div className="relative h-56 w-full bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 overflow-hidden">
                 {project.image ? (
                     <Image
                         src={project.image}
@@ -37,8 +37,8 @@ export const ProjectCard = ({
                 </div>
             </div>
 
-            <CardHeader className="p-5 pb-2">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:opacity-80 transition-opacity uppercase tracking-tight">
+            <CardHeader className="p-6 pb-2">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 group-hover:opacity-80 transition-opacity uppercase tracking-tight">
                     {project.title}
                 </h3>
                 <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
@@ -56,13 +56,13 @@ export const ProjectCard = ({
                 </div>
             </CardHeader>
 
-            <CardContent className="p-5 pt-2 flex-grow">
+            <CardContent className="p-6 pt-2 flex-grow">
                 <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
                     {project.description}
                 </p>
             </CardContent>
 
-            <CardFooter className="p-5 pt-0 flex gap-3">
+            <CardFooter className="p-6 pt-0 flex gap-3">
                 <Button
                     size="sm"
                     onClick={() => onEdit(project)}

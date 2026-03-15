@@ -135,7 +135,7 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-white dark:bg-[#000045] font-sans antialiased mx-auto transition-colors duration-300",
+          "min-h-screen bg-white dark:bg-[#00001a] font-sans antialiased transition-colors duration-300",
           fontSans.variable,
           fontDisplay.variable
         )}

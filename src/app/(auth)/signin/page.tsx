@@ -172,28 +172,33 @@ export default function SignInPage() {
 
   // ─── UI ───────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#00001a' }}>
 
       {/* Subtle grid pattern */}
       <div
-        className="pointer-events-none fixed inset-0 opacity-[0.03]"
+        className="pointer-events-none fixed inset-0 opacity-[0.025]"
         style={{
           backgroundImage:
             "linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
+      {/* Background glow blobs matching project theme */}
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute top-[20%] left-[20%] w-80 h-80 rounded-full blur-[120px]" style={{ background: 'rgba(37,99,235,0.12)' }} />
+        <div className="absolute bottom-[20%] right-[20%] w-64 h-64 rounded-full blur-[100px]" style={{ background: 'rgba(255,185,2,0.07)' }} />
+      </div>
 
       <div className="relative w-full max-w-[420px]">
 
-        {/* Glow accent */}
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
+        {/* Glow accent — gold */}
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(255,185,2,0.10)' }} />
 
         {/* Card */}
-        <div className="relative bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(20px)' }}>
 
-          {/* Top bar */}
-          <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600" />
+          {/* Top bar — gold */}
+          <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, #FFB902, #f0c030, #FFB902)' }} />
 
           <div className="p-8">
 
@@ -205,18 +210,25 @@ export default function SignInPage() {
                     className={cn(
                       "flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold transition-all duration-300",
                       step === s
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/40"
+                        ? "shadow-lg"
                         : i < (step === "otp" ? 1 : 0)
-                        ? "bg-blue-600/20 text-blue-400"
-                        : "bg-slate-800 text-slate-500"
+                        ? "text-[#FFB902]"
+                        : "text-slate-500"
                     )}
+                    style={
+                      step === s
+                        ? { background: '#FFB902', color: '#04061a', boxShadow: '0 0 12px rgba(255,185,2,0.4)' }
+                        : i < (step === "otp" ? 1 : 0)
+                        ? { background: 'rgba(255,185,2,0.15)' }
+                        : { background: 'rgba(255,255,255,0.08)' }
+                    }
                   >
                     {i + 1}
                   </div>
                   <span
                     className={cn(
                       "text-[11px] font-medium transition-colors",
-                      step === s ? "text-slate-300" : "text-slate-600"
+                      step === s ? "text-slate-200" : "text-slate-500"
                     )}
                   >
                     {s === "credentials" ? "Credentials" : "Verify OTP"}
@@ -225,8 +237,9 @@ export default function SignInPage() {
                     <div
                       className={cn(
                         "flex-1 h-px w-8 transition-colors",
-                        step === "otp" ? "bg-blue-600/50" : "bg-slate-800"
+                        step === "otp" ? "" : ""
                       )}
+                      style={{ background: step === "otp" ? 'rgba(255,185,2,0.4)' : 'rgba(255,255,255,0.08)' }}
                     />
                   )}
                 </div>
@@ -240,10 +253,10 @@ export default function SignInPage() {
               <form onSubmit={handleCredentialsSubmit} className="space-y-5">
                 <div>
                   <div className="flex items-center gap-2.5 mb-1.5">
-                    <Lock className="h-4 w-4 text-blue-500 shrink-0" />
+                    <Lock className="h-4 w-4 shrink-0" style={{ color: '#FFB902' }} />
                     <h1 className="text-lg font-bold text-slate-100">Admin Sign In</h1>
                   </div>
-                  <p className="text-[13px] text-slate-500 leading-relaxed pl-[26px]">
+                  <p className="text-[13px] text-slate-400 leading-relaxed pl-[26px]">
                     Enter your credentials to receive a verification code.
                   </p>
                 </div>
@@ -268,7 +281,8 @@ export default function SignInPage() {
                         placeholder="admin@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-9 bg-slate-800/60 border-slate-700 text-slate-100 placeholder:text-slate-600 focus:border-blue-500 focus:ring-blue-500/20 h-10"
+                        className="pl-9 h-10 placeholder:text-slate-600 text-slate-100 focus:border-[#FFB902] focus:ring-[#FFB902]/20"
+                        style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)' }}
                         required
                       />
                     </div>
@@ -287,7 +301,8 @@ export default function SignInPage() {
                         placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-9 pr-10 bg-slate-800/60 border-slate-700 text-slate-100 placeholder:text-slate-600 focus:border-blue-500 focus:ring-blue-500/20 h-10"
+                        className="pl-9 pr-10 h-10 placeholder:text-slate-600 text-slate-100 focus:border-[#FFB902] focus:ring-[#FFB902]/20"
+                        style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)' }}
                         required
                       />
                       <button
@@ -305,7 +320,8 @@ export default function SignInPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all duration-200"
+                  className="w-full h-10 font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                  style={{ background: '#FFB902', color: '#04061a', boxShadow: '0 4px 20px rgba(255,185,2,0.25)' }}
                 >
                   {loading ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending code…</>
@@ -323,7 +339,7 @@ export default function SignInPage() {
               <form onSubmit={handleOtpSubmit} className="space-y-5">
                 <div>
                   <div className="flex items-center gap-2.5 mb-1.5">
-                    <ShieldCheck className="h-4 w-4 text-blue-500 shrink-0" />
+                    <ShieldCheck className="h-4 w-4 shrink-0" style={{ color: '#FFB902' }} />
                     <h1 className="text-lg font-bold text-slate-100">Verify Identity</h1>
                   </div>
                   <p className="text-[13px] text-slate-500 leading-relaxed pl-[26px]">
@@ -360,10 +376,11 @@ export default function SignInPage() {
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     className={cn(
                       "text-center text-2xl font-bold tracking-[0.5em] h-14",
-                      "bg-slate-800/60 border-slate-700 text-slate-100 placeholder:text-slate-700",
-                      "focus:border-blue-500 focus:ring-blue-500/20",
+                      "text-slate-100 placeholder:text-slate-600",
+                      "focus:border-[#FFB902] focus:ring-[#FFB902]/20",
                       "font-mono transition-all"
                     )}
+                    style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)' }}
                     autoFocus
                     disabled={isExpired}
                   />
@@ -385,7 +402,8 @@ export default function SignInPage() {
                       type="button"
                       onClick={handleResend}
                       disabled={resendLoading}
-                      className="flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                      className="flex items-center gap-1 font-medium transition-colors hover:opacity-80"
+                      style={{ color: '#FFB902' }}
                     >
                       {resendLoading ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
@@ -404,7 +422,8 @@ export default function SignInPage() {
                 <Button
                   type="submit"
                   disabled={loading || isExpired || otp.length !== 6}
-                  className="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all duration-200 disabled:opacity-50"
+                  className="w-full h-10 font-semibold text-sm transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-40"
+                  style={{ background: '#FFB902', color: '#04061a', boxShadow: '0 4px 20px rgba(255,185,2,0.25)' }}
                 >
                   {loading ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Verifying…</>
@@ -434,7 +453,7 @@ export default function SignInPage() {
 
           {/* Footer */}
           <div className="px-8 pb-6 text-center">
-            <p className="text-[11px] text-slate-700">
+            <p className="text-[11px] text-slate-500">
               Secured with SMTP-based two-factor authentication
             </p>
           </div>
