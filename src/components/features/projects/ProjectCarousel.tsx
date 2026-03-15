@@ -9,11 +9,11 @@ interface Project {
   _id: string;
   title: string;
   description: string;
-  image?: string;
+  image?: string | null;
   technologies?: string[];
-  projectUrl?: string;
-  githubUrl?: string;
-  caseStudyUrl?: string;
+  projectUrl?: string | null;
+  githubUrl?: string | null;
+  caseStudyUrl?: string | null;
   dates?: string;
 }
 
