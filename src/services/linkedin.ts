@@ -260,9 +260,6 @@ export async function publishLinkedInPost(
   accessToken: string,
   personId: string,
   postText: string,
-  blogUrl: string,
-  blogTitle: string,
-  blogExcerpt: string,
   imageAssetUrns: string[] = [],
 ): Promise<LinkedInPostResult> {
   const author = `urn:li:person:${personId}`;
@@ -270,37 +267,22 @@ export async function publishLinkedInPost(
   let specificContent: object;
 
   if (imageAssetUrns.length > 0) {
-    const textWithUrl = postText.includes(blogUrl)
-      ? postText
-      : `${postText}\n\nRead the full article: ${blogUrl}`;
-
     specificContent = {
       "com.linkedin.ugc.ShareContent": {
-        shareCommentary: { text: textWithUrl },
+        shareCommentary: { text: postText },
         shareMediaCategory: "IMAGE",
-        media: imageAssetUrns.map((urn, i) => ({
+        media: imageAssetUrns.map((urn) => ({
           status: "READY",
           media: urn,
-          title: {
-            attributes: [],
-            text: i === 0 ? blogTitle : `${blogTitle} (${i + 1})`,
-          },
         })),
       },
     };
   } else {
+    // Plain text post — no link preview card so the link-in-comments strategy works
     specificContent = {
       "com.linkedin.ugc.ShareContent": {
         shareCommentary: { text: postText },
-        shareMediaCategory: "ARTICLE",
-        media: [
-          {
-            status: "READY",
-            originalUrl: blogUrl,
-            title: { attributes: [], text: blogTitle },
-            description: { attributes: [], text: blogExcerpt },
-          },
-        ],
+        shareMediaCategory: "NONE",
       },
     };
   }
@@ -335,6 +317,37 @@ export async function publishLinkedInPost(
     : `https://www.linkedin.com/in/${personId}/recent-activity/shares/`;
 
   return { postId, postUrl };
+}
+
+/**
+ * Add a comment to a LinkedIn post (used for "link in comments" method)
+ */
+export async function addLinkedInComment(
+  accessToken: string,
+  personId: string,
+  postId: string,
+  commentText: string,
+): Promise<void> {
+  const res = await fetch(
+    `${LINKEDIN_API}/socialActions/${encodeURIComponent(postId)}/comments`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "X-Restli-Protocol-Version": "2.0.0",
+      },
+      body: JSON.stringify({
+        actor: `urn:li:person:${personId}`,
+        message: { text: commentText },
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`LinkedIn comment failed: ${err}`);
+  }
 }
 
 /**

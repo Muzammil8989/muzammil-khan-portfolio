@@ -70,6 +70,7 @@ model Blog {
   createdAt    String
   updatedAt    String
   linkedinPost LinkedinPostMeta?
+  createdBy    String?            // email of the session user who created the post
 
   @@map("blogs")
 }
