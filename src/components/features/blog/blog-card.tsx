@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Heart, Clock, ArrowUpRight } from "lucide-react";
 import { Blog } from "@/services/blog";
 import Link from "next/link";
+import { useLikeBlog } from "@/app/hooks/useBlogs";
+import { safeGet, safeSet } from "@/lib/like-token";
 
 interface BlogCardProps {
   blog: Blog;
@@ -26,42 +28,48 @@ const TYPE_EMOJI: Record<string, string> = {
   "Quick Tip": "💡",
 };
 
+const LIKED_KEY = "liked_blogs";
+
 export function BlogCard({ blog, cardNumber }: BlogCardProps) {
   const [hasLiked, setHasLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(blog.likes || 0);
-  const [isLiking, setIsLiking] = useState(false);
+  const likeMutation = useLikeBlog();
 
-  useEffect(() => {
-    if (blog?._id) {
-      const liked = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
-      setHasLiked(liked.includes(blog._id));
-    }
-  }, [blog?._id]);
-
+  // Sync likes count when prop updates (e.g. after query invalidation)
   useEffect(() => {
     setLikesCount(blog.likes || 0);
   }, [blog.likes]);
 
-  const handleLike = async (e: React.MouseEvent) => {
+  // Check if this browser already liked (safe localStorage read)
+  useEffect(() => {
+    if (!blog?._id) return;
+    const liked: string[] = JSON.parse(safeGet(LIKED_KEY));
+    setHasLiked(liked.includes(blog._id));
+  }, [blog?._id]);
+
+  const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!blog?._id || hasLiked || isLiking) return;
+    if (!blog?._id || hasLiked || likeMutation.isPending) return;
+
+    // Optimistic update
     setLikesCount((p) => p + 1);
     setHasLiked(true);
-    setIsLiking(true);
-    try {
-      await fetch(`/api/blogs/${blog._id}/like`, { method: "POST" });
-      const liked = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
-      if (!liked.includes(blog._id)) {
-        liked.push(blog._id);
-        localStorage.setItem("liked_blogs", JSON.stringify(liked));
-      }
-    } catch {
-      setLikesCount((p) => p - 1);
-      setHasLiked(false);
-    } finally {
-      setIsLiking(false);
-    }
+
+    likeMutation.mutate(blog._id, {
+      onSuccess: () => {
+        const liked: string[] = JSON.parse(safeGet(LIKED_KEY));
+        if (!liked.includes(blog._id)) {
+          liked.push(blog._id);
+          safeSet(LIKED_KEY, JSON.stringify(liked));
+        }
+      },
+      onError: () => {
+        // Rollback optimistic update
+        setLikesCount((p) => p - 1);
+        setHasLiked(false);
+      },
+    });
   };
 
   const bars = DIFFICULTY_BARS[blog.difficulty] ?? 1;
@@ -114,7 +122,7 @@ export function BlogCard({ blog, cardNumber }: BlogCardProps) {
             </span>
             <button
               onClick={handleLike}
-              disabled={hasLiked || isLiking}
+              disabled={hasLiked || likeMutation.isPending}
               aria-label="Like this post"
               className={`flex items-center gap-1 transition-colors duration-200 ${
                 hasLiked ? "text-rose-400" : "hover:text-rose-400"
