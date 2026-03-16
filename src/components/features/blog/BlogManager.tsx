@@ -15,7 +15,7 @@ export function BlogManager() {
   return (
     <Suspense fallback={<BlogManagerSkeleton />}>
       <BlogManagerProvider>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 pb-6">
           <BlogManagerHeader />
           <BlogManagerStats />
 
