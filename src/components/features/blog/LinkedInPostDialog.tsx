@@ -33,14 +33,11 @@ function toUnicodeBold(text: string): string {
 }
 
 function buildDefaultText(blog: Blog): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
-  const blogUrl = `${siteUrl}/blog/${blog.slug}`;
   const tagsLine = blog.tags.slice(0, 5).map((t) => `#${t.replace(/\s+/g, "")}`).join(" ");
 
   return `${blog.excerpt || blog.title}
 
-Read the full article on my portfolio:
-${blogUrl}
+Full article link in the comments 👇
 
 ${tagsLine}`;
 }
@@ -125,18 +122,18 @@ export function LinkedInPostDialog({ blog, open, onOpenChange }: LinkedInPostDia
             <DialogDescription>
               Share{" "}
               <span className="font-medium text-foreground">"{blog.title}"</span> on LinkedIn.
-              Readers will be redirected to your portfolio to read the full article.
+              The blog link is automatically posted as the first comment for maximum reach.
             </DialogDescription>
           </DialogHeader>
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5">
         <div className="space-y-5">
-          {/* Blog link preview */}
+          {/* Blog link info */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
             <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">
-              Links to:{" "}
+              Auto-comment:{" "}
               <a href={blogUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
                 {blogUrl}
               </a>
@@ -239,17 +236,10 @@ export function LinkedInPostDialog({ blog, open, onOpenChange }: LinkedInPostDia
           {/* Post preview info */}
           <div className="bg-[#0077B5]/5 border border-[#0077B5]/20 rounded-lg px-4 py-3 text-xs text-muted-foreground space-y-1">
             <p className="font-medium text-foreground text-sm">What LinkedIn users will see:</p>
-            {images.length > 0 ? (
-              <p>
-                Your post text with {images.length} image{images.length > 1 ? "s" : ""}.
-                The blog URL is included in the post text — users click it to read the full article.
-              </p>
-            ) : (
-              <p>
-                Your post text with a rich link preview card showing the blog title, excerpt, and your portfolio URL.
-                Users click the card to read the full article.
-              </p>
-            )}
+            <p>
+              Your post text{images.length > 0 ? ` with ${images.length} image${images.length > 1 ? "s" : ""}` : ""} — no link in the post body.
+              The blog URL is automatically posted as the <span className="font-medium text-foreground">first comment</span>, which gets more reach from LinkedIn's algorithm.
+            </p>
           </div>
 
           {/* Actions */}

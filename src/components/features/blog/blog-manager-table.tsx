@@ -23,6 +23,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
@@ -38,6 +43,12 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ThumbsUp,
+  MessageSquare,
+  Repeat2,
+  Send,
+  ExternalLink,
+  ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useBlogManager } from "./blog-manager-context";
@@ -322,6 +333,100 @@ export function BlogManagerTable() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+function LinkedInPreviewCard({ blog }: { blog: Blog }) {
+  const liPost = blog.linkedinPost!;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const blogUrl = `${siteUrl}/blog/${blog.slug}`;
+  const postedDate = liPost.postedAt
+    ? new Date(liPost.postedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : "Recently";
+
+  return (
+    <div className="w-80 rounded-xl overflow-hidden border border-border shadow-lg bg-background">
+      {/* LinkedIn-style header */}
+      <div className="bg-[#0077B5] px-4 py-2 flex items-center gap-2">
+        <LucideLinkedin className="h-4 w-4 text-white" />
+        <span className="text-white text-xs font-semibold">LinkedIn Post Preview</span>
+      </div>
+
+      {/* Post card */}
+      <div className="p-4">
+        {/* Author row */}
+        <div className="flex items-start gap-3 mb-3">
+          <div className="h-10 w-10 rounded-full bg-[#0077B5] flex items-center justify-center shrink-0 text-white text-sm font-bold">
+            MK
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground leading-tight">Muhammad Muzammil Khan</p>
+            <p className="text-[11px] text-muted-foreground leading-tight truncate">Full Stack Developer</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{postedDate} · 🌐</p>
+          </div>
+        </div>
+
+        {/* Post text */}
+        <div className="text-sm text-foreground leading-relaxed mb-3 line-clamp-4 whitespace-pre-line">
+          {blog.excerpt}
+          {"\n\nFull article link in the comments 👇"}
+        </div>
+
+        {/* Tags */}
+        {blog.tags?.length > 0 && (
+          <p className="text-xs text-[#0077B5] mb-3 line-clamp-1">
+            {blog.tags.slice(0, 4).map((t) => `#${t.replace(/\s+/g, "")}`).join(" ")}
+          </p>
+        )}
+
+        {/* Image count indicator */}
+        {liPost.imageCount > 0 && (
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground bg-muted/50 rounded-md px-2.5 py-1.5 mb-3">
+            <ImageIcon className="h-3 w-3" />
+            <span>{liPost.imageCount} image{liPost.imageCount > 1 ? "s" : ""} attached</span>
+          </div>
+        )}
+
+        {/* Auto-comment indicator */}
+        <div className="bg-[#0077B5]/10 border border-[#0077B5]/20 rounded-lg px-3 py-2 mb-3">
+          <p className="text-[10px] font-semibold text-[#0077B5] mb-1">📌 First Comment (auto-posted)</p>
+          <p className="text-[11px] text-muted-foreground break-all leading-snug">
+            Read the full article here: <span className="text-[#0077B5]">{blogUrl}</span>
+          </p>
+        </div>
+
+        {/* Reaction bar */}
+        <div className="flex items-center justify-between border-t border-border pt-2.5">
+          {[
+            { icon: ThumbsUp, label: "Like" },
+            { icon: MessageSquare, label: "Comment" },
+            { icon: Repeat2, label: "Repost" },
+            { icon: Send, label: "Send" },
+          ].map(({ icon: Icon, label }) => (
+            <button
+              key={label}
+              className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-[#0077B5] transition-colors px-1 py-0.5 rounded"
+            >
+              <Icon className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* View on LinkedIn button */}
+      <div className="px-4 pb-4">
+        <a
+          href={liPost.postUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-[#0077B5] hover:bg-[#006097] text-white text-xs font-semibold transition-colors"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          View on LinkedIn
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function TitleCell({ blog }: { blog: Blog }) {
   const liPost = blog.linkedinPost;
   return (
@@ -329,16 +434,20 @@ function TitleCell({ blog }: { blog: Blog }) {
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold text-foreground truncate leading-tight">{blog.title}</span>
         {liPost && (
-          <a
-            href={liPost.postUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="View on LinkedIn"
-            className="shrink-0 text-[#0077B5] hover:text-[#005f8e] transition-colors"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <LucideLinkedin className="h-3.5 w-3.5" />
-          </a>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="shrink-0 text-[#0077B5] hover:text-[#005f8e] transition-colors"
+                onClick={(e) => e.stopPropagation()}
+                title="Preview LinkedIn post"
+              >
+                <LucideLinkedin className="h-3.5 w-3.5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 border-0 shadow-none" side="bottom" align="start" sideOffset={8}>
+              <LinkedInPreviewCard blog={blog} />
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">

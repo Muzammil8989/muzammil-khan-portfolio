@@ -6,6 +6,7 @@ import {
   isTokenValid,
   uploadImagesToLinkedIn,
   publishLinkedInPost,
+  addLinkedInComment,
 } from "@/services/linkedin";
 
 /**
@@ -88,11 +89,22 @@ export async function POST(request: NextRequest) {
       linkedInToken.accessToken,
       linkedInToken.personId,
       postText,
-      blogUrl,
-      blog.title,
-      blog.excerpt || "",
       assetUrns,
     );
+
+    // Add blog URL as first comment (link-in-comments strategy for better reach)
+    if (result.postId) {
+      try {
+        await addLinkedInComment(
+          linkedInToken.accessToken,
+          linkedInToken.personId,
+          result.postId,
+          `Read the full article here: ${blogUrl}`,
+        );
+      } catch (commentErr) {
+        console.warn("LinkedIn comment failed (post still published):", commentErr);
+      }
+    }
 
     // Save LinkedIn post info back to the blog document
     await prisma.blog.update({
