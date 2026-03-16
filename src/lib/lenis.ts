@@ -15,6 +15,12 @@ export function useLenis() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Dashboard uses a contained overflow-scroll layout — Lenis would
+    // intercept wheel events and break the inner <main> scroll.
+    if (pathname.startsWith("/dashboard")) {
+      return;
+    }
+
     // Initialize Lenis
     const lenis = new Lenis({
       duration: 1.5, // Smooth scroll duration (increased for smoother feel)
