@@ -13,10 +13,8 @@ export default async function WorkPage() {
   });
 
   return (
-    <div className="h-full overflow-y-auto">
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <WorkManager />
-      </HydrationBoundary>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <WorkManager />
+    </HydrationBoundary>
   );
 }

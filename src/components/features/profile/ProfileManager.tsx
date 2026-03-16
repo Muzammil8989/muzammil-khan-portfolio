@@ -105,15 +105,15 @@ export function ProfileManager() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">Profiles</h2>
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-slate-100">Profiles</h2>
                     <p className="text-sm text-gray-500 dark:text-slate-400">Manage your public bio and branding</p>
                 </div>
                 {profiles.length === 0 && isMounted && (
                     <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
                         <DialogTrigger asChild>
-                            <Button className="font-bold transition-opacity hover:opacity-85 shadow-md" style={{ background: "#FFB902", color: "#04061a" }}>
+                            <Button className="w-full sm:w-auto font-bold transition-opacity hover:opacity-85 shadow-md" style={{ background: "#FFB902", color: "#04061a" }}>
                                 <Plus className="mr-2 h-4 w-4" /> Create Profile
                             </Button>
                         </DialogTrigger>
@@ -139,7 +139,7 @@ export function ProfileManager() {
             </div>
 
             {profiles.length > 0 ? (
-                <div className={`grid gap-6 ${profiles.length === 1 ? "grid-cols-1 max-w-md" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+                <div className={`grid gap-4 sm:gap-6 ${profiles.length === 1 ? "grid-cols-1 max-w-sm sm:max-w-md" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
                     {profiles.map((profile) => (
                         <ProfileCard
                             key={profile._id}
@@ -158,7 +158,7 @@ export function ProfileManager() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-20 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
+                <div className="text-center py-12 sm:py-20 bg-gray-50/50 dark:bg-slate-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-slate-700">
                     <User className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">No profiles found</h3>
                     <p className="text-gray-500 dark:text-slate-400 mb-6">Create your first professional identity.</p>

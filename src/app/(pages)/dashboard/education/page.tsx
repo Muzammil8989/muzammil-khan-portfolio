@@ -13,10 +13,8 @@ export default async function EducationPage() {
   });
 
   return (
-    <div className="h-full overflow-y-auto">
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <EducationManager />
-      </HydrationBoundary>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <EducationManager />
+    </HydrationBoundary>
   );
 }

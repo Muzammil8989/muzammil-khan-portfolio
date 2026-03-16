@@ -55,7 +55,7 @@ export const ProfileCard = ({
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center gap-2 pt-2 pb-4">
+      <CardFooter className="flex gap-2 pt-2 pb-4">
         <Button
           size="sm"
           onClick={() => onEdit(profile)}

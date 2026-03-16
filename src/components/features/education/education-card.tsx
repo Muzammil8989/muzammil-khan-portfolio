@@ -68,7 +68,7 @@ export const EducationCard = ({
       </CardContent>
 
       {/* Footer */}
-      <CardFooter className="flex justify-center gap-2 pt-2 pb-4">
+      <CardFooter className="flex gap-2 pt-2 pb-4">
         <Button
           variant="outline"
           size="sm"

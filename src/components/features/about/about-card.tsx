@@ -33,7 +33,7 @@ export const AboutCard = ({
         <p className="line-clamp-3">{about.message}</p>
       </CardContent>
       {showActions && onEdit && onDelete && (
-        <CardFooter className="flex justify-center gap-2 pt-2 pb-4">
+        <CardFooter className="flex gap-2 pt-2 pb-4">
           <Button
             variant="outline"
             size="sm"
