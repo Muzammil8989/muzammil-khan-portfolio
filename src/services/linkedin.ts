@@ -271,13 +271,9 @@ export async function publishLinkedInPost(
       "com.linkedin.ugc.ShareContent": {
         shareCommentary: { text: postText },
         shareMediaCategory: "IMAGE",
-        media: imageAssetUrns.map((urn, i) => ({
+        media: imageAssetUrns.map((urn) => ({
           status: "READY",
           media: urn,
-          title: {
-            attributes: [],
-            text: i === 0 ? blogTitle : `${blogTitle} (${i + 1})`,
-          },
         })),
       },
     };
