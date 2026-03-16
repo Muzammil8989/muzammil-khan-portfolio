@@ -261,7 +261,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8" data-lenis-prevent>
+        <main className="flex-1 overflow-y-auto p-4 pb-16 sm:p-6 sm:pb-10 md:p-8" data-lenis-prevent>
           {children}
         </main>
       </div>
