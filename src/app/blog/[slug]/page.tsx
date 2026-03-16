@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 // Wraps arrow/symbol chars that browsers render as emoji inside
 // <span style="font-variant-emoji:text"> so they appear as plain text glyphs.
@@ -125,10 +126,16 @@ interface BlogDetailPageProps {
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
 
-  // Get user IP for server-side like check
   const headersList = await headers();
+
+  // Prefer the browser UUID token (set by like-token.ts on client) so the
+  // server-side isLiked flag matches what the client uses for deduplication.
+  // Falls back to IP when the cookie isn't present yet (first-ever page load).
+  const cookieHeader = headersList.get("cookie") ?? "";
+  const cookieToken = cookieHeader.match(/(?:^|;\s*)like_token=([^;]+)/)?.[1]?.trim() ?? "";
   const forwarded = headersList.get("x-forwarded-for");
   const ip = forwarded ? forwarded.split(",")[0] : "anonymous";
+  const likeIdentifier = cookieToken || ip;
 
   // Fetch blog data directly on the server
   let blog: Blog;
@@ -138,12 +145,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     const rawBlog = await BlogService.getBySlug(slug) as any;
     if (!rawBlog) notFound();
 
-    // Inject isLiked status for the current user
+    // Inject isLiked status for the current user (never leak identifiers to client)
     blog = {
       ...rawBlog,
       _id: rawBlog._id.toString(),
-      isLiked: rawBlog.likedBy?.includes(ip) || false,
-      likedBy: undefined, // Don't leak other IPs
+      isLiked: rawBlog.likedBy?.includes(likeIdentifier) || false,
+      likedBy: undefined,
     } as Blog;
 
     // Fetch related blogs based on tags, fallback to recent posts
@@ -325,7 +332,21 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             } as any}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeTextArrows]}
+              rehypePlugins={[
+                // Sanitize HTML embedded in Markdown (XSS protection).
+                // Extends defaultSchema to allow style attributes our custom
+                // components inject (e.g. font-variant-emoji on arrow spans).
+                [rehypeSanitize, {
+                  ...defaultSchema,
+                  attributes: {
+                    ...defaultSchema.attributes,
+                    span: [...(defaultSchema.attributes?.span ?? []), "style"],
+                    code: [...(defaultSchema.attributes?.code ?? []), "className"],
+                    div:  [...(defaultSchema.attributes?.div  ?? []), "className"],
+                  },
+                }],
+                rehypeTextArrows,
+              ]}
               components={{
                 h1: ({ children }) => <h1 className="text-3xl sm:text-4xl mt-12 mb-6" style={{ color: 'var(--color-brand-accent)' }}>{children}</h1>,
                 h2: ({ children }) => <h2 className="text-2xl sm:text-3xl mt-10 mb-5 pb-2 border-b" style={{ color: 'var(--color-brand-accent)', borderColor: 'var(--border-subtle)' }}>{children}</h2>,

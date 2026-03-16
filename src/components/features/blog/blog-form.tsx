@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, createContext, use } from "react";
+import { useState, useEffect, useRef, createContext, use } from "react";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,9 @@ interface BlogFormActions {
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
+  handleSlugChange: (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
   handleSeoChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
@@ -72,7 +75,7 @@ function useBlogForm() {
 function BasicInfoSection() {
   const { state, actions } = useBlogForm();
   const { formData } = state;
-  const { handleChange } = actions;
+  const { handleChange, handleSlugChange } = actions;
 
   return (
     <div className="space-y-4">
@@ -96,12 +99,12 @@ function BasicInfoSection() {
           id="slug"
           name="slug"
           value={formData.slug}
-          onChange={handleChange}
+          onChange={handleSlugChange}
           required
           placeholder="how-to-build-modern-web-app-nextjs"
         />
         <p className="text-xs text-muted-foreground">
-          URL-friendly version (auto-generated from title)
+          Auto-generated from title — edit to set a custom URL slug
         </p>
       </div>
 
@@ -483,6 +486,9 @@ interface BlogFormProps {
 
 export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
   const { resolvedTheme } = useTheme();
+  // Track whether the user has manually typed a custom slug so we stop
+  // auto-generating it from the title (only applies when creating, not editing).
+  const slugManuallyEdited = useRef(false);
   const [formData, setFormData] = useState<BlogInput>({
     title: "",
     slug: "",
@@ -534,7 +540,9 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
   }, [blog]);
 
   useEffect(() => {
-    if (formData.title && !blog) {
+    // Only auto-generate slug when creating (not editing) AND the user hasn't
+    // manually typed a custom slug yet.
+    if (formData.title && !blog && !slugManuallyEdited.current) {
       const slug = generateSlug(formData.title);
       setFormData((prev) => ({
         ...prev,
@@ -554,6 +562,11 @@ export function BlogForm({ blog, onSubmit, isSubmitting }: BlogFormProps) {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    slugManuallyEdited.current = true;
+    handleChange(e);
   };
 
   const handleSeoChange = (
@@ -798,6 +811,7 @@ export function CodeBlock({ code, language, filename }) {
       setLanguageInput,
       setFrameworkInput,
       handleChange,
+      handleSlugChange,
       handleSeoChange,
       handleAddTag,
       handleRemoveTag,

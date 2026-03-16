@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BlogInput, CodeBlock, BlogSeo } from "@/core/validation/blog";
+import { getOrCreateLikeToken } from "@/lib/like-token";
 
 const API_URL = "/api/blogs";
 
@@ -150,6 +151,9 @@ export const fetchFeaturedBlogs = async (limit: number = 3): Promise<Blog[]> => 
  * Like a blog post
  */
 export const likeBlog = async (id: string): Promise<Blog> => {
-  const res = await axios.post(`${API_URL}/${id}/like`);
+  const token = getOrCreateLikeToken();
+  const res = await axios.post(`${API_URL}/${id}/like`, null, {
+    headers: { "X-Like-Token": token },
+  });
   return res.data?.data || res.data;
 };
