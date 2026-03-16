@@ -79,8 +79,9 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validatedData = BlogSchema.parse(body);
 
-    // Create blog
-    const blog = await BlogService.create(validatedData);
+    // Create blog, track who created it
+    const createdBy = (token.email || token.name || token.sub || "unknown") as string;
+    const blog = await BlogService.create(validatedData, createdBy);
 
     return blog;
   }, 201);

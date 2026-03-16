@@ -93,7 +93,7 @@ export class BlogService {
   /**
    * Create new blog post
    */
-  static async create(data: BlogInput) {
+  static async create(data: BlogInput, createdBy?: string) {
     const existing = await prisma.blog.findUnique({ where: { slug: data.slug } });
     if (existing) {
       throw new AppError("BAD_REQUEST", "A blog with this slug already exists", 400);
@@ -111,6 +111,7 @@ export class BlogService {
         likes: 0,
         version: 1,
         likedBy: [],
+        ...(createdBy ? { createdBy } : {}),
       },
     });
 
