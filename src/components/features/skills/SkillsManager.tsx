@@ -48,7 +48,7 @@ export function SkillsManager() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 pb-6">
             <div className="bg-white/50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm space-y-4">
                 <div>
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
