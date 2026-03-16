@@ -82,7 +82,7 @@ export function ProjectManager() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-gray-100 dark:border-slate-700 backdrop-blur-sm">
                 <div>
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-slate-100">Portfolio Projects</h2>
