@@ -18,9 +18,6 @@ import { ProjectCarousel } from "@/components/features/projects/ProjectCarousel"
 
 export const dynamic = "force-dynamic";
 
-interface AboutData {
-  message: string;
-}
 
 export default async function Page() {
   // Direct server-side data fetching
@@ -66,19 +63,19 @@ export default async function Page() {
       {/* Main Container */}
       <div className="relative z-10 w-full mx-auto px-6 py-12 space-y-14 max-w-5xl">
         {/* Hero Section */}
-        <header className="flex flex-col md:flex-row items-center gap-10 w-full">
+        <header className="flex flex-col md:flex-row items-center gap-8 md:gap-10 w-full">
           {profiles.map((profile: any) => (
             <React.Fragment key={profile._id}>
-              <div className="relative w-full md:w-auto flex justify-center md:block">
+              <div className="relative shrink-0 flex justify-center">
                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-blue-200 dark:from-blue-600 dark:to-indigo-700 rounded-full blur-3xl opacity-40 dark:opacity-40"></div>
-                <Avatar className="relative w-32 h-32 md:w-44 md:h-44 border-4 border-white dark:border-white/20 object-cover shadow-2xl">
+                <Avatar className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-44 md:h-44 border-4 border-white dark:border-white/20 object-cover shadow-2xl">
                   <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
                   <AvatarFallback className="text-4xl font-bold bg-indigo-50 dark:bg-blue-900 text-indigo-600 dark:text-blue-300">
                     {profile.initials}
                   </AvatarFallback>
                 </Avatar>
               </div>
-              <div className="text-center md:text-left space-y-4 w-full flex-1">
+              <div className="space-y-4 w-full flex-1 text-center md:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest" style={{
                   backgroundColor: 'var(--surface-overlay)',
                   borderColor: 'var(--border-default)',
@@ -87,10 +84,11 @@ export default async function Page() {
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-brand-primary)' }}></span>
                   Available for opportunities
                 </div>
-                <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.1]" style={{ color: 'var(--text-primary)' }}>
-                  Hi, I'm <span style={{ color: 'var(--color-brand-accent)' }}>{profile.name.replace(' Khan', '')}</span> 👋
+                <h1 className="font-[family-name:var(--font-display)] font-extrabold tracking-tight leading-tight" style={{ color: 'var(--text-primary)' }}>
+                  <span className="text-2xl sm:text-3xl md:text-4xl block">Hi, I'm 👋</span>
+                  <span className="text-2xl sm:text-4xl md:text-5xl whitespace-nowrap block" style={{ color: 'var(--color-brand-accent)' }}>{profile.name.replace(' Khan', '')}</span>
                 </h1>
-                <p className="text-base sm:text-lg w-full leading-relaxed font-light" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-base sm:text-lg w-full leading-relaxed font-light text-justify md:text-left" style={{ color: 'var(--text-secondary)' }}>
                   {profile.description}
                 </p>
               </div>
