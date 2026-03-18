@@ -1,3 +1,5 @@
+import { DATA } from "@/data/resume";
+
 /**
  * WHY: Helps search engines understand page content
  * IMPACT: Rich snippets in search results
@@ -49,6 +51,8 @@ export function BlogPostingStructuredData({
   dateModified,
   author,
   authorUrl,
+  publisherName,
+  publisherImage,
   keywords,
   readingTime,
 }: {
@@ -60,6 +64,8 @@ export function BlogPostingStructuredData({
   dateModified?: string;
   author: string;
   authorUrl?: string;
+  publisherName?: string;
+  publisherImage?: string;
   keywords?: string[];
   readingTime?: number;
 }) {
@@ -69,18 +75,19 @@ export function BlogPostingStructuredData({
     headline: title,
     description,
     url,
-    image: image || "https://muzammilkhan.vercel.app/og-image.png",
+    image: image || `${DATA.url}/opengraph-image`,
     datePublished,
     dateModified: dateModified || datePublished,
     author: {
       "@type": "Person",
       name: author,
-      url: authorUrl || "https://muzammilkhan.vercel.app",
+      url: authorUrl || DATA.url,
     },
     publisher: {
       "@type": "Person",
-      name: "Muhammad Muzammil",
-      url: "https://muzammilkhan.vercel.app",
+      name: publisherName || DATA.name,
+      url: DATA.url,
+      image: publisherImage,
     },
     keywords: keywords?.join(", "),
     timeRequired: readingTime ? `PT${readingTime}M` : undefined,

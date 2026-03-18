@@ -22,6 +22,7 @@ export const metadata: Metadata = {
     description: "Deep dives into modern software architecture, technical leadership, and full-stack development.",
     type: "website",
     url: blogUrl,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Engineering Blog" }],
   },
   twitter: {
     card: "summary_large_image",
