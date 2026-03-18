@@ -88,7 +88,7 @@ export function ProjectCardPublic({
                 alt={title}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                className="object-contain transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => {
                   console.error("Image failed to load:", image, e);
                   setImageError(true);
@@ -141,7 +141,7 @@ export function ProjectCardPublic({
       {/* Tags Section */}
       <CardContent className="mt-auto flex flex-col px-3 sm:px-4 pb-2 bg-card">
         {tags && tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.25">
+          <div className="flex flex-wrap gap-1.5">
             {tags.map((tag, index) => (
               <Badge
                 key={tag}
