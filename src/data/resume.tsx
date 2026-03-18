@@ -4,7 +4,7 @@ import { HomeIcon, NotebookIcon } from "lucide-react";
 export const DATA = {
   name: "Muhammad Muzammil Khan",
   initials: "MMK",
-  url: "https://muhammad-muzammil-khan.vercel.app",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://muhammad-muzammil-khan.vercel.app",
   location: "Karachi, Pakistan",
   locationLink: "https://www.google.com/maps/place/Karachi",
   skills: [

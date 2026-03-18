@@ -99,6 +99,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
         modifiedTime: blog.updatedAt,
         authors: [blog.author],
         tags: blog.tags,
+        images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: blog.title }],
       },
       twitter: {
         card: "summary_large_image",
@@ -209,6 +210,8 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
         dateModified={blog.updatedAt}
         author={blog.author}
         authorUrl={baseUrl}
+        publisherName={(blog as any).authorProfile?.name}
+        publisherImage={(blog as any).authorProfile?.avatarUrl}
         keywords={[...(blog.tags || []), ...(blog.languages || []), ...(blog.frameworks || [])]}
         readingTime={blog.readingTime}
       />

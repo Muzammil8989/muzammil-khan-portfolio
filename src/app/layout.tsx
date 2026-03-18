@@ -90,6 +90,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: `${profile.name} Portfolio`,
       locale: "en_US",
       type: "website",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${profile.name} - Full Stack Web Developer` }],
     },
     twitter: {
       card: "summary_large_image",
@@ -121,11 +122,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 // Root Layout
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const profile = await getProfileData();
+
   return (
     <html lang="en" suppressHydrationWarning className="lenis lenis-smooth">
       <head>
@@ -143,18 +146,18 @@ export default function RootLayout({
       >
         {/* SEO: Organization & WebSite Structured Data */}
         <OrganizationStructuredData
-          name="Muhammad Muzammil"
+          name={profile.name}
           url={DATA.url}
-          description="Full Stack Developer specializing in modern web technologies and software architecture"
+          description={profile.description || "Full Stack Developer specializing in modern web technologies and software architecture"}
           sameAs={[
             DATA.contact.social.GitHub.url,
             DATA.contact.social.LinkedIn.url,
           ]}
         />
         <WebSiteStructuredData
-          name="Muhammad Muzammil - Full Stack Developer"
+          name={`${profile.name} - Full Stack Developer`}
           url={DATA.url}
-          description="Portfolio and blog of Muhammad Muzammil, showcasing software engineering projects and technical insights"
+          description={profile.description || `Portfolio and blog of ${profile.name}, showcasing software engineering projects and technical insights`}
         />
 
         <Providers>{children}</Providers>
