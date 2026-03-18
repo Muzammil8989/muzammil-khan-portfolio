@@ -32,10 +32,10 @@ export default async function Page() {
 
   const aboutMessage =
     (aboutData as any)?.message ||
-    "I hold a BS in Computer Science from Bahria University and work as a Full Stack Developer at Pakistan Agriculture Research (PAR) with DPSolutions (USA). I turn Figma designs and ideas into fast, reliable web apps. Focused on building scalable web apps with great user experience and strong backend performance. I specialize in creating seamless automations that optimize workflows and enhance system efficiency.";
+    "I hold a BS in Computer Science from Bahria University and work as a Full Stack Developer at Pakistan Agriculture Research (PAR) with DPSolutions (USA). I build scalable solutions from wireframes to production, focusing on clean code and smooth user experiences, while also automating repetitive tasks to improve efficiency.";
 
   const highlightList = [
-    "BS in Computer Science", "Bahria University", "Full Stack Developer", "Pakistan Agriculture Research", "DPSolutions", "scalable web apps", "seamless automations", "optimize workflows", "system efficiency", "great user experience", "strong backend performance"
+    "BS in Computer Science", "Bahria University", "Full Stack Developer", "Pakistan Agriculture Research", "DPSolutions", "scalable solutions", "clean code", "smooth user experiences", "automating repetitive tasks", "improve efficiency"
   ];
 
   const profile = profiles[0];
