@@ -19,6 +19,7 @@ interface Project {
 
 export function ProjectCarousel({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState(0);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const n = projects.length;
 
   const prev = useCallback(() => setActive(a => (a - 1 + n) % n), [n]);
@@ -64,23 +65,38 @@ export function ProjectCarousel({ projects }: { projects: Project[] }) {
                       ? 'border-[rgba(255,185,2,0.35)] shadow-[0_8px_32px_rgba(255,185,2,0.08)]'
                       : 'border-slate-200 dark:border-white/10'
                   }`}
+                  onMouseEnter={() => setHoveredCard(i)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  onTouchStart={() => setHoveredCard(i)}
+                  onTouchEnd={() => setHoveredCard(null)}
                 >
                   {/* Image */}
-                  <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  <div className="relative aspect-video overflow-hidden bg-slate-50 dark:bg-slate-900">
                     {project.image ? (
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes="(max-width: 768px) 82vw, 380px"
-                      />
+                      <>
+                        {/* object-cover: visible by default, fades out on hover/touch */}
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          className={`object-cover transition-opacity duration-500 ease-in-out ${hoveredCard === i ? 'opacity-0' : 'opacity-100'}`}
+                          sizes="(max-width: 768px) 82vw, 380px"
+                        />
+                        {/* object-contain: hidden by default, fades in on hover/touch */}
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          className={`object-contain transition-opacity duration-500 ease-in-out ${hoveredCard === i ? 'opacity-100' : 'opacity-0'}`}
+                          sizes="(max-width: 768px) 82vw, 380px"
+                        />
+                      </>
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-blue-900/30 dark:to-indigo-900/30">
                         <span className="text-3xl opacity-30">🚀</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                    <div className={`absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent transition-opacity duration-300 ${hoveredCard === i ? 'opacity-100' : 'opacity-0'}`} />
                     {project.dates && (
                       <div className="absolute top-3 right-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-700">
                         {project.dates}
@@ -99,7 +115,7 @@ export function ProjectCarousel({ projects }: { projects: Project[] }) {
 
                     {/* Tech tags */}
                     <div className="flex flex-wrap gap-1.5">
-                      {project.technologies?.slice(0, 4).map(tech => (
+                      {project.technologies?.map(tech => (
                         <span
                           key={tech}
                           className="px-2 py-0.5 text-xs font-medium bg-indigo-50 dark:bg-blue-900/30 text-indigo-700 dark:text-blue-300 rounded border border-indigo-100 dark:border-blue-800/60"
