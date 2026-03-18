@@ -166,8 +166,11 @@ const BlurText: React.FC<BlurTextProps> = React.memo(({
       className={`blur-text ${className}`}
       style={{
         textAlign: "justify",
-        textJustify: "inter-word",
-        hyphens: "auto",
+        textAlignLast: "left",
+        textJustify: "inter-character",
+        hyphens: "none",
+        overflowWrap: "normal",
+        wordBreak: "normal",
       }}
     >
       {elements.map((segment, index) => {

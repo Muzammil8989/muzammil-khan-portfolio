@@ -88,7 +88,7 @@ export default async function Page() {
                   <span className="text-2xl sm:text-3xl md:text-4xl block">Hi, I'm 👋</span>
                   <span className="text-2xl sm:text-4xl md:text-5xl whitespace-nowrap block" style={{ color: 'var(--color-brand-accent)' }}>{profile.name.replace(' Khan', '')}</span>
                 </h1>
-                <p className="text-base sm:text-lg w-full leading-relaxed font-light text-justify md:text-left" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-base sm:text-lg w-full leading-relaxed font-light" style={{ color: 'var(--text-secondary)', textAlign: 'justify', textAlignLast: 'left', textJustify: 'inter-character', hyphens: 'none', wordBreak: 'normal', overflowWrap: 'normal' }}>
                   {profile.description}
                 </p>
               </div>
@@ -107,7 +107,7 @@ export default async function Page() {
             <BlurText
               text={aboutMessage}
               delay={200}
-              className="text-slate-600 dark:text-slate-200 leading-relaxed text-lg font-light"
+              className="text-slate-600 dark:text-slate-200 leading-relaxed text-base font-light"
               emphasizeKeywords={highlightList}
               emphasizeClassName="font-semibold text-[#FFB902] decoration-[#FFB902] underline decoration-2 underline-offset-4"
             />
