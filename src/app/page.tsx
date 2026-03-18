@@ -35,10 +35,10 @@ export default async function Page() {
 
   const aboutMessage =
     (aboutData as any)?.message ||
-    "I am a dedicated Full Stack Engineer with a BS in Computer Science from Bahria University. Currently shaping the digital landscape at Pakistan Agriculture Research.";
+    "I hold a BS in Computer Science from Bahria University and work as a Full Stack Developer at Pakistan Agriculture Research (PAR) with DPSolutions (USA). I turn Figma designs and ideas into fast, reliable web apps. Focused on building scalable web apps with great user experience and strong backend performance. I specialize in creating seamless automations that optimize workflows and enhance system efficiency.";
 
   const highlightList = [
-    "BS in Computer Science", "Bahria University", "Full Stack Engineer", "Pakistan Agriculture Research", "high-performance applications", "refined user interfaces"
+    "BS in Computer Science", "Bahria University", "Full Stack Developer", "Pakistan Agriculture Research", "DPSolutions", "scalable web apps", "seamless automations", "optimize workflows", "system efficiency", "great user experience", "strong backend performance"
   ];
 
   const profile = profiles[0];
@@ -91,7 +91,7 @@ export default async function Page() {
                   Hi, I'm <span style={{ color: 'var(--color-brand-accent)' }}>{profile.name.replace(' Khan', '')}</span> 👋
                 </h1>
                 <p className="text-base sm:text-lg w-full leading-relaxed font-light" style={{ color: 'var(--text-secondary)' }}>
-                  Full Stack Web Developer focused on building <span className="font-medium" style={{ color: 'var(--text-primary)' }}>scalable web apps</span> with great user experience and strong backend performance.
+                  {profile.description}
                 </p>
               </div>
             </React.Fragment>
