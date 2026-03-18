@@ -71,7 +71,7 @@ export function ProjectCarousel({ projects }: { projects: Project[] }) {
                   onTouchEnd={() => setHoveredCard(null)}
                 >
                   {/* Image */}
-                  <div className="relative aspect-video overflow-hidden bg-slate-50 dark:bg-slate-900">
+                  <div className="relative aspect-video overflow-hidden bg-white dark:bg-[#0a0f32]">
                     {project.image ? (
                       <>
                         {/* object-cover: visible by default, fades out on hover/touch */}
