@@ -15,19 +15,29 @@ import Footer from "@/components/layout/footer";
 import { ContactSection } from "@/components/features/contact/contact-section";
 import { SkillBadges } from "@/components/features/skills/SkillBadges";
 import { ProjectCarousel } from "@/components/features/projects/ProjectCarousel";
+import { AnimatedHeading } from "@/components/ui/animated-heading";
+import { unstable_cache } from "next/cache";
+
+// Cache each DB call for 60s — repeat visitors get instant responses, no DB hit.
+// First visitor per minute pays the DB cost; everyone else gets cached data.
+const getProfiles    = unstable_cache(() => ProfileService.getAll(),       ["profiles"],   { revalidate: 60 });
+const getAbout       = unstable_cache(() => AboutService.get(),            ["about"],      { revalidate: 60 });
+const getWork        = unstable_cache(() => WorkService.getAll(),          ["work"],       { revalidate: 60 });
+const getEducation   = unstable_cache(() => EducationService.getAll(),     ["education"],  { revalidate: 60 });
+const getProjects    = unstable_cache(() => ProjectService.getAll(),       ["projects"],   { revalidate: 60 });
+const getSkills      = unstable_cache(() => SkillService.getSkillsList(),  ["skills"],     { revalidate: 60 });
 
 export const dynamic = "force-dynamic";
 
 
 export default async function Page() {
-  // Direct server-side data fetching
   const [profiles, aboutData, workData, educationData, projectsData, skillsData] = await Promise.all([
-    ProfileService.getAll(),
-    AboutService.get(),
-    WorkService.getAll(),
-    EducationService.getAll(),
-    ProjectService.getAll(),
-    SkillService.getSkillsList()
+    getProfiles(),
+    getAbout(),
+    getWork(),
+    getEducation(),
+    getProjects(),
+    getSkills(),
   ]);
 
   const aboutMessage =
@@ -66,7 +76,7 @@ export default async function Page() {
         <header className="flex flex-col md:flex-row items-center gap-8 md:gap-10 w-full">
           {profiles.map((profile: any) => (
             <React.Fragment key={profile._id}>
-              <div className="relative shrink-0 flex justify-center">
+              <div className="hero-avatar-animate relative shrink-0 flex justify-center">
                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-blue-200 dark:from-blue-600 dark:to-indigo-700 rounded-full blur-3xl opacity-40 dark:opacity-40"></div>
                 <Avatar className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-44 md:h-44 border-4 border-white dark:border-white/20 object-cover shadow-2xl">
                   <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
@@ -76,7 +86,7 @@ export default async function Page() {
                 </Avatar>
               </div>
               <div className="space-y-4 w-full flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest" style={{
+                <div className="hero-badge-animate inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest" style={{
                   backgroundColor: 'var(--surface-overlay)',
                   borderColor: 'var(--border-default)',
                   color: 'var(--color-brand-primary)'
@@ -84,11 +94,11 @@ export default async function Page() {
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-brand-primary)' }}></span>
                   Available for opportunities
                 </div>
-                <h1 className="font-[family-name:var(--font-display)] font-extrabold tracking-tight leading-tight" style={{ color: 'var(--text-primary)' }}>
+                <h1 className="hero-name-animate font-[family-name:var(--font-display)] font-extrabold tracking-tight leading-tight" style={{ color: 'var(--text-primary)' }}>
                   <span className="text-2xl sm:text-3xl md:text-4xl block">Hi, I'm 👋</span>
                   <span className="text-2xl sm:text-4xl md:text-5xl whitespace-nowrap block" style={{ color: 'var(--color-brand-accent)' }}>{profile.name.replace(' Khan', '')}</span>
                 </h1>
-                <p className="text-base sm:text-lg w-full leading-relaxed font-light" style={{ color: 'var(--text-secondary)', textAlign: 'justify', textAlignLast: 'left', textJustify: 'inter-character', hyphens: 'none', wordBreak: 'normal', overflowWrap: 'normal' }}>
+                <p className="hero-desc-animate text-base sm:text-lg w-full leading-relaxed font-light" style={{ color: 'var(--text-secondary)', textAlign: 'justify', textAlignLast: 'left', textJustify: 'inter-character', hyphens: 'none', wordBreak: 'normal', overflowWrap: 'normal' }}>
                   {profile.description}
                 </p>
               </div>
@@ -99,9 +109,9 @@ export default async function Page() {
         {/* About Section */}
         <section id="about" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+            <AnimatedHeading className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               About Me
-            </h2>
+            </AnimatedHeading>
           </div>
           <div className="md:col-span-2 space-y-6">
             <BlurText
@@ -117,9 +127,9 @@ export default async function Page() {
         {/* Work Experience Section */}
         <section id="experience" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+            <AnimatedHeading className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               Work Experience
-            </h2>
+            </AnimatedHeading>
           </div>
           <div className="md:col-span-2 space-y-4 sm:space-y-6">
             {workData.map((work: any, index: number) => (
@@ -143,9 +153,9 @@ export default async function Page() {
         {/* Education Section */}
         <section id="education" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+            <AnimatedHeading className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               Education
-            </h2>
+            </AnimatedHeading>
           </div>
           <div className="md:col-span-2 space-y-4">
             {educationData.map((edu: any) => (
@@ -165,9 +175,9 @@ export default async function Page() {
         {/* Skills Section */}
         <section id="skills" className="grid md:grid-cols-3 gap-12 items-start scroll-mt-20">
           <div className="md:col-span-1">
-            <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
+            <AnimatedHeading className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white sticky top-10">
               Expertise
-            </h2>
+            </AnimatedHeading>
           </div>
           <div className="md:col-span-2">
             <SkillBadges skills={skillsData} />
@@ -178,9 +188,9 @@ export default async function Page() {
       {/* Projects Section - Carousel */}
       <section className="py-16 scroll-mt-20" id="projects">
         <div className="w-full max-w-5xl mx-auto px-6 mb-8">
-          <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">
+          <AnimatedHeading className="font-[family-name:var(--font-display)] text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">
             Featured Projects
-          </h2>
+          </AnimatedHeading>
           <p className="text-base text-slate-600 dark:text-slate-400 font-light">
             Click the side cards or use arrows to navigate
           </p>

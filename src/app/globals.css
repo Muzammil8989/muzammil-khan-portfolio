@@ -322,4 +322,107 @@
     border-radius: 4px;
     transition: background-color 0.3s ease;
   }
+
+  /* ─── Performance-safe CSS animations ─────────────────────────────────────
+     All use only opacity + transform (GPU-accelerated, no layout thrash).
+     Reduced motion users get instant visibility with no animation.
+  ─────────────────────────────────────────────────────────────────────────── */
+
+  /* Hero keyframes */
+  @keyframes heroAvatarIn {
+    from { opacity: 0; transform: scale(0.82); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes heroSlideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scroll-triggered keyframes */
+  @keyframes badgePopIn {
+    from { opacity: 0; transform: scale(0.72) translateY(6px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes fadeUpIn {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Hero entrance classes — play on page load, before hydration */
+  .hero-avatar-animate {
+    animation: heroAvatarIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-badge-animate {
+    animation: heroSlideDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+  .hero-name-animate {
+    animation: heroFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  }
+  .hero-desc-animate {
+    animation: heroFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.38s both;
+  }
+
+  /* Section heading — slide in from left on scroll */
+  .section-heading-animate {
+    opacity: 0;
+    transform: translateX(-18px);
+    transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  }
+  .section-heading-animate.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Skills badges — staggered pop-in on scroll */
+  .badges-container {
+    /* container — no visual change, just the trigger target */
+  }
+  .badge-animate {
+    opacity: 0;
+    transform: scale(0.72) translateY(6px);
+  }
+  .badges-container.visible .badge-animate {
+    animation: badgePopIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--badge-i, 0) * 0.045s);
+  }
+
+  /* Contact cards — fade up stagger on scroll */
+  .contact-cards-container .contact-card-animate {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .contact-cards-container.visible .contact-card-animate {
+    animation: fadeUpIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Reduced motion — skip all animations, show elements immediately */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-avatar-animate,
+    .hero-badge-animate,
+    .hero-name-animate,
+    .hero-desc-animate {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .section-heading-animate {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .badge-animate {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .contact-card-animate {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+  }
 }
