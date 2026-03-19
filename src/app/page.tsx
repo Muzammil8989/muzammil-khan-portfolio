@@ -126,7 +126,7 @@ export default async function Page() {
           <div className="md:col-span-2 space-y-6">
             <BlurText
               text={aboutMessage}
-              delay={200}
+              delay={40}
               className="text-slate-600 dark:text-slate-200 leading-relaxed text-base font-light"
               emphasizeKeywords={highlightList}
               emphasizeClassName="font-semibold text-[#FFB902] decoration-[#FFB902] underline decoration-2 underline-offset-4"
