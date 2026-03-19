@@ -16,19 +16,28 @@ import { ContactSection } from "@/components/features/contact/contact-section";
 import { SkillBadges } from "@/components/features/skills/SkillBadges";
 import { ProjectCarousel } from "@/components/features/projects/ProjectCarousel";
 import { AnimatedHeading } from "@/components/ui/animated-heading";
+import { unstable_cache } from "next/cache";
+
+// Cache each DB call for 60s — repeat visitors get instant responses, no DB hit.
+// First visitor per minute pays the DB cost; everyone else gets cached data.
+const getProfiles    = unstable_cache(() => ProfileService.getAll(),       ["profiles"],   { revalidate: 60 });
+const getAbout       = unstable_cache(() => AboutService.get(),            ["about"],      { revalidate: 60 });
+const getWork        = unstable_cache(() => WorkService.getAll(),          ["work"],       { revalidate: 60 });
+const getEducation   = unstable_cache(() => EducationService.getAll(),     ["education"],  { revalidate: 60 });
+const getProjects    = unstable_cache(() => ProjectService.getAll(),       ["projects"],   { revalidate: 60 });
+const getSkills      = unstable_cache(() => SkillService.getSkillsList(),  ["skills"],     { revalidate: 60 });
 
 export const dynamic = "force-dynamic";
 
 
 export default async function Page() {
-  // Direct server-side data fetching
   const [profiles, aboutData, workData, educationData, projectsData, skillsData] = await Promise.all([
-    ProfileService.getAll(),
-    AboutService.get(),
-    WorkService.getAll(),
-    EducationService.getAll(),
-    ProjectService.getAll(),
-    SkillService.getSkillsList()
+    getProfiles(),
+    getAbout(),
+    getWork(),
+    getEducation(),
+    getProjects(),
+    getSkills(),
   ]);
 
   const aboutMessage =
