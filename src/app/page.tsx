@@ -27,7 +27,7 @@ const getEducation   = unstable_cache(() => EducationService.getAll(),     ["edu
 const getProjects    = unstable_cache(() => ProjectService.getAll(),       ["projects"],   { revalidate: 60 });
 const getSkills      = unstable_cache(() => SkillService.getSkillsList(),  ["skills"],     { revalidate: 60 });
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 
 export default async function Page() {
