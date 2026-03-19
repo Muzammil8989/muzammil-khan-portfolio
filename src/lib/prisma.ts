@@ -11,7 +11,8 @@ export const prisma =
         : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// Cache in all environments — critical for serverless (Vercel) production
+globalForPrisma.prisma = globalForPrisma.prisma ?? prisma;
 
 /**
  * Maps Prisma's `id` field back to `_id` for backward compatibility

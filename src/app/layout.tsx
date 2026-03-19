@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 import { Providers } from "./providers/providers";
@@ -25,8 +26,9 @@ const fontDisplay = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-// Fetch profile data directly from DB (no HTTP round-trip)
-async function getProfileData() {
+// React.cache() deduplicates this call within a single render pass —
+// generateMetadata() and RootLayout() both call it but only ONE DB query runs.
+const getProfileData = cache(async () => {
   try {
     const profiles = await ProfileService.getAll();
     const profile = profiles[0] as any;
@@ -38,7 +40,7 @@ async function getProfileData() {
     console.error("Error fetching profile:", error);
     return { name: DATA.name };
   }
-}
+});
 
 // Dynamic Metadata (title + description)
 export async function generateMetadata(): Promise<Metadata> {

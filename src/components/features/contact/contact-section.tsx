@@ -3,8 +3,12 @@
 import { ContactForm } from "./contact-form";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { DATA } from "@/data/resume";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { AnimatedHeading } from "@/components/ui/animated-heading";
 
 export function ContactSection() {
+  const cardsRef = useScrollAnimation<HTMLDivElement>();
+
   return (
     <section id="contact" className="py-20 scroll-mt-20">
       <div className="w-full max-w-7xl mx-auto px-6">
@@ -13,24 +17,24 @@ export function ContactSection() {
           <div className="md:col-span-1 space-y-6">
             <div className="sticky top-10 space-y-6">
               <div>
-                <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+                <AnimatedHeading className="font-[family-name:var(--font-display)] text-3xl font-bold text-slate-900 dark:text-white">
                   Let's Connect
-                </h2>
+                </AnimatedHeading>
                 <p className="mt-3 font-light text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div ref={cardsRef} className="contact-cards-container space-y-3">
                 {[
                   { icon: Mail, label: "Email", content: <a href={`mailto:${DATA.contact.email}`} className="text-sm truncate block transition-colors duration-200 hover:text-[#FFB902]" style={{ color: "var(--text-primary)" }}>{DATA.contact.email}</a> },
                   { icon: Phone, label: "Phone", content: <a href={`tel:${DATA.contact.tel}`} className="text-sm transition-colors duration-200 hover:text-[#FFB902]" style={{ color: "var(--text-primary)" }}>{DATA.contact.tel}</a> },
                   { icon: MapPin, label: "Location", content: <p className="text-sm" style={{ color: "var(--text-primary)" }}>Remote Worldwide</p> },
-                ].map(({ icon: Icon, label, content }) => (
+                ].map(({ icon: Icon, label, content }, i) => (
                   <div
                     key={label}
-                    className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group"
-                    style={{ border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.02)" }}
+                    className="contact-card-animate flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group"
+                    style={{ animationDelay: `${i * 0.1}s`, border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.02)" }}
                     onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(255,185,2,0.3)")}
                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
                   >
