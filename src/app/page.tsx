@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import { ProfileService } from "@/services/profile-service";
 import { AboutService } from "@/services/about-service";
 import { WorkService } from "@/services/work-service";
@@ -78,12 +78,22 @@ export default async function Page() {
             <React.Fragment key={profile._id}>
               <div className="hero-avatar-animate relative shrink-0 flex justify-center">
                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-blue-200 dark:from-blue-600 dark:to-indigo-700 rounded-full blur-3xl opacity-40 dark:opacity-40"></div>
-                <Avatar className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-44 md:h-44 border-4 border-white dark:border-white/20 object-cover shadow-2xl">
-                  <AvatarImage src={profile.avatarUrl} alt={profile.name} className="object-cover" />
-                  <AvatarFallback className="text-4xl font-bold bg-indigo-50 dark:bg-blue-900 text-indigo-600 dark:text-blue-300">
-                    {profile.initials}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white dark:border-white/20 shadow-2xl">
+                  {profile.avatarUrl ? (
+                    <Image
+                      src={profile.avatarUrl}
+                      alt={profile.name}
+                      fill
+                      priority
+                      className="object-cover"
+                      sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 176px"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-4xl font-bold bg-indigo-50 dark:bg-blue-900 text-indigo-600 dark:text-blue-300">
+                      {profile.initials}
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="space-y-4 w-full flex-1 text-center md:text-left">
                 <div className="hero-badge-animate inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest" style={{
