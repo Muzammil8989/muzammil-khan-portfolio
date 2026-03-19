@@ -134,8 +134,6 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="lenis lenis-smooth">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
       </head>
       <body
@@ -176,7 +174,7 @@ export default async function RootLayout({
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', { transport_type: 'beacon' });
               `}
             </Script>
           </>
